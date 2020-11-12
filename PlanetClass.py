@@ -36,4 +36,4 @@ class Planet:
 
     @velocity.setter
     def velocity(self, updated_velocity):
-        return self._velocity = updated_velocity
+        self._velocity = updated_velocity
