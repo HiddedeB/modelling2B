@@ -2,6 +2,7 @@ from numba import jit
 import numpy as np
 from multiprocessing import Process as P
 from itertools import combinations
+from PlanetClass import Planet
 
 objs = np.array([])
 

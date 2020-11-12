@@ -1,0 +1,42 @@
+{
+	"mercury":{
+		"mass":0.33e24, //kg
+		"radius":2.44e6, //m
+		"smaxis":57.91e6, //m
+		"period":0.241, //years
+		"orbital inclination":7, //degrees
+		"eccentricity":0.2056,
+		"loanode":48.331, //degrees
+		"argperiapsis":29.124 //degrees
+	},
+	"venus":{
+		"mass":4.8675e24, //kg
+		"radius":6.05e6, //m
+		"smaxis":108.2e6, //m
+		"period":0.615198, //years
+		"orbital inclination":3.394, //degrees
+		"eccentricity":0.006772,
+		"loanode":76.68, //degrees
+		"argperiapsis":54.884 //degrees
+	},
+	"earth":{
+		"mass":5.972e24, //kg
+		"radius":6.371e6, //m
+		"smaxis":148.598e6, //m
+		"period":1, //years
+		"orbital inclination":0, //degrees
+		"eccentricity":0.01671,
+		"loanode":-11.26, //degrees
+		"argperiapsis":114.208 //degrees
+	},
+	"mars":{
+		"mass":0.33e24, //kg
+		"radius":2.44e6, //m
+		"smaxis":57.91e6, //m
+		"period":0.241, //years
+		"orbital inclination":7, //degrees
+		"eccentricity":0.2056,
+		"loanode":48.331, //degrees
+		"argperiapsis":29.124 //degrees
+	},
+}

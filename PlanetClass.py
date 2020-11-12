@@ -16,6 +16,7 @@ class Planet:
         :type mass: float
         :param float radius: radius of the planet
         :type radius: float
+        TODO: planeten misschien een nullable naam geven, baanargumenten zoals eccentriciteit enzo ook als variabelen
         '''
         self._pos = initial_position
         self.mass = mass
