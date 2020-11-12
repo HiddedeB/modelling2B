@@ -2,41 +2,81 @@
 	"mercury":{
 		"mass":0.33e24, //kg
 		"radius":2.44e6, //m
-		"smaxis":57.91e6, //m
+		"smaxis":57.91e9, //m
 		"period":0.241, //years
 		"orbital inclination":7, //degrees
 		"eccentricity":0.2056,
 		"loanode":48.331, //degrees
-		"argperiapsis":29.124 //degrees
+		"argperiapsis":29.124
 	},
 	"venus":{
 		"mass":4.8675e24, //kg
 		"radius":6.05e6, //m
-		"smaxis":108.2e6, //m
+		"smaxis":108.2e9, //m
 		"period":0.615198, //years
 		"orbital inclination":3.394, //degrees
 		"eccentricity":0.006772,
 		"loanode":76.68, //degrees
-		"argperiapsis":54.884 //degrees
+		"argperiapsis":54.884
 	},
 	"earth":{
 		"mass":5.972e24, //kg
 		"radius":6.371e6, //m
-		"smaxis":148.598e6, //m
+		"smaxis":148.598e9, //m
 		"period":1, //years
 		"orbital inclination":0, //degrees
 		"eccentricity":0.01671,
 		"loanode":-11.26, //degrees
-		"argperiapsis":114.208 //degrees
+		"argperiapsis":114.208
 	},
 	"mars":{
-		"mass":0.33e24, //kg
-		"radius":2.44e6, //m
-		"smaxis":57.91e6, //m
-		"period":0.241, //years
-		"orbital inclination":7, //degrees
-		"eccentricity":0.2056,
-		"loanode":48.331, //degrees
-		"argperiapsis":29.124 //degrees
+		"mass":0.642e24, //kg
+		"radius":3.389e6, //m
+		"smaxis":227.939e9, //m
+		"period":1.88, //years
+		"orbital inclination":1.85, //degrees
+		"eccentricity":0.0934,
+		"loanode":49.558, //degrees
+		"argperiapsis":286.502
 	},
+	"jupiter":{
+		"mass":1.8982e27, //kg
+		"radius":69.911e6, //m
+		"smaxis":778.57e9, //m
+		"period":11.862, //years
+		"orbital inclination":1.303, //degrees
+		"eccentricity":0.0489,
+		"loanode":100.464, //degrees
+		"argperiapsis":273.867
+	},
+	"saturn":{
+		"mass":5.6834e26, //kg
+		"radius":58.232e6, //m
+		"smaxis":1433.53e9, //m
+		"period":29.4571, //years
+		"orbital inclination":2.485, //degrees
+		"eccentricity":0.0565,
+		"loanode":113.665, //degrees
+		"argperiapsis":339.392
+	},
+	"uranus":{
+		"mass":8.681e25, //kg
+		"radius":25.362e6, //m
+		"smaxis":2875.04e9, //m
+		"period":84.0205, //years
+		"orbital inclination":0.773, //degrees
+		"eccentricity":0.046381,
+		"loanode":74.006, //degrees
+		"argperiapsis":96.999
+	},
+	"neptune":{
+		"mass":1.024e26, //kg
+		"radius":24.622e6, //m
+		"smaxis":4444.5e9, //m
+		"period":164.8, //years
+		"orbital inclination":1.768, //degrees
+		"eccentricity":0.008678,
+		"loanode":131.784, //degrees
+		"argperiapsis":276.336
+	}
 }
