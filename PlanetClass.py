@@ -2,6 +2,9 @@ import scipy as sc
 import numpy as np
 from scipy.integrate import solve_ivp
 import astropy.constants as const
+import matplotlib.pyplot as plt
+from numba import njit
+import copy
 
 class planet:
     '''Class to hold all variables related to a certain planet'''
@@ -56,35 +59,59 @@ if __name__ == "__main__":
                    initial_velocity=initial_velocity_earth)
     sun = planet(mass=const.M_sun.value, initial_position=initial_vector_sun, radius=const.R_sun.value,
                 initial_velocity=initial_velocity_sun)
-
-    y0 = np.concatenate([earth.pos, sun.pos])
-    time_frame = (0, 10**8)
-    step = 500
-    method_used = 'RK45'
+    y_test = earth.pos
+    for i in range(3):
+        y_test = np.append((i+2)*y_test, earth.pos)
+    y0 = np.concatenate([y_test, sun.pos])
+    time_frame = (0, 4*10**9)
+    step = 1000
+    method_used = 'RK23'
     relative_tolerance = 100
     absolute_tolerance = 10**4
+    mass = [earth.mass for i in range(4)]
 
-    def equation_of_speed(t,y):
-        # Calculation of V via centrifugal and gravitation force (Newtonian)
-        v_earth = np.sqrt(sun.mass*const.G.value/np.linalg.norm(np.array([y[0],y[1]])))
+    x = copy.deepcopy(const.au.value)
+    position = np.array([x, 0],dtype=float)
+    y_test = position
+    for i in range(3):
+        y_test = np.append(y_test, (i+2)*position)
+    mass_sun = 1.989 * 10 ** (30)  # kg, massa zon
+    mass_earth = 5.972 * 10 ** (26)  # kg, massa aarde
+    G = copy.deepcopy(const.G.value)
+    mass = np.array([mass_earth for i in range(4)])
 
-        # Determine theta and change
-        theta = np.arctan2(y[1],y[0])
-        dx_earth = -v_earth*np.sin(theta)
-        dy_earth = v_earth*np.cos(theta)
+    @njit
+    def equation_of_speed(t,y, mass, G, mass_sun):
+        equation = np.zeros(int(y.shape[0])-2)
+        v_sun = 0
+        for i in range(int(y.shape[0]/2-1)):
+            # Calculation of V via centrifugal and gravitation force (Newtonian)
+            v_i = np.sqrt(mass_sun*G/np.linalg.norm(np.array([y[2*i],y[2*i+1]])))
+            m_i = mass[i]
 
+            # Determine theta and change
+            theta = np.arctan2(y[2*i+1],y[2*i])
+            dx_i = -v_i*np.sin(theta)
+            dy_i = v_i*np.cos(theta)
+            equation[2*i] = dx_i
+            equation[2*i+1] = dy_i
+
+            v_sun += -v_i*m_i/mass_sun
         # Sun calculations
-        stheta = np.arctan2(y[3],y[2])
-        v_sun = -v_earth*earth.mass/sun.mass
+        stheta = np.arctan2(y[-2],y[-1])
         dx_sun = -v_sun*np.sin(stheta)
         dy_sun = v_sun*np.cos(stheta)
-        equation = [dx_earth, dy_earth, dx_sun, dy_sun]
-        return np.hstack((equation))
+        equation_sun = np.zeros(2)
+        equation_sun[0] = dx_sun
+        equation_sun[1] = dy_sun
+        return np.hstack((equation, equation_sun))
 
-    solution = solve_ivp(equation_of_speed, time_frame, y0, max_step=step, method=method_used, rtol=relative_tolerance,
-                         atol=absolute_tolerance)
+    solution = solve_ivp(equation_of_speed, t_span=time_frame, y0=y0, args=(mass, G, mass_sun), max_step=step,
+                         method=method_used, rtol=relative_tolerance, atol=absolute_tolerance)
+
     plt.figure()
     data = solution['y']
-    plt.plot(data[0], data[1], label='earth_orbit')
-    plt.plot(data[2], data[3], label='sun_orbit')
+    for i in range(4):
+        plt.plot(data[2*i], data[2*i+1])
+    plt.plot(data[-1], data[-2], label='sun_orbit')
     plt.show()
