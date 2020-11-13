@@ -5,4 +5,4 @@ class PlanetaryDataHandler:
 			self.rawdata = json.load(file)
 		for i in self.rawdata:
 			setattr(self,i,self.rawdata[i])
-		
+		kaas = 'gouds'
