@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from numba import njit
 import copy
 
+
 class planet:
     '''Class to hold all variables related to a certain planet'''
     def __init__(self,
@@ -78,40 +79,42 @@ if __name__ == "__main__":
     mass_sun = 1.989 * 10 ** (30)  # kg, massa zon
     mass_earth = 5.972 * 10 ** (26)  # kg, massa aarde
     G = copy.deepcopy(const.G.value)
-    mass = np.array([mass_earth for i in range(4)])
+    mass = np.append(mass_sun, np.array([mass_earth for i in range(4)]))
 
-    @njit
-    def equation_of_speed(t,y, mass, G, mass_sun):
-        equation = np.zeros(int(y.shape[0])-2)
-        v_sun = 0
-        for i in range(int(y.shape[0]/2-1)):
+    #@njit
+    def equation_of_speed(t,y, mass, G):
+        r = np.sqrt(y[::2]**2+y[1::2]**2)
+        print(r.shape)
+        v = np.zeros(r.shape[0])
+        dx, dy = np.zeros(r.shape[0]), np.zeros(r.shape[0])
+        d_total = np.zeros(2*r.shape[0])
+        theta = np.arctan2(y[1::2], y[::2])
+
+        for i in range(r.shape[0]-1):
             # Calculation of V via centrifugal and gravitation force (Newtonian)
-            v_i = np.sqrt(mass_sun*G/np.linalg.norm(np.array([y[2*i],y[2*i+1]])))
-            m_i = mass[i]
+            v = v + np.roll(mass,i)*G*(r-np.roll(r, i))/np.abs(r-np.roll(r,i))**3
 
-            # Determine theta and change
-            theta = np.arctan2(y[2*i+1],y[2*i])
-            dx_i = -v_i*np.sin(theta)
-            dy_i = v_i*np.cos(theta)
-            equation[2*i] = dx_i
-            equation[2*i+1] = dy_i
+        v = v/mass
+        v[:-1] = v[:-1] + 2 * mass[-1] * G/np.abs(r[:-1]-r[-1]) # Adding the extra substracted term back in and adding
+        # another.
+        dx[:-1] = -v*np.sin(theta)
+        dy[:-1] = v*np.cos(theta)
 
-            v_sun += -v_i*m_i/mass_sun
         # Sun calculations
-        stheta = np.arctan2(y[-2],y[-1])
-        dx_sun = -v_sun*np.sin(stheta)
-        dy_sun = v_sun*np.cos(stheta)
-        equation_sun = np.zeros(2)
-        equation_sun[0] = dx_sun
-        equation_sun[1] = dy_sun
-        return np.hstack((equation, equation_sun))
+        v[-1] = -np.sum(mass[:-1]*v[:-1])/mass[-1]
 
-    solution = solve_ivp(equation_of_speed, t_span=time_frame, y0=y0, args=(mass, G, mass_sun), max_step=step,
+        dx[-1] = -v[-1]*np.sin(theta[-1])
+        dy[-1] = v[-1]*np.cos(theta[-1])
+        d_total[::2] = dx
+        d_total[1::2] = dy
+        return d_total
+
+    solution = solve_ivp(equation_of_speed, t_span=time_frame, y0=y0, args=(mass, G), max_step=step,
                          method=method_used, rtol=relative_tolerance, atol=absolute_tolerance)
-
-    plt.figure()
-    data = solution['y']
-    for i in range(4):
-        plt.plot(data[2*i], data[2*i+1])
-    plt.plot(data[-1], data[-2], label='sun_orbit')
-    plt.show()
+    #
+    # plt.figure()
+    # data = solution['y']
+    # for i in range(4):
+    #     plt.plot(data[2*i], data[2*i+1])
+    # plt.plot(data[-1], data[-2], label='sun_orbit')
+    # plt.show()
