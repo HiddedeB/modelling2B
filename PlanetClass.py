@@ -10,7 +10,7 @@ import copy
 class planet:
     '''Class to hold all variables related to a certain planet'''
 
-    def __init__(self, initial_position, mass, radius, initial_velocity, loanode=0, period=0, name="", eccentricity=0, smaxis=0,
+    def __init__(self, initial_position=0, mass, radius, initial_velocity=0, loanode=0, period=0, name="", eccentricity=0, smaxis=0,
                  argperiapsis=0):
         '''NOTE:
         :param initial_position: initial position vector
