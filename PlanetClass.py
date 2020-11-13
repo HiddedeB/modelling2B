@@ -9,25 +9,42 @@ import copy
 
 class planet:
     '''Class to hold all variables related to a certain planet'''
-    def __init__(self,
-                 initial_position,
-                 mass,
-                 radius,
-                 initial_velocity):
+
+    def __init__(self, initial_position, mass, radius, loanode, initial_velocity, period, name, eccentricity, smaxis,
+                 argperiapsis):
         '''NOTE:
         :param initial_position: initial position vector
-        :type initial_position: ndarray
+        :type initial_position: ndarray TODO fix data type
+        :param initial_velocity: initial velocity array
+        :type initial_velocity: ndarray
         :param float mass: mass of the planet
         :type mass: float
         :param float radius: radius of the planet
         :type radius: float
-        TODO: planeten misschien een nullable naam geven, baanargumenten zoals eccentriciteit enzo ook als variabelen
+        :param name: name of the object
+        :type name: str
+        :param eccentricity: eccentricity of the orbit of the planet
+        :type eccentricity: float
+        :param smaxis: ?? TODO update this
+        :type smaxis: float
+        :param period: period of the orbit
+        :type period: float
+        :param loanode: ?? TODO update this
+        :type loanode: float
+        :param argperiapsis: ?? TODO update this
+        :type argperiapsis: float
         '''
-        self._history = []
+        self.history = []
         self.pos = initial_position
         self.mass = mass
         self.radius = radius
         self.velocity = initial_velocity
+        self.name = name
+        self.e = eccentricity
+        self.smaxis = smaxis
+        self.period = period
+        self.loanode = loanode
+        self.argperiapsis = argperiapsis
 
     @property
     def pos(self):
@@ -49,6 +66,67 @@ class planet:
     @property
     def history(self):
         return self._history
+
+    @history.setter
+    def history(self, var):
+        self._history = var
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, var):
+        self._name = var
+
+    @property
+    def e(self):
+        return self._e
+
+    @e.setter
+    def e(self, value):
+        self._e = value
+
+    @property
+    def smaxis(self):
+        return self._smaxis
+
+    @smaxis.setter
+    def smaxis(self, var):
+        self._smaxis = var
+
+    @property
+    def period(self):
+        return self._period
+
+    @period.setter
+    def period(self, value):
+        self._period = value
+
+    @property
+    def orbital_inclination(self):
+        return self._orbital_inclination
+
+    @orbital_inclination.setter
+    def orbital_inclination(self, value):
+        self._orbital_inclination = value
+
+    @property
+    def argperiapsis(self):
+        return self._argperiapsis
+
+    @argperiapsis.setter
+    def argperiapsis(self, var):
+        self._argperiapsis = var
+
+    @property
+    def loanode(self):
+        return self._loanode
+
+    @loanode.setter
+    def loanode(self, var):
+        self._loanode = var
+
 
 if __name__ == "__main__":
     # Example of 2D 2-body problem earth and sun
@@ -81,24 +159,23 @@ if __name__ == "__main__":
     G = copy.deepcopy(const.G.value)
     mass = np.append(mass_sun, np.array([mass_earth for i in range(4)]))
 
-    #@njit
+    @njit
     def equation_of_speed(t,y, mass, G):
         r = np.sqrt(y[::2]**2+y[1::2]**2)
-        print(r.shape)
         v = np.zeros(r.shape[0])
         dx, dy = np.zeros(r.shape[0]), np.zeros(r.shape[0])
         d_total = np.zeros(2*r.shape[0])
         theta = np.arctan2(y[1::2], y[::2])
 
-        for i in range(r.shape[0]-1):
-            # Calculation of V via centrifugal and gravitation force (Newtonian)
+        for i in range(1, r.shape[0]):
+            # Calculation of V via centrifugal and gravitation force (Newtonian
             v = v + np.roll(mass,i)*G*(r-np.roll(r, i))/np.abs(r-np.roll(r,i))**3
 
         v = v/mass
         v[:-1] = v[:-1] + 2 * mass[-1] * G/np.abs(r[:-1]-r[-1]) # Adding the extra substracted term back in and adding
         # another.
-        dx[:-1] = -v*np.sin(theta)
-        dy[:-1] = v*np.cos(theta)
+        dx[:-1] = -v[:-1]*np.sin(theta[:-1])
+        dy[:-1] = v[:-1]*np.cos(theta[:-1])
 
         # Sun calculations
         v[-1] = -np.sum(mass[:-1]*v[:-1])/mass[-1]
@@ -111,10 +188,10 @@ if __name__ == "__main__":
 
     solution = solve_ivp(equation_of_speed, t_span=time_frame, y0=y0, args=(mass, G), max_step=step,
                          method=method_used, rtol=relative_tolerance, atol=absolute_tolerance)
-    #
-    # plt.figure()
-    # data = solution['y']
-    # for i in range(4):
-    #     plt.plot(data[2*i], data[2*i+1])
-    # plt.plot(data[-1], data[-2], label='sun_orbit')
-    # plt.show()
+
+    plt.figure()
+    data = solution['y']
+    for i in range(4):
+        plt.plot(data[2*i], data[2*i+1])
+    plt.plot(data[-1], data[-2], label='sun_orbit')
+    plt.show()
