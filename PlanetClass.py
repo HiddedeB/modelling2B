@@ -10,8 +10,8 @@ import copy
 class planet:
     '''Class to hold all variables related to a certain planet'''
 
-    def __init__(self, initial_position, mass, radius, loanode, initial_velocity, period, name, eccentricity, smaxis,
-                 argperiapsis):
+    def __init__(self, initial_position, mass, radius, initial_velocity, loanode=0, period=0, name="", eccentricity=0, smaxis=0,
+                 argperiapsis=0):
         '''NOTE:
         :param initial_position: initial position vector
         :type initial_position: ndarray TODO fix data type
