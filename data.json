@@ -1,82 +1,82 @@
 {
 	"mercury":{
-		"mass":0.33e24, //kg
-		"radius":2.44e6, //m
-		"smaxis":57.91e9, //m
-		"period":0.241, //years
-		"orbital inclination":7, //degrees
+		"mass":0.33e24,
+		"radius":2.44e6, 
+		"smaxis":57.91e9, 
+		"period":0.241, 
+		"orbital inclination":7, 
 		"eccentricity":0.2056,
-		"loanode":48.331, //degrees
+		"loanode":48.331, 
 		"argperiapsis":29.124
 	},
 	"venus":{
-		"mass":4.8675e24, //kg
-		"radius":6.05e6, //m
-		"smaxis":108.2e9, //m
-		"period":0.615198, //years
-		"orbital inclination":3.394, //degrees
+		"mass":4.8675e24, 
+		"radius":6.05e6, 
+		"smaxis":108.2e9, 
+		"period":0.615198, 
+		"orbital inclination":3.394, 
 		"eccentricity":0.006772,
-		"loanode":76.68, //degrees
+		"loanode":76.68, 
 		"argperiapsis":54.884
 	},
 	"earth":{
-		"mass":5.972e24, //kg
-		"radius":6.371e6, //m
-		"smaxis":148.598e9, //m
-		"period":1, //years
-		"orbital inclination":0, //degrees
+		"mass":5.972e24, 
+		"radius":6.371e6, 
+		"smaxis":148.598e9, 
+		"period":1, 
+		"orbital inclination":0, 
 		"eccentricity":0.01671,
-		"loanode":-11.26, //degrees
+		"loanode":-11.26, 
 		"argperiapsis":114.208
 	},
 	"mars":{
-		"mass":0.642e24, //kg
-		"radius":3.389e6, //m
-		"smaxis":227.939e9, //m
-		"period":1.88, //years
-		"orbital inclination":1.85, //degrees
+		"mass":0.642e24, 
+		"radius":3.389e6, 
+		"smaxis":227.939e9, 
+		"period":1.88, 
+		"orbital inclination":1.85, 
 		"eccentricity":0.0934,
-		"loanode":49.558, //degrees
+		"loanode":49.558, 
 		"argperiapsis":286.502
 	},
 	"jupiter":{
-		"mass":1.8982e27, //kg
-		"radius":69.911e6, //m
-		"smaxis":778.57e9, //m
-		"period":11.862, //years
-		"orbital inclination":1.303, //degrees
+		"mass":1.8982e27, 
+		"radius":69.911e6, 
+		"smaxis":778.57e9, 
+		"period":11.862, 
+		"orbital inclination":1.303, 
 		"eccentricity":0.0489,
-		"loanode":100.464, //degrees
+		"loanode":100.464, 
 		"argperiapsis":273.867
 	},
 	"saturn":{
-		"mass":5.6834e26, //kg
-		"radius":58.232e6, //m
-		"smaxis":1433.53e9, //m
-		"period":29.4571, //years
-		"orbital inclination":2.485, //degrees
+		"mass":5.6834e26, 
+		"radius":58.232e6, 
+		"smaxis":1433.53e9, 
+		"period":29.4571, 
+		"orbital inclination":2.485, 
 		"eccentricity":0.0565,
-		"loanode":113.665, //degrees
+		"loanode":113.665, 
 		"argperiapsis":339.392
 	},
 	"uranus":{
-		"mass":8.681e25, //kg
-		"radius":25.362e6, //m
-		"smaxis":2875.04e9, //m
-		"period":84.0205, //years
-		"orbital inclination":0.773, //degrees
+		"mass":8.681e25, 
+		"radius":25.362e6, 
+		"smaxis":2875.04e9, 
+		"period":84.0205, 
+		"orbital inclination":0.773, 
 		"eccentricity":0.046381,
-		"loanode":74.006, //degrees
+		"loanode":74.006, 
 		"argperiapsis":96.999
 	},
 	"neptune":{
-		"mass":1.024e26, //kg
-		"radius":24.622e6, //m
-		"smaxis":4444.5e9, //m
-		"period":164.8, //years
-		"orbital inclination":1.768, //degrees
+		"mass":1.024e26, 
+		"radius":24.622e6, 
+		"smaxis":4444.5e9, 
+		"period":164.8, 
+		"orbital inclination":1.768, 
 		"eccentricity":0.008678,
-		"loanode":131.784, //degrees
+		"loanode":131.784, 
 		"argperiapsis":276.336
 	}
 }

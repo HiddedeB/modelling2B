@@ -9,7 +9,7 @@ objs = np.array([])
 #c'vo
 #public static dict MakeTree(lst):
 	#gebruiken we denk ik niet bij ellipsbanen?
-#	return 1
+#	return {}
 
 for tijdstap:
 	pairs = np.array([i for i in combinations(objs,2)])
