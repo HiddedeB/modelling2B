@@ -4,4 +4,5 @@ class PlanetaryDataHandler:
 		with open('data.json') as file:
 			self.rawdata = json.load(file)
 		for i in self.rawdata:
-			setattr(self,)
+			setattr(self,i,self.rawdata[i])
+		
