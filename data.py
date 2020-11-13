@@ -1,6 +1,13 @@
 from PlanetClass import planet
 import warnings, numpy, json
 
+# #specify specs
+# with open('data.json') as file:
+# 	planets_in_data = [i for i in json.load(file)]
+# spec = [('rawdata',dict)]
+# spec.append([(i,planet) for i in planets_in_data])
+
+# @jitclass gaat alleen werken als we alleen planet9 toe kunnen voegen, of iig iets moeten hardcoden.
 class PlanetaryDataHandler:
 	def __init__(self):
 		with open('data.json') as file:
