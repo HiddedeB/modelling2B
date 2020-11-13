@@ -10,7 +10,7 @@ import copy
 class planet:
     '''Class to hold all variables related to a certain planet'''
 
-    def __init__(self, initial_position, mass, radius, initial_velocity, loanode=0, period=0, name="", eccentricity=0,
+    def __init__(self, mass, radius, initial_position=0, initial_velocity=0, loanode=0, period=0, name="", eccentricity=0,
                  smaxis=0, argperiapsis=0):
         '''NOTE:
         :param initial_position: initial position vector
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     for i in range(3):
         y_test = np.append((i+2)*y_test, earth.pos)
     y0 = np.concatenate([y_test, sun.pos])
-    time_frame = (0, 4*10*9)
+    time_frame = (0, 4*10**9)
     step = 1000
     method_used = 'RK23'
     relative_tolerance = 100
@@ -168,7 +168,7 @@ if __name__ == "__main__":
         theta = np.arctan2(y[1::2], y[::2])
 
         for i in range(1, r.shape[0]):
-            # Calculation of V via centrifugal and gravitation force (Newtonian)
+            # Calculation of V via centrifugal and gravitation force (Newtonian
             v = v + np.roll(mass,i)*G*(r-np.roll(r, i))/np.abs(r-np.roll(r,i))**3
 
         v = v/mass
