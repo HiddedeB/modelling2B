@@ -133,10 +133,10 @@ if __name__ == "__main__":
     # Example of 2D 2-body problem earth and sun
 
     #Parameters for the simulator
-    time_frame = np.array([0, 10**7], dtype=int)
+    time_frame = np.array([0, 365.25*24*3600], dtype=int)
     step = 1000
     method = 'RK23'
-    absolute_tolerance = 1e7
+    absolute_tolerance = 1e5
     relative_tolerance = 1e4
 
     #Masses
@@ -145,10 +145,10 @@ if __name__ == "__main__":
     mass = np.array([mass_earth, mass_sun], dtype=float)
 
     # Initial conditions
-    au = 1.495e10
+    au = 1.495e11
     G = copy.deepcopy(const.G.value)
-    initial_position = [au, au, 0, 0]
-    initial_velocity = [0, 120e6, 0, 0]
+    initial_position = [au, 0, 0, 0]
+    initial_velocity = [0, 2.9765e4, 0, 0]
     initial_conditions = np.array(initial_position + initial_velocity, dtype=float)
 
 
@@ -157,27 +157,30 @@ if __name__ == "__main__":
         length = int(len(vec)/2)
         r = np.sqrt(vec[:length:2]**2+vec[1:length:2]**2)
         x, y = vec[:length:2], vec[1:length:2]
-        F = np.zeros(length)
+        a = np.zeros(length)
         dv_total = np.zeros(length)
 
-        for i in range(1, int(length/4)+1):
+        for i in range(1, int(length/2)):
             # Calculation of V via gravitation force (Newtonian)
             theta = np.arctan2((y-np.roll(y, i)), (x-np.roll(x, i)))
 
-            F[::2] = F[::2] + np.roll(mass, i)*G/np.abs(r-np.roll(r, i))**2 * np.sin(theta)
-            F[1::2] = F[1::2] + np.roll(mass, i)*G/np.abs(r-np.roll(r, i))**2 * np.cos(theta)
+            a[::2] = a[::2] - np.roll(mass, i)*G/np.abs(r-np.roll(r, i))**2 * np.cos(theta)
+            a[1::2] = a[1::2] - np.roll(mass, i)*G/np.abs(r-np.roll(r, i))**2 * np.sin(theta)
 
-        dv_total[::2] = F[::2]/mass
-        dv_total[1::2] = F[1::2]/mass
-        d_total = vec[2*r.shape[0]:]
+        dv_total = a
+        d_total = vec[length:]
+        #print(dv_total,d_total)
 
         d_vec = np.concatenate((d_total, dv_total))
         return d_vec             #TODO fix the fact that we now have to return an array for [y', v']
 
-    dy = equation_of_speed(time_frame[0], initial_conditions, mass, G)
+    # dy = equation_of_speed(time_frame[0], initial_conditions, mass, G)
     solution = solve_ivp(equation_of_speed, t_span=time_frame, y0=initial_conditions, args=(mass, G), max_step=step,
-                         method=method, rtol=relative_tolerance, atol=absolute_tolerance)
+                        method=method, rtol=relative_tolerance, atol=absolute_tolerance)
     data = solution['y']
     plt.figure()
     plt.plot(data[0], data[1])
     plt.plot(data[2], data[3])
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.show()
+    # print(dy)
