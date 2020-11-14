@@ -162,7 +162,7 @@ if __name__ == "__main__":
 
         for i in range(1, int(length/4)+1):
             # Calculation of V via gravitation force (Newtonian)
-            theta = np.arctan2((y-np.roll(y,i)),(x-np.roll(x,i)))
+            theta = np.arctan2((y-np.roll(y, i)), (x-np.roll(x, i)))
             F[::2] = F[::2] + np.roll(mass, i)*G/np.abs(r-np.roll(r, i))**2 * np.sin(theta)
             F[1::2] = F[1::2] + np.roll(mass, i)*G/np.abs(r-np.roll(r, i))**2 * np.cos(theta)
 
@@ -177,4 +177,6 @@ if __name__ == "__main__":
     solution = solve_ivp(equation_of_speed, t_span=time_frame, y0=initial_conditions, args=(mass, G), max_step=step,
                          method=method, rtol=relative_tolerance, atol=absolute_tolerance)
     data = solution['y']
+    plt.figure()
     plt.plot(data[0], data[1])
+    plt.plot(data[2], data[3])
