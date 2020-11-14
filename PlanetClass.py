@@ -130,68 +130,48 @@ class planet:
 
 if __name__ == "__main__":
     # Example of 2D 2-body problem earth and sun
-    initial_vector_earth = np.array([const.au.value, 0],dtype=float)
-    initial_velocity_earth = np.array([0, np.sqrt(const.M_sun.value*const.G.value/const.R_earth.value)], dtype=float)
-    initial_vector_sun = np.array([-const.M_earth.value*const.au.value/const.M_sun.value, 0], dtype=float)
-    initial_velocity_sun = np.array([0,0],dtype=float)
-    earth = planet(mass=const.M_earth.value, initial_position=initial_vector_earth, radius=const.R_earth.value,
-                   initial_velocity=initial_velocity_earth)
-    sun = planet(mass=const.M_sun.value, initial_position=initial_vector_sun, radius=const.R_sun.value,
-                initial_velocity=initial_velocity_sun)
-    y_test = earth.pos
-    for i in range(3):
-        y_test = np.append((i+2)*y_test, earth.pos)
-    y0 = np.concatenate([y_test, sun.pos])
-    time_frame = (0, 4*10**9)
-    step = 1000
-    method_used = 'RK23'
-    relative_tolerance = 100
-    absolute_tolerance = 10**4
-    mass = [earth.mass for i in range(4)]
 
-    x = copy.deepcopy(const.au.value)
-    position = np.array([x, 0],dtype=float)
-    y_test = position
-    for i in range(3):
-        y_test = np.append(y_test, (i+2)*position)
-    mass_sun = 1.989 * 10 ** (30)  # kg, massa zon
-    mass_earth = 5.972 * 10 ** (26)  # kg, massa aarde
+    #Parameters for the simulator
+    time_frame = np.array([0, 10**6], dtype=int)
+    step = 10000
+    method = 'RK23'
+    absolute_tolerance = 10e7
+    relative_tolerance = 10e4
+
+    #Masses
+    mass_earth = 5.972e24
+    mass_sun = 1.989e30
+    mass = np.array([mass_earth, mass_sun], dtype=float)
+
+    # Initial conditions
+    au = 1.495e10
     G = copy.deepcopy(const.G.value)
-    mass = np.append(mass_sun, np.array([mass_earth for i in range(4)]))
+    initial_position = [au, au, 0, 0]
+    initial_velocity = [0, 120e6, 0, 0]
+    initial_conditions = np.array(initial_position + initial_velocity, dtype=float)
 
-    @njit
-    def equation_of_speed(t,y, mass, G):
-        r = np.sqrt(y[::2]**2+y[1::2]**2)
-        v = np.zeros(r.shape[0])
-        dx, dy = np.zeros(r.shape[0]), np.zeros(r.shape[0])
-        d_total = np.zeros(2*r.shape[0])
-        theta = np.arctan2(y[1::2], y[::2])
 
-        for i in range(1, r.shape[0]):
-            # Calculation of V via centrifugal and gravitation force (Newtonian
-            v = v + np.roll(mass,i)*G*(r-np.roll(r, i))/np.abs(r-np.roll(r,i))**3
+    # @njit
+    def equation_of_speed(t,vec, mass, G):
+        length = int(len(vec)/2)
+        r = np.sqrt(vec[:length:2]**2+vec[1:length:2]**2)
+        x, y = vec[:length:2], vec[1:length:2]
+        F = np.zeros(length)
+        dv_total = np.zeros(length)
 
-        v = v/mass
-        v[:-1] = v[:-1] + 2 * mass[-1] * G/np.abs(r[:-1]-r[-1]) # Adding the extra substracted term back in and adding
-        # another.
-        dx[:-1] = -v[:-1]*np.sin(theta[:-1])
-        dy[:-1] = v[:-1]*np.cos(theta[:-1])
+        for i in range(1, int(length/4)+1):
+            # Calculation of V via gravitation force (Newtonian)
+            theta = np.arctan2((y-np.roll(y,i)),(x-np.roll(x,i)))
+            F[::2] = F[::2] + np.roll(mass, i)*G/np.abs(r-np.roll(r, i))**2 * np.sin(theta)
+            F[1::2] = F[1::2] + np.roll(mass, i)*G/np.abs(r-np.roll(r, i))**2 * np.cos(theta)
 
-        # Sun calculations
-        v[-1] = -np.sum(mass[:-1]*v[:-1])/mass[-1]
+        dv_total[::2] = F[::2]/mass
+        dv_total[1::2] = F[1::2]/mass
+        d_total = vec[2*r.shape[0]:]
 
-        dx[-1] = -v[-1]*np.sin(theta[-1])
-        dy[-1] = v[-1]*np.cos(theta[-1])
-        d_total[::2] = dx
-        d_total[1::2] = dy
-        return d_total
+        d_vec = np.concatenate((d_total, dv_total))
+        return d_vec             #TODO fix the fact that we now have to return an array for [y', v']
 
-    solution = solve_ivp(equation_of_speed, t_span=time_frame, y0=y0, args=(mass, G), max_step=step,
-                         method=method_used, rtol=relative_tolerance, atol=absolute_tolerance)
-
-    plt.figure()
-    data = solution['y']
-    for i in range(4):
-        plt.plot(data[2*i], data[2*i+1])
-    plt.plot(data[-1], data[-2], label='sun_orbit')
-    plt.show()
+    dy = equation_of_speed(time_frame, initial_conditions, mass, G)
+    # solution = solve_ivp(equation_of_speed, t_span=time_frame, y0=initial_position, args=(mass, G), max_step=step,
+    #                      method=method, rtol=relative_tolerance, atol=absolute_tolerance)
