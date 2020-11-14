@@ -133,11 +133,11 @@ if __name__ == "__main__":
     # Example of 2D 2-body problem earth and sun
 
     #Parameters for the simulator
-    time_frame = np.array([0, 10**6], dtype=int)
-    step = 10000
+    time_frame = np.array([0, 10**7], dtype=int)
+    step = 1000
     method = 'RK23'
-    absolute_tolerance = 10e7
-    relative_tolerance = 10e4
+    absolute_tolerance = 1e7
+    relative_tolerance = 1e4
 
     #Masses
     mass_earth = 5.972e24
@@ -152,7 +152,7 @@ if __name__ == "__main__":
     initial_conditions = np.array(initial_position + initial_velocity, dtype=float)
 
 
-    # @njit
+    @njit
     def equation_of_speed(t,vec, mass, G):
         length = int(len(vec)/2)
         r = np.sqrt(vec[:length:2]**2+vec[1:length:2]**2)
@@ -173,6 +173,8 @@ if __name__ == "__main__":
         d_vec = np.concatenate((d_total, dv_total))
         return d_vec             #TODO fix the fact that we now have to return an array for [y', v']
 
-    dy = equation_of_speed(time_frame, initial_conditions, mass, G)
-    # solution = solve_ivp(equation_of_speed, t_span=time_frame, y0=initial_position, args=(mass, G), max_step=step,
-    #                      method=method, rtol=relative_tolerance, atol=absolute_tolerance)
+    dy = equation_of_speed(time_frame[0], initial_conditions, mass, G)
+    solution = solve_ivp(equation_of_speed, t_span=time_frame, y0=initial_conditions, args=(mass, G), max_step=step,
+                         method=method, rtol=relative_tolerance, atol=absolute_tolerance)
+    data = solution['y']
+    plt.plot(data[0], data[1])
