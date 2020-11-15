@@ -22,8 +22,8 @@ class PlanetaryDataHandler:
 				temp = planet(mass=j['mass'],radius=j['radius'])
 			setattr(self,i,temp)
 
-	def initialize(self) -> None:
-		return [getattr(self,i) for i in self.rawdata]
+	def get_planets(self) -> np.ndarray:
+		return np.array([getattr(self,i) for i in self.rawdata])
 
 	def createnewplanet(self,_mass:int=0,_radius:int=0,_initial_position:np.ndarray=np.array([]),
 		_initial_velocity:np.ndarray=np.array([]),_loanode:float=0,_period:float=0,_name:str='Planet9',
