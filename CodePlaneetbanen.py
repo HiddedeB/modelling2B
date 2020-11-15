@@ -5,26 +5,29 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from numba import njit
 import copy
+from data import PlanetaryDataHandler
 
+pdh = PlanetaryDataHandler()
 # mercury Data
-mass_m = 0.33e24 #kg
-radius_m = 2.44e6 #m
-smaxis_m = 57.91e9 #m
-period_m = 0.241 #year
-orbital_inclination_m = 7 #degrees
-eccentricity_m=0.2056 #no units
-loanode_m=48.331 #degrees
-argperiapsis_m =29.124 #degrees
+# mass_m = 0.33e24 #kg
+# radius_m = 2.44e6 #m
+# smaxis_m = 57.91e9 #m
+# period_m = 0.241 #year
+# orbital_inclination_m = 7 #degrees
+# eccentricity_m=0.2056 #no units
+# loanode_m=48.331 #degrees
+# argperiapsis_m =29.124 #degrees
 
-# Data venus
-mass_v=4.8675e24 #kg
-radius_v=6.05e6 #m
-smaxis_v=108.2e9 #m
-period_v=0.615198 #year
-orbital_inclination_V=3.394 #degrees
-eccentricity_v = 0.006772 #no units
-loanode_v =76.68 #degrees
-argperiapsis_v=54.884 #degrees
+# # Data venus
+# mass_v=4.8675e24 #kg
+# radius_v=6.05e6 #m
+# smaxis_v=108.2e9 #m
+# period_v=0.615198 #year
+# orbital_inclination_V=3.394 #degrees
+# eccentricity_v = 0.006772 #no units
+# loanode_v =76.68 #degrees
+# argperiapsis_v=54.884 #degrees
+# pls gebruik pdh.mercury.mass enzo hiervoor
 
 
 # Plotting the ellips given de known six properties
@@ -52,4 +55,4 @@ def plotelips3d(theta,eccentricity,smaxis,Omega,omega,I):
 
 #making plot for 0 to 2pi
 theta_values = np.linspace(0,2*np.pi,1000)
-plotelips3d(theta_values,eccentricity_m,smaxis_m,loanode_m,argperiapsis_m, orbital_inclination_m)
+plotelips3d(theta_values,pdh.mercury.eccentricity,pdh.mercury.smaxis,pdh.mercury.loanode,pdh.mercury.argperiapsis, pdh.mercury.orbital_inclination)
