@@ -33,6 +33,12 @@ class planet:
         :type loanode: float
         :param argperiapsis: ?? TODO update this
         :type argperiapsis: float
+        :param orbital_inclination: ?? minor TODO update this
+        :type orbital_inclination: float
+        :param mean_longitude: ?? minor TODO update this
+        :type mean_longitude: float
+        :param longitude_periapsis: sum of loanode and argperiapsis
+        :type longitude_periapsis: float
         '''
         self.history = []
         self.pos = initial_position
