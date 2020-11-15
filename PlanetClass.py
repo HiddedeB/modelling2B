@@ -157,7 +157,7 @@ if __name__ == "__main__":
         length = int(len(vec)/2)
         r = np.sqrt(vec[:length:2]**2+vec[1:length:2]**2)
         x, y = vec[:length:2], vec[1:length:2]
-        a = np.zeros(length)
+        a = np.zeros(length, dtype=float)
 
         #maybe matrix voor for loop.
         for i in range(1, int(length/2)):
