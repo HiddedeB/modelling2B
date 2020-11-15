@@ -132,14 +132,14 @@ class planet:
 if __name__ == "__main__":
     # Example of 2D 2-body problem earth and sun
 
-    #Parameters for the simulator
+    # Parameters for the simulator
     time_frame = np.array([0, 365.25*24*3600], dtype=int)
     step = 1000
     method = 'RK23'
     absolute_tolerance = 1e5
     relative_tolerance = 1e4
 
-    #Masses
+    # Masses
     mass_earth = 5.972e24
     mass_sun = 1.989e30
     mass = np.array([mass_earth, mass_sun], dtype=float)
@@ -158,8 +158,8 @@ if __name__ == "__main__":
         r = np.sqrt(vec[:length:2]**2+vec[1:length:2]**2)
         x, y = vec[:length:2], vec[1:length:2]
         a = np.zeros(length)
-        dv_total = np.zeros(length)
 
+        #maybe matrix voor for loop.
         for i in range(1, int(length/2)):
             # Calculation of V via gravitation force (Newtonian)
             theta = np.arctan2((y-np.roll(y, i)), (x-np.roll(x, i)))
@@ -169,10 +169,9 @@ if __name__ == "__main__":
 
         dv_total = a
         d_total = vec[length:]
-        #print(dv_total,d_total)
 
         d_vec = np.concatenate((d_total, dv_total))
-        return d_vec             #TODO fix the fact that we now have to return an array for [y', v']
+        return d_vec
 
     # dy = equation_of_speed(time_frame[0], initial_conditions, mass, G)
     solution = solve_ivp(equation_of_speed, t_span=time_frame, y0=initial_conditions, args=(mass, G), max_step=step,
