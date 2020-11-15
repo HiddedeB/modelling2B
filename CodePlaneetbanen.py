@@ -55,4 +55,5 @@ def plotelips3d(theta,eccentricity,smaxis,Omega,omega,I):
 
 #making plot for 0 to 2pi
 theta_values = np.linspace(0,2*np.pi,1000)
-plotelips3d(theta_values,pdh.mercury.eccentricity,pdh.mercury.smaxis,pdh.mercury.loanode,pdh.mercury.argperiapsis, pdh.mercury.orbital_inclination)
+m=pdh.mercury
+plotelips3d(theta_values,m.eccentricity,m.smaxis,m.loanode,m.argperiapsis, m.orbital_inclination)
