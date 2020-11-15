@@ -15,8 +15,8 @@ class PlanetaryDataHandler:
 		for i in self.rawdata:
 			j = self.rawdata[i]
 			temp = planet(mass=j['mass'], radius=j['radius'], loanode=j['loanode'], period=j['period'], name=i,
-				eccentricity=j['eccentricity'], smaxis=j['smaxis'],
-				argperiapsis=j['argperiapsis'], orbital_inclination=j['orbital inclination'])
+				eccentricity=j['eccentricity'], smaxis=j['smaxis'],argperiapsis=j['argperiapsis'],
+				orbital_inclination=j['orbital inclination'],mean_longitude=j['mean longitude'])
 			setattr(self,i,temp)
 
 	def initialize(self) -> None:
@@ -24,7 +24,7 @@ class PlanetaryDataHandler:
 
 	def createnewplanet(self,_mass:int=0,_radius:int=0,_initial_position:np.ndarray=np.array([]),
 		_initial_velocity:np.ndarray=np.array([]),_loanode:float=0,_period:float=0,_name:str='Planet9',
-		_eccentricity:float=0,_smaxis:int=0,_argperiapsis:float=0,_orbital_inclination:float=0) -> bool:
+		_eccentricity:float=0,_smaxis:int=0,_argperiapsis:float=0,_orbital_inclination:float=0,_mean_longitude:float=0) -> bool:
 
 		"""
 		Function to create a new planet, 'Planet9' is used as default name. Returns True on succes
@@ -43,7 +43,7 @@ class PlanetaryDataHandler:
 		else:
 			if check1:
 				temp = planet(mass=_mass,radius=_radius,loanode=_loanode,eccentricity=_eccentricity,smaxis=_smaxis,
-					argperiapsis=_argperiapsis, orbital_inclination=_orbital_inclination, name=_name)
+					argperiapsis=_argperiapsis, orbital_inclination=_orbital_inclination, name=_name, mean_longitude=_mean_longitude)
 				setattr(self,_name,temp)
 				return True
 			elif check2:

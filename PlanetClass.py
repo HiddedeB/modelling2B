@@ -11,7 +11,7 @@ class planet:
     '''Class to hold all variables related to a certain planet'''
 
     def __init__(self, mass, radius, initial_position=0, initial_velocity=0, loanode=0, period=0, name="", eccentricity=0,
-                 smaxis=0, argperiapsis=0, orbital_inclination=0):
+                 smaxis=0, argperiapsis=0, orbital_inclination=0, mean_longitude=0):
         '''NOTE:
         :param initial_position: initial position vector
         :type initial_position: ndarray TODO fix data type
@@ -46,6 +46,8 @@ class planet:
         self.loanode = loanode
         self.argperiapsis = argperiapsis
         self.orbital_inclination = orbital_inclination
+        self.mean_longitude = mean_longitude
+        self.longitude_periapsis = self.loanode + self.argperiapsis
 
     @property
     def pos(self):
@@ -127,6 +129,24 @@ class planet:
     @loanode.setter
     def loanode(self, var):
         self._loanode = var
+
+    @property
+    def mean_longitude(self):
+        return self._mean_longitude
+
+    @mean_longitude.setter
+    def mean_longitude(self,var):
+        self._mean_longitude = var
+
+    @property
+    def longitude_periapsis(self):
+        return self._longitude_periapsis
+
+    @longitude_periapsis.setter
+    def longitude_periapsis(self,var):
+        self._longitude_periapsis = var
+    
+    
 
 
 if __name__ == "__main__":
