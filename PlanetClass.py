@@ -146,6 +146,8 @@ class planet:
     def longitude_periapsis(self,var):
         self._longitude_periapsis = var
     
+    def __str__(self):
+        return "Instance of planet " + self.name
     
 
 

@@ -1,5 +1,5 @@
 from PlanetClass import planet
-import warnings, numpy, json
+import warnings, numpy as np, json
 
 # #specify specs
 # with open('data.json') as file:
@@ -50,3 +50,6 @@ class PlanetaryDataHandler:
 				temp = planet(mass=_mass,radius=_radius,initial_velocity=_initial_velocity,initial_position=_initial_position)
 				setattr(self,_name,temp)
 				return True
+
+	def __str__(self):
+		return "Please don't print me, ask for my rawdata instead. I'll help you a bit though. \n" + str(self.rawdata)
