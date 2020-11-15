@@ -1,0 +1,90 @@
+{
+	"mercury": {
+		"mass": 3.3e+23,
+		"radius": 2440000.0,
+		"smaxis": 57910000000.0,
+		"period": 0.241,
+		"orbital inclination": 7,
+		"eccentricity": 0.2056,
+		"loanode": 48.331,
+		"argperiapsis": 29.124,
+		"mean longitude": 252.25
+	},
+	"venus": {
+		"mass": 4.8675e+24,
+		"radius": 6050000.0,
+		"smaxis": 108200000000.0,
+		"period": 0.615198,
+		"orbital inclination": 3.394,
+		"eccentricity": 0.006772,
+		"loanode": 76.68,
+		"argperiapsis": 54.884,
+		"mean longitude": 181.98
+	},
+	"earth": {
+		"mass": 5.972e+24,
+		"radius": 6371000.0,
+		"smaxis": 148598000000.0,
+		"period": 1,
+		"orbital inclination": 0,
+		"eccentricity": 0.01671,
+		"loanode": -11.26,
+		"argperiapsis": 114.208,
+		"mean longitude": 100.47
+	},
+	"mars": {
+		"mass": 6.42e+23,
+		"radius": 3389000.0,
+		"smaxis": 227939000000.0,
+		"period": 1.88,
+		"orbital inclination": 1.85,
+		"eccentricity": 0.0934,
+		"loanode": 49.558,
+		"argperiapsis": 286.502,
+		"mean longitude": 355.43
+	},
+	"jupiter": {
+		"mass": 1.8982e+27,
+		"radius": 69911000.0,
+		"smaxis": 778570000000.0,
+		"period": 11.862,
+		"orbital inclination": 1.303,
+		"eccentricity": 0.0489,
+		"loanode": 100.464,
+		"argperiapsis": 273.867,
+		"mean longitude": 34.33
+	},
+	"saturn": {
+		"mass": 5.6834e+26,
+		"radius": 58232000.0,
+		"smaxis": 1433530000000.0,
+		"period": 29.4571,
+		"orbital inclination": 2.485,
+		"eccentricity": 0.0565,
+		"loanode": 113.665,
+		"argperiapsis": 339.392,
+		"mean longitude": 50.08
+	},
+	"uranus": {
+		"mass": 8.681e+25,
+		"radius": 25362000.0,
+		"smaxis": 2875040000000.0,
+		"period": 84.0205,
+		"orbital inclination": 0.773,
+		"eccentricity": 0.046381,
+		"loanode": 74.006,
+		"argperiapsis": 96.999,
+		"mean longitude": 314.2
+	},
+	"neptune": {
+		"mass": 1.024e+26,
+		"radius": 24622000.0,
+		"smaxis": 4444500000000.0,
+		"period": 164.8,
+		"orbital inclination": 1.768,
+		"eccentricity": 0.008678,
+		"loanode": 131.784,
+		"argperiapsis": 276.336,
+		"mean longitude": 304.22
+	}
+}

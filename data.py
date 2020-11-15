@@ -42,14 +42,51 @@ class PlanetaryDataHandler:
 			raise ValueError('Not enough data specified to use this planet in simulations.')
 		else:
 			if check1:
-				temp = planet(mass=_mass,radius=_radius,loanode=_loanode,eccentricity=_eccentricity,smaxis=_smaxis,
-					argperiapsis=_argperiapsis, orbital_inclination=_orbital_inclination, name=_name, mean_longitude=_mean_longitude)
+				self.rawdata[_name] = {"mass":_mass,"radius":_radius,"loanode":_loanode,"eccentricity":_eccentricity,"smaxis":_smaxis,
+					"argperiapsis":_argperiapsis, "orbital inclination":_orbital_inclination,"mean_longitude":_mean_longitude}
+				j = self.rawdata[_name]
+				temp = planet(mass=j['mass'], radius=j['radius'], loanode=j['loanode'], period=j['period'], name=_name,
+					eccentricity=j['eccentricity'], smaxis=j['smaxis'],argperiapsis=j['argperiapsis'],
+					orbital_inclination=j['orbital inclination'],mean_longitude=j['mean longitude'])
 				setattr(self,_name,temp)
 				return True
 			elif check2:
-				temp = planet(mass=_mass,radius=_radius,initial_velocity=_initial_velocity,initial_position=_initial_position)
+				self.rawdata[_name] = {"mass":_mass,"radius":_radius,"initial velocity":_initial_velocity,"initial position":_initial_position}
+				j = self.rawdata[_name]
+				temp = planet(mass=j['mass'],radius=j['radius'],initial_velocity=j['initial velocity'],initial_position=j['initial position'])
 				setattr(self,_name,temp)
 				return True
 
 	def __str__(self):
 		return "Please don't print me, ask for my rawdata instead. I'll help you a bit though. \n" + str(self.rawdata)
+
+	def save(self):
+		"""Save using console, provides a walkthrough. Filename can be given with or without '.json'."""
+		print([i for i in self.rawdata])
+		selection = input("Which planets would you like to save? Type the names from the list given above separated with a space, leave empty for all.\n")
+		try:
+			if selection == '':
+				out = self.rawdata
+			else:
+				out = {i:self.rawdata[i] for i in selection.split()}
+			w = True
+		except Exception as e:
+			print(e)
+			w = False
+		if w:
+			fname = input('Please enter the desired filename: ')
+			if not fname[-5:] == '.json':
+				fname = fname + '.json'
+			with open(fname,'w') as file:
+				json.dump(out,file,indent='\t')
+
+	def save2(self,filename:str,selection:list=[]):
+		"""Save using script, give a selection like ['mercury','earth'] and a filename with or without '.json'."""
+		if selection == []:
+			out = self.rawdata
+		else:
+			out = {i:self.rawdata[i] for i in selection}
+		if not filename[-5:] == '.json':
+			filename = filename + '.json'
+		with open(filename,'w') as file:
+			json.dump(out,file,indent='\t')
