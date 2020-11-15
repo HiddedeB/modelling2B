@@ -153,7 +153,7 @@ if __name__ == "__main__":
 
 
     @njit
-    def equation_of_speed(t,vec, mass, G):
+    def equation_of_speed(t, vec, mass, G):
         length = int(len(vec)/2)
         r = np.sqrt(vec[:length:2]**2+vec[1:length:2]**2)
         x, y = vec[:length:2], vec[1:length:2]
