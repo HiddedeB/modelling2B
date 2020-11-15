@@ -14,9 +14,12 @@ class PlanetaryDataHandler:
 			self.rawdata = json.load(file)
 		for i in self.rawdata:
 			j = self.rawdata[i]
-			temp = planet(mass=j['mass'], radius=j['radius'], loanode=j['loanode'], period=j['period'], name=i,
-				eccentricity=j['eccentricity'], smaxis=j['smaxis'],argperiapsis=j['argperiapsis'],
-				orbital_inclination=j['orbital inclination'],mean_longitude=j['mean longitude'])
+			if i != "sun":
+				temp = planet(mass=j['mass'], radius=j['radius'], loanode=j['loanode'], period=j['period'], name=i,
+					eccentricity=j['eccentricity'], smaxis=j['smaxis'],argperiapsis=j['argperiapsis'],
+					orbital_inclination=j['orbital inclination'],mean_longitude=j['mean longitude'])
+			else:
+				temp = planet(mass=j['mass'],radius=j['radius'])
 			setattr(self,i,temp)
 
 	def initialize(self) -> None:
