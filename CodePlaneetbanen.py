@@ -37,6 +37,7 @@ def plot_elips_3d(theta,eccentricity,smaxis,Omega,omega,I, input):
     ax.plot(X,Y,Z, c=input)
     plt.show()
     return vector
+
 # Making plot for 0 to 2pi for Mercury
 theta_values = np.linspace(0,2*np.pi,10**3)
 m=pdh.mercury
@@ -68,8 +69,8 @@ def matrix_element_calc(n_1,n_2,m_1,m_2,m_c,alpha12,b_1,b_2):
 def sys_of_eq(t,y,A11,A12,A21,A22,B11,B12,B21,B22):
     h1,h2,k1,k2,p1,p2,q1,q2 = y
 
-    return [A11*k1 + A12*k2, A21*k1+A22*k2, -A11*h1 - A12*h2, -A21*h1-A22*h2,
-            B11*q1 + B12*q2, B21*q1+B22*q2, -B11*p1 - B12*p2, -B21*p1-B22*p2]
+    return np.array([A11*k1 + A12*k2, A21*k1+A22*k2, -A11*h1 - A12*h2, -A21*h1-A22*h2,
+            B11*q1 + B12*q2, B21*q1+B22*q2, -B11*p1 - B12*p2, -B21*p1-B22*p2])
 
 # Arguments to pass on to the ODE Solver
 def args(smaxis1,smaxis2,m_1,m_2,m_c):
@@ -92,10 +93,10 @@ def args(smaxis1,smaxis2,m_1,m_2,m_c):
 
 # Initial condition calculator
 def initial_conditions(e1,e2,omega1,omega2,I1,I2,Omega1,Omega2):
-    return [e1*np.sin(omega1),e2*np.sin(omega2),
+    return np.array([e1*np.sin(omega1),e2*np.sin(omega2),
             e1*np.cos(omega1),e2*np.cos(omega2),
             I1*np.sin(Omega1),I2*np.sin(Omega2),
-            I1*np.cos(Omega1),I2* np.cos(Omega2)]
+            I1*np.cos(Omega1),I2* np.cos(Omega2)])
 
 # Solving the system of differential equations
 def ODE_solv(smaxis1,smaxis2,m_1,m_2,m_c,e1,e2,omega1,omega2,I1,I2,Omega1,Omega2, time, t_ev):
@@ -109,15 +110,17 @@ def variable_transfromations(h,k,p,q):
 
 
 
+
+
 # Probeersel voor het vinden van de juiste parameters
 
-stonks = ODE_solv(m.smaxis,v.smaxis,m.mass,v.mass,pdh.sun.mass,0.2056,0.006772,
+results = ODE_solv(m.smaxis,v.smaxis,m.mass,v.mass,pdh.sun.mass,0.2056,0.006772,
          m.loanode,v.loanode,np.deg2rad(m.orbital_inclination),np.deg2rad(v.orbital_inclination),
-         m.argperiapsis,v.argperiapsis, time = 10000, t_ev = None)
+         m.argperiapsis,v.argperiapsis, time = 10**9*365.25*24*60*60, t_ev = None)
 
 
-t = np.linspace(0,10000,10)
-z=stonks.sol(t)
+t = np.linspace(0,10**9*365.25*24*60*60,10)
+z=results.sol(t)
 
 # Kijken of de parameters op t=1000 sense maken in het originele coordinate system
 original_system_mercury = variable_transfromations(z.T[-1][0], z.T[-1][2],
