@@ -32,7 +32,7 @@ def xyz(theta,eccentricity,smaxis,Omega,omega,I):
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 
-def plotelips3d(theta,eccentricity,smaxis,Omega,omega,I, input):
+def plot_elips_3d(theta,eccentricity,smaxis,Omega,omega,I, input):
     X,Y,Z,vector = xyz(theta,eccentricity,smaxis,Omega,omega, I)
     ax.plot(X,Y,Z, c=input)
     plt.show()
@@ -40,16 +40,16 @@ def plotelips3d(theta,eccentricity,smaxis,Omega,omega,I, input):
 # Making plot for 0 to 2pi for Mercury
 theta_values = np.linspace(0,2*np.pi,10**3)
 m=pdh.mercury
-vector_mercury = plotelips3d(theta_values,0.2056,m.smaxis,m.loanode,
+vector_mercury = plot_elips_3d(theta_values,0.2056,m.smaxis,m.loanode,
                              m.argperiapsis, np.deg2rad(m.orbital_inclination), 'r')
 
 # Making plot for 0 to 2pi for Venus
 v=pdh.venus
-vector_venus = plotelips3d(theta_values,0.006772,v.smaxis,v.loanode,
+vector_venus = plot_elips_3d(theta_values,0.006772,v.smaxis,v.loanode,
                            v.argperiapsis, np.deg2rad(v.orbital_inclination),'grey')
 
 # Right hand side of the system of differential equations
-def matrixelementcalc(n_1,n_2,m_1,m_2,m_c,alpha12,b_1,b_2):
+def matrix_element_calc(n_1,n_2,m_1,m_2,m_c,alpha12,b_1,b_2):
     #A-elements matrix
     A_11 = n_1 * (1/4) * (m_2/(m_c + m_1)) * np.abs(alpha12)**2 * b_1
     A_22 = n_2 * (1/4) * (m_1/(m_c + m_2)) * np.abs(alpha12)**2 * b_1
@@ -57,16 +57,16 @@ def matrixelementcalc(n_1,n_2,m_1,m_2,m_c,alpha12,b_1,b_2):
     A_21 = -1*n_2 * (1/4) * (m_1/(m_c + m_2)) * np.abs(alpha12)**2 * b_2
 
     #B_elements matrix
-    B_11 = -1*n_1 * (1 / 4) * (m_2 / (m_c + m_1)) * np.abs(alpha12) ** 2 * b_1
-    B_22 = -1*n_2 * (1 / 4) * (m_1 / (m_c + m_2)) * np.abs(alpha12) ** 2 * b_1
-    B_12 =  n_1 * (1 / 4) * (m_2 / (m_c + m_1)) * np.abs(alpha12) ** 2 * b_1
-    B_21 =  n_2 * (1 / 4) * (m_1 / (m_c + m_2)) * np.abs(alpha12) ** 2 * b_1
+    B_11 = -1*n_1 * (1/4) * (m_2 / (m_c + m_1)) * np.abs(alpha12) ** 2 * b_1
+    B_22 = -1*n_2 * (1/4) * (m_1 / (m_c + m_2)) * np.abs(alpha12) ** 2 * b_1
+    B_12 =  n_1 * (1/4) * (m_2 / (m_c + m_1)) * np.abs(alpha12) ** 2 * b_1
+    B_21 =  n_2 * (1/4) * (m_1 / (m_c + m_2)) * np.abs(alpha12) ** 2 * b_1
 
     return np.array([A_11,A_12,A_21,A_22]), np.array([B_11,B_12,B_21,B_22])
 
 # System of equations for solving the ODE
-def sysofeq(t,z,A11,A12,A21,A22,B11,B12,B21,B22):
-    h1,h2,k1,k2,p1,p2,q1,q2 = z
+def sys_of_eq(t,y,A11,A12,A21,A22,B11,B12,B21,B22):
+    h1,h2,k1,k2,p1,p2,q1,q2 = y
 
     return [A11*k1 + A12*k2, A21*k1+A22*k2, -A11*h1 - A12*h2, -A21*h1-A22*h2,
             B11*q1 + B12*q2, B21*q1+B22*q2, -B11*p1 - B12*p2, -B21*p1-B22*p2]
@@ -85,13 +85,13 @@ def args(smaxis1,smaxis2,m_1,m_2,m_c):
     b_twothirds_one = (1/np.pi) * sp.integrate.quad(integrabel_function_1, 0 ,2*np.pi)[0]
     b_twothirds_two =  (1/np.pi) * sp.integrate.quad(integrabel_function_2, 0, 2*np.pi)[0]
 
-    vec_1,vec_2 = matrixelementcalc(n_1,n_2,m_1,m_2,m_c,alpha12,b_twothirds_one,b_twothirds_two)
+    vec_1,vec_2 = matrix_element_calc(n_1,n_2,m_1,m_2,m_c,alpha12,b_twothirds_one,b_twothirds_two)
 
     return (vec_1[0],vec_1[1],vec_1[2],vec_1[3],
                    vec_2[0],vec_2[1],vec_2[2],vec_2[3])
 
 # Initial condition calculator
-def Initial_conditions(e1,e2,omega1,omega2,I1,I2,Omega1,Omega2):
+def initial_conditions(e1,e2,omega1,omega2,I1,I2,Omega1,Omega2):
     return [e1*np.sin(omega1),e2*np.sin(omega2),
             e1*np.cos(omega1),e2*np.cos(omega2),
             I1*np.sin(Omega1),I2*np.sin(Omega2),
@@ -99,30 +99,29 @@ def Initial_conditions(e1,e2,omega1,omega2,I1,I2,Omega1,Omega2):
 
 # Solving the system of differential equations
 def ODE_solv(smaxis1,smaxis2,m_1,m_2,m_c,e1,e2,omega1,omega2,I1,I2,Omega1,Omega2, time, t_ev):
-    IC = Initial_conditions(e1,e2,omega1,omega2,I1,I2,Omega1,Omega2)
-    return solve_ivp(sysofeq,[0,time], IC, args= args(smaxis1,smaxis2,m_1,m_2,m_c),t_eval=t_ev)
+    IC = initial_conditions(e1,e2,omega1,omega2,I1,I2,Omega1,Omega2)
+    return solve_ivp(sys_of_eq,[0,time], IC, args= args(smaxis1,smaxis2,m_1,m_2,m_c),t_eval=t_ev, dense_output=True)
 
 # Transforming the variables back to usual coordinate system
-def Variable_transfromations(h,k,p,q):
+def variable_transfromations(h,k,p,q):
     return np.array([np.sqrt(h**2+k**2), np.sqrt(p**2+q**2),
                     np.arcsin(h/np.sqrt(h**2+k**2)), np.arcsin(p/np.sqrt(p**2+q**2))])
 
 
 
+# Probeersel voor het vinden van de juiste parameters
 
 stonks = ODE_solv(m.smaxis,v.smaxis,m.mass,v.mass,pdh.sun.mass,0.2056,0.006772,
          m.loanode,v.loanode,np.deg2rad(m.orbital_inclination),np.deg2rad(v.orbital_inclination),
-         m.argperiapsis,v.argperiapsis, 1000, t_ev = None)
+         m.argperiapsis,v.argperiapsis, time = 10000, t_ev = None)
+
+
+t = np.linspace(0,10000,10)
+z=stonks.sol(t)
 
 # Kijken of de parameters op t=1000 sense maken in het originele coordinate system
-Original_system_mercury = Variable_transfromations(stonks.y[-1][0], stonks.y[-1][2],
-                                                   stonks.y[-1][4], stonks.y[-1][6])
-
-IC = Initial_conditions(0.2056,0.006772,m.loanode,v.loanode,np.deg2rad(m.orbital_inclination),
-                        np.deg2rad(v.orbital_inclination),m.argperiapsis,v.argperiapsis)
-
-args = args(m.smaxis,v.smaxis,m.mass,v.mass,pdh.sun.mass)
-
+original_system_mercury = variable_transfromations(z.T[-1][0], z.T[-1][2],
+                                                   z.T[-1][4], z.T[-1][6])
 
 
 
