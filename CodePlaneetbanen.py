@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.integrate import solve_ivp
 import scipy as sp
-import astropy.constants as const
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from numba import njit
@@ -50,7 +49,7 @@ vector_venus = plotelips3d(theta_values,0.006772,v.smaxis,v.loanode,
                            v.argperiapsis, np.deg2rad(v.orbital_inclination),'grey')
 
 # Right hand side of the system of differential equations
-def Matrixelementcalc(n_1,n_2,m_1,m_2,m_c,alpha12,b_1,b_2):
+def matrixelementcalc(n_1,n_2,m_1,m_2,m_c,alpha12,b_1,b_2):
     #A-elements matrix
     A_11 = n_1 * (1/4) * (m_2/(m_c + m_1)) * np.abs(alpha12)**2 * b_1
     A_22 = n_2 * (1/4) * (m_1/(m_c + m_2)) * np.abs(alpha12)**2 * b_1
@@ -65,24 +64,64 @@ def Matrixelementcalc(n_1,n_2,m_1,m_2,m_c,alpha12,b_1,b_2):
 
     return np.array([A_11,A_12,A_21,A_22]), np.array([B_11,B_12,B_21,B_22])
 
-def rhsf(smaxis1,smaxis2,a_1,a_2,m_1,m_2,m_c,vector_1,vector_2):
+# System of equations for solving the ODE
+def sysofeq(t,z,A11,A12,A21,A22,B11,B12,B21,B22):
+    h1,h2,k1,k2,p1,p2,q1,q2 = z
+
+    return [A11*k1 + A12*k2, A21*k1+A22*k2, -A11*h1 - A12*h2, -A21*h1-A22*h2,
+            B11*q1 + B12*q2, B21*q1+B22*q2, -B11*p1 - B12*p2, -B21*p1-B22*p2]
+
+# Arguments to pass on to the ODE Solver
+def args(smaxis1,smaxis2,m_1,m_2,m_c):
 
     # Berekenen van de angle phi van de r van Venus en Mercury aan de hand van de bekende 6 parameters
     alpha12 = smaxis1/smaxis2
-    n_1 = 2*np.pi/(a_1**(3/2))
-    n_2 = 2*np.pi/(a_2**(3/2))
+    n_1 = 2*np.pi/(smaxis1**(3/2))
+    n_2 = 2*np.pi/(smaxis2**(3/2))
 
-    vector_1_normed = vector_1/np.linalg.norm(vector_1)
-    vector_2_normed = vector_2 / np.linalg.norm(vector_2)
-    phi = np.cos(np.dot(vector_1_normed,vector_2_normed))
-
-    #defining the integrable constant b_twothirds for the system of ODE
+    # Defining the integrable constant b_twothirds for the system of ODE
     integrabel_function_1 = lambda phi: np.cos(phi)/(1-2*alpha12*np.cos(phi) + alpha12**2)**(3/2) #angle phi
     integrabel_function_2 = lambda phi: np.cos(2*phi)/(1-2*alpha12*np.cos(2*phi) + alpha12**2)**(3/2) #angle 2*phi
-    b_twothirds_one = (1/np.pi) * sp.intgrate_quad(integrabel_function_1, 0 ,2*np.pi)
-    b_twothirds_two =  (1/np.pi) * sp.intgrate_quad(integrabel_function_2, 0, 2*np.pi)
+    b_twothirds_one = (1/np.pi) * sp.integrate.quad(integrabel_function_1, 0 ,2*np.pi)[0]
+    b_twothirds_two =  (1/np.pi) * sp.integrate.quad(integrabel_function_2, 0, 2*np.pi)[0]
 
-    vec_1,vec_2 = Matrixelementcalc(n_1,n_2,m_1,m_2,m_c,alpha12,b_twothirds_one,b_twothirds_two)
+    vec_1,vec_2 = matrixelementcalc(n_1,n_2,m_1,m_2,m_c,alpha12,b_twothirds_one,b_twothirds_two)
+
+    return (vec_1[0],vec_1[1],vec_1[2],vec_1[3],
+                   vec_2[0],vec_2[1],vec_2[2],vec_2[3])
+
+# Initial condition calculator
+def Initial_conditions(e1,e2,omega1,omega2,I1,I2,Omega1,Omega2):
+    return [e1*np.sin(omega1),e2*np.sin(omega2),
+            e1*np.cos(omega1),e2*np.cos(omega2),
+            I1*np.sin(Omega1),I2*np.sin(Omega2),
+            I1*np.cos(Omega1),I2* np.cos(Omega2)]
+
+# Solving the system of differential equations
+def ODE_solv(smaxis1,smaxis2,m_1,m_2,m_c,e1,e2,omega1,omega2,I1,I2,Omega1,Omega2, time, t_ev):
+    IC = Initial_conditions(e1,e2,omega1,omega2,I1,I2,Omega1,Omega2)
+    return solve_ivp(sysofeq,[0,time], IC, args= args(smaxis1,smaxis2,m_1,m_2,m_c),t_eval=t_ev)
+
+# Transforming the variables back to usual coordinate system
+def Variable_transfromations(h,k,p,q):
+    return np.array([np.sqrt(h**2+k**2), np.sqrt(p**2+q**2),
+                    np.arcsin(h/np.sqrt(h**2+k**2)), np.arcsin(p/np.sqrt(p**2+q**2))])
+
+
+
+
+stonks = ODE_solv(m.smaxis,v.smaxis,m.mass,v.mass,pdh.sun.mass,0.2056,0.006772,
+         m.loanode,v.loanode,np.deg2rad(m.orbital_inclination),np.deg2rad(v.orbital_inclination),
+         m.argperiapsis,v.argperiapsis, 1000, t_ev = None)
+
+# Kijken of de parameters op t=1000 sense maken in het originele coordinate system
+Original_system_mercury = Variable_transfromations(stonks.y[-1][0], stonks.y[-1][2],
+                                                   stonks.y[-1][4], stonks.y[-1][6])
+
+IC = Initial_conditions(0.2056,0.006772,m.loanode,v.loanode,np.deg2rad(m.orbital_inclination),
+                        np.deg2rad(v.orbital_inclination),m.argperiapsis,v.argperiapsis)
+
+args = args(m.smaxis,v.smaxis,m.mass,v.mass,pdh.sun.mass)
 
 
 
