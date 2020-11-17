@@ -124,10 +124,8 @@ if not "planet9" in dicts:
 spec = [(i,dicttype) for i in dicts]
 spec += [('asteroids',types.ListType(dicttype))]
 
-print(spec)
-
-def create_pdh():
-	with open('data.json') as file:
+def create_pdh(filename):
+	with open(filename) as file:
 		data = json.load(file)
 	tojitclass = typed.Dict()
 	for i in data:
@@ -135,7 +133,6 @@ def create_pdh():
 		for j in data[i]:
 			temp[j]=data[i][j]
 		tojitclass[i]=temp
-	print(repr(tojitclass))
 	return JitPDH(tojitclass)
 
 @jitclass(spec)
@@ -155,8 +152,6 @@ class JitPDH:
 		self.asteroids = typed.List.empty_list(dicttype)
 
 		for i in rawdata:
-			print(i)
-			print(rawdata[i])
 			temp = rawdata[i]
 			if i == "sun":
 				self.sun = temp
@@ -203,37 +198,6 @@ class JitPDH:
 
 	def __str__(self):
 		return "Please don't print me, ask for my rawdata instead. I'll help you a bit though. \n" + str(self.rawdata)
-
-	# def save(self):
-	# 	"""Save using console, provides a walkthrough. Filename can be given with or without '.json'."""
-	# 	print([i for i in self.rawdata])
-	# 	selection = input("Which planets would you like to save? Type the names from the list given above separated with a space, leave empty for all.\n")
-	# 	try:
-	# 		if selection == '':
-	# 			out = self.rawdata
-	# 		else:
-	# 			out = {i:self.rawdata[i] for i in selection.split()}
-	# 		w = True
-	# 	except Exception as e:
-	# 		print(e)
-	# 		w = False
-	# 	if w:
-	# 		fname = input('Please enter the desired filename: ')
-	# 		if not fname[-5:] == '.json':
-	# 			fname = fname + '.json'
-	# 		with open(fname,'w') as file:
-	# 			json.dump(out,file,indent='\t')
-
-	# def save2(self,filename:str,selection:list=[]):
-	# 	"""Save using script, give a selection like ['mercury','earth'] and a filename with or without '.json'."""
-	# 	if selection == []:
-	# 		out = self.rawdata
-	# 	else:
-	# 		out = {i:self.rawdata[i] for i in selection}
-	# 	if not filename[-5:] == '.json':
-	# 		filename = filename + '.json'
-	# 	with open(filename,'w') as file:
-	# 		json.dump(out,file,indent='\t')
 
 	def set_kuyperbelt(self,total_mass,r_res,range_min,range_max,hom_mode=False):
 		"""Creates an array of planet objects for the euler lagrange method
