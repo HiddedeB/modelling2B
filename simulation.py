@@ -20,7 +20,7 @@ if __name__ == "__main__":
     # Example of 2D 2-body problem earth and sun
 
     # Parameters for the simulator
-    time_frame = np.array([0, 7*365.25*24*3600], dtype=int)
+    time_frame = np.array([0, 10*365.25*24*3600], dtype=int)
     step = 1000
     method = 'RK23'
     absolute_tolerance = 1e5
