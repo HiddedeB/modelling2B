@@ -123,6 +123,7 @@ if not "planet9" in dicts:
 	dicts.append("planet9")
 spec = [(i,dicttype) for i in dicts]
 spec += [('asteroids',types.ListType(dicttype))]
+spec += [('rawdata',types.DictType(dicttype))]
 
 def create_pdh(filename):
 	with open(filename) as file:
@@ -139,6 +140,7 @@ def create_pdh(filename):
 class JitPDH:
 	def __init__(self,rawdata):
 
+		self.rawdata = rawdata
 		self.sun = typed.Dict.empty(*dict_kv_ty)
 		self.mercury = typed.Dict.empty(*dict_kv_ty)
 		self.venus = typed.Dict.empty(*dict_kv_ty)
