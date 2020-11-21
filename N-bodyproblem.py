@@ -101,12 +101,21 @@ vec_beta2 = np.vectorize(beta2)
 
 # A calculations unequal
 beta_jupiter_2 = vec_beta2(alpha_matrix[0,1:])
-alpha_times_bar_matrix[0,1:] = -(1/4) * masses_dividor[0] * alpha_times_bar_matrix[0,1:] * beta_jupiter_2
+alpha_times_bar_matrix[0,1:] = -(1/4) * masses_dividor[0]* masses_vector[1:] *alpha_times_bar_matrix[0,1:] * beta_jupiter_2
 
 beta_saturn_21 = vec_beta2(alpha_matrix[1,:1])
 beta_saturn_22 = vec_beta2(alpha_matrix[1,2:])
 
-alpha_times_bar_matrix[1,:1] = -(1/4) * masses_dividor[1] * alpha_times_bar_matrix[1,:1] * beta_saturn_21
-alpha_times_bar_matrix[1,2:] = -(1/4) * masses_dividor[1] * alpha_times_bar_matrix[1,2:] * beta_saturn_21
+alpha_times_bar_matrix[1,:1] = -(1/4) * masses_dividor[1]*masses_vector[0]  * alpha_times_bar_matrix[1,:1] * beta_saturn_21
+alpha_times_bar_matrix[1,2:] = -(1/4) * masses_dividor[1] * masses_vector[2:]*alpha_times_bar_matrix[1,2:] * beta_saturn_22
+
+beta_uranus_21 = vec_beta2(alpha_matrix[2,:2])
+beta_uranus_22 = vec_beta2(alpha_matrix[2,3:])
+
+alpha_times_bar_matrix[2,:2] = -(1/4) * masses_dividor[2]*masses_vector[:2]  * alpha_times_bar_matrix[2,:2] * beta_uranus_21
+alpha_times_bar_matrix[2,3:] = -(1/4) * masses_dividor[2] * masses_vector[3:]*alpha_times_bar_matrix[2,3:] * beta_uranus_22
+
+beta_neptune_2 = vec_beta2(alpha_matrix[3,:3])
+alpha_times_bar_matrix[3,:3] = -(1/4) * masses_dividor[3]* masses_vector[:3] *alpha_times_bar_matrix[3,:3] * beta_neptune_2
 
 
