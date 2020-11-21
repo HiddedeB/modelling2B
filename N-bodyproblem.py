@@ -43,7 +43,7 @@ def alpha_calculator(semi_major):
     alpha_neptunus_total = semi_major[3]/(semi_major_n[:4]) #internal elements
 
     # Calculating alpha_bar for jupiter
-    alpha_bar_jupiter = np.ones(3)
+    alpha_bar_jupiter = alpha_jupiter
 
     # Calculating alpha bar elements for saturn
     alpha_bar_saturn = np.concatenate([np.ones(1),alpha_saturnus_exeternal])
@@ -52,32 +52,32 @@ def alpha_calculator(semi_major):
     alpha_bar_uranus = np.concatenate([np.ones(2), alpha_uranus_exeternal])
 
     # Calculating_alpha_bar elements for neptunus
-    alpha_bar_neptunus = alpha_neptunus_total
+    alpha_bar_neptunus = np.ones(3)
 
     # Making matrix of these elements for alpha:
     zero_matrix = np.zeros((4,4))
     zero_matrix[0,1:] = alpha_jupiter
-    zero_matrix[1][0] = alpha_saturnus_internal
+    zero_matrix[1,:1] = alpha_saturnus_internal
     zero_matrix[1,2:] = alpha_saturnus_exeternal
     zero_matrix[2,0:2] = alpha_uranus_internal
-    zero_matrix[2][3] = alpha_uranus_exeternal
+    zero_matrix[2,3:] = alpha_uranus_exeternal
     zero_matrix[3,0:3] = alpha_neptunus_total
     alpha_matrix = zero_matrix
 
     # Making matrix of these elements for alpha_times_bar:
     zero_matrix = np.zeros((4,4))
     zero_matrix[0,1:] = alpha_jupiter * alpha_bar_jupiter
-    zero_matrix[1][0] = alpha_saturnus_internal * alpha_bar_saturn[:1]
+    zero_matrix[1,:1] = alpha_saturnus_internal * alpha_bar_saturn[:1]
     zero_matrix[1,2:] = alpha_saturnus_exeternal * alpha_bar_saturn[1:]
     zero_matrix[2,0:2] = alpha_uranus_internal * alpha_bar_uranus[:2]
-    zero_matrix[2][3] = alpha_uranus_exeternal*alpha_bar_uranus[2:]
+    zero_matrix[2,3:] = alpha_uranus_exeternal*alpha_bar_uranus[2:]
     zero_matrix[3,0:3] = alpha_neptunus_total * alpha_bar_neptunus
     alpha_times_bar_matrix = zero_matrix
 
     return alpha_matrix, alpha_times_bar_matrix
 
 alpha_matrix,alpha_times_bar_matrix = alpha_calculator(alpha_vector)
-
+a,b = alpha_calculator(alpha_vector)
 # Adjusting the alpha_matrix in a slightly better form for doing calculations later on
 alpha_times_bar_matrix[0,:]= alpha_times_bar_matrix[0,:] * n_vector[0]
 alpha_times_bar_matrix[1,:] = alpha_times_bar_matrix[1,:]  * n_vector[1]
@@ -155,17 +155,17 @@ A_matrix = A_matrix + np.diag(A_vector_equal)
 B_matrix = B_matrix + np.diag(B_vector_equal)
 
 # System of equations maker
-def sys_of_eq_maker(t,y, A_matrix,B_matrix):
-    h1,h2,h3,h4,k1,k2,k3,k4,p1,p2,p3,p4,q1,q2,q3,q4 = y
-    elements1 = np.array([[k1,k2,k3,k4]
-                         [-h1,-h2,-h3,-h4]])
-    elements2 = np.array([q1,q2,q3,q4],
-                         [-p1,-p2,-p3,-p4])
-
-    resulting_vectors1 = A_matrix.dot(elements1)
-    resulting_vectors2 = B_matrix.dot(elements2)
-
-    return
+#def sys_of_eq_maker(t,y, A_matrix,B_matrix):
+#    h1,h2,h3,h4,k1,k2,k3,k4,p1,p2,p3,p4,q1,q2,q3,q4 = y
+#    elements1 = np.array([[k1,k2,k3,k4]
+#                         [-h1,-h2,-h3,-h4]])
+#    elements2 = np.array([q1,q2,q3,q4],
+#                         [-p1,-p2,-p3,-p4])
+#
+#    resulting_vectors1 = A_matrix.dot(elements1)
+#    resulting_vectors2 = B_matrix.dot(elements2)
+#
+#    return
 
 
 
