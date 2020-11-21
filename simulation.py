@@ -192,3 +192,6 @@ class simulation():
                             max_step=max_step)
 
 
+if __name__ == '__main__':
+    file_name = 'data.json'
+    sim = simulation(file_name=file_name)
