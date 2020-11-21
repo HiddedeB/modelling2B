@@ -5,6 +5,7 @@ from scipy.integrate import solve_ivp
 from scipy.integrate import quad
 # Imporing all the important planetary data
 pdh = PlanetaryDataHandler()
+sun = pdh.sun
 j=pdh.jupiter
 s = pdh.saturn
 u = pdh.uranus
@@ -12,6 +13,8 @@ n = pdh.neptune
 
 # Semi-major axis of the 4 giants
 alpha_vector = np.array([j.smaxis, s.smaxis, u.smaxis, n.smaxis])
+masses_vector = np.array([j.mass, s.mass, u.mass, n.mass])
+masses_dividor = 1/(sun.mass+masses_vector)
 
 # Calculating the right alpha elements, alpha and alpha bar for the matrix elements
 
@@ -73,19 +76,19 @@ alpha_matrix,alpha_times_bar_matrix = alpha_calculator(alpha_vector)
 n_vector = 2*np.pi/(alpha_vector**(3/2))
 
 # Adjusting the alpha_matrix in a slightly better form for doing calculations later on
-alpha_times_bar_matrix[0,:]=alpha_times_bar_matrix[0,:] * n_vector[0]
+alpha_times_bar_matrix[0,:]= alpha_times_bar_matrix[0,:] * n_vector[0]
 alpha_times_bar_matrix[1,:] = alpha_times_bar_matrix[1,:]  * n_vector[1]
 alpha_times_bar_matrix[2,:] = alpha_times_bar_matrix[2,:]  * n_vector[2]
 alpha_times_bar_matrix[3,:] = alpha_times_bar_matrix[3,:]  * n_vector[3]
 
 # The b_3/2 elements
 def integrand1(phi, alpha):
-    return (1 / np.pi) * np.cos(phi) / (1 - 2 * alpha_matrix[0,:] *
+    return (1 / np.pi) * np.cos(phi) / (1 - 2 * alpha *
                                         np.cos(phi) + alpha ** 2) ** (3/2) # angle phi
 
 def integrand2(phi,alpha):
-    return (1 / np.pi) * np.cos(2 * phi) / (1 - 2 * alpha_matrix[0,:] *
-                                            np.cos(2 * phi) + alpha_matrix[1,:] ** 2) ** (3 / 2)  # angle 2*phi
+    return (1 / np.pi) * np.cos(2 * phi) / (1 - 2 * alpha *
+                                            np.cos(2 * phi) + alpha ** 2) ** (3 / 2)  # angle 2*phi
 
 def beta1(alpha):
     return quad(integrand1, 0, 2*np.pi, args=(alpha))[0]
@@ -96,5 +99,14 @@ def beta2(alpha):
 vec_beta1 = np.vectorize(beta1)
 vec_beta2 = np.vectorize(beta2)
 
-# Making the Beta Matrix
+# A calculations unequal
+beta_jupiter_2 = vec_beta2(alpha_matrix[0,1:])
+alpha_times_bar_matrix[0,1:] = -(1/4) * masses_dividor[0] * alpha_times_bar_matrix[0,1:] * beta_jupiter_2
+
+beta_saturn_21 = vec_beta2(alpha_matrix[1,:1])
+beta_saturn_22 = vec_beta2(alpha_matrix[1,2:])
+
+alpha_times_bar_matrix[1,:1] = -(1/4) * masses_dividor[1] * alpha_times_bar_matrix[1,:1] * beta_saturn_21
+alpha_times_bar_matrix[1,2:] = -(1/4) * masses_dividor[1] * alpha_times_bar_matrix[1,2:] * beta_saturn_21
+
 
