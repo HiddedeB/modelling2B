@@ -22,7 +22,7 @@ if __name__ == "__main__":
     # Parameters for the simulator
     time_frame = np.array([0, 10*365.25*24*3600], dtype=int)
     step = 1000
-    method = 'RK23'
+    method = 'RK23'[]
     absolute_tolerance = 1e5
     relative_tolerance = 1e4
 

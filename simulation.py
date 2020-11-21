@@ -132,6 +132,12 @@ class simulation():
         return np.array([h, k, p, q])
 
     @staticmethod
+    def variable_transfromations(h, k, p, q):
+        '''NOTE: Function to transfer the new made coordinates h, k, p, q to e, I, var_omega and big_omega'''
+        return np.array([np.sqrt(h**2 + k**2), np.sqrt(p**2 + q**2), np.arcsin(h/np.sqrt(h**2 + k**2)),
+                         np.arcsin(p/np.sqrt(p**2 + q**2))])
+
+    @staticmethod
     @njit
     def orbital_calculator(t, vector, a_matrix, b_matrix):
         '''NOTE: function to run the solver with, vector contains h, k, p, q in that order. Furthermore, the values are
@@ -190,6 +196,16 @@ class simulation():
         solution = solve_ivp(self.orbital_calculator, t_span=time_scale, y0=initial_conditions, args=(a_matrix,
                             b_matrix), method=method, rtol=relative_tolerance, atol=absolute_tolerance,
                             max_step=max_step)
+
+        planet_number = a_matrix.shape()[0]
+        data = solution['y']
+        h = data[:planet_number, :]
+        k = data[planet_number:2 * planet_number, :]
+        p = data[2 * planet_number: 3 * planet_number, :]
+        q = data[3 * planet_number:, :]
+        e, I, var_omega, big_omega = self.variable_transfromations(h, k, p, q)
+
+        return e, I, var_omega, big_omega, solution
 
 
 if __name__ == '__main__':
