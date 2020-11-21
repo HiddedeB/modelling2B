@@ -55,7 +55,7 @@ class simulation():
             def g(phi, alpha):
                 # Angle phi
                 if alpha != 0:
-                    return (1 / np.pi) * np.cos(phi) / (1 - 2 * alpha * np.cos(phi) + alpha ** 2) ** (3 / 2)
+                    return (1 / np.pi) * np.cos(phi) / (1 - 2 * alpha * np.cos(phi) + alpha**2)**(3 / 2)
                 else:
                     return 0
 
@@ -65,7 +65,7 @@ class simulation():
             def f(phi, alpha):
                 # Angle 2*phi
                 if alpha != 0:
-                    return (1 / np.pi) * np.cos(2 * phi) / (1 - 2 * alpha * np.cos(2 * phi) + alpha ** 2) ** (3 / 2)
+                    return (1 / np.pi) * np.cos(2 * phi) / (1 - 2 * alpha * np.cos(2 * phi) + alpha**2)**(3 / 2)
                 else:
                     return 0
 
