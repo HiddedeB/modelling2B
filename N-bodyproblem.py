@@ -45,24 +45,16 @@ def alpha_calculator(semi_major):
 
     # Making matrix of these elements:
     zero_matrix = np.zeros((4,4))
-    zero_matrix[0,1:] = alpha_jupiter
-    zero_matrix[1][0] = alpha_saturnus_internal
-    zero_matrix[1,2:] = alpha_saturnus_exeternal
-    zero_matrix[2,0:2] = alpha_uranus_internal
-    zero_matrix[2][3] = alpha_uranus_exeternal
-    zero_matrix[3,0:3] = alpha_neptunus_total
-    alpha_matrix = zero_matrix
+    zero_matrix[0,1:] = alpha_jupiter * alpha_bar_jupiter
+    zero_matrix[1][0] = alpha_saturnus_internal * alpha_bar_saturn[:1]
+    zero_matrix[1,2:] = alpha_saturnus_exeternal * alpha_bar_saturn[1:]
+    zero_matrix[2,0:2] = alpha_uranus_internal * alpha_bar_uranus[:2]
+    zero_matrix[2][3] = alpha_uranus_exeternal*alpha_bar_uranus[2:]
+    zero_matrix[3,0:3] = alpha_neptunus_total * alpha_bar_neptunus
+    alpha_times_bar_matrix = zero_matrix
 
-    zero_matrix = np.zeros((4,4))
-    zero_matrix[0,1:] = alpha_bar_jupiter
-    zero_matrix[1][0] = alpha_bar_saturn[:1]
-    zero_matrix[1,2:] = alpha_bar_saturn[1:]
-    zero_matrix[2,0:2] = alpha_bar_uranus[:2]
-    zero_matrix[2][3] = alpha_bar_uranus[2:]
-    zero_matrix[3,0:3] = alpha_bar_neptunus
-    alpha_bar_matrix = zero_matrix
+    return alpha_times_bar_matrix
 
-    return alpha_matrix, alpha_bar_matrix
+alpha_matrix = alpha_calculator(alpha_vector)
 
-alpha_matrix,alpha_bar_matrix = alpha_calculator(alpha_vector)
-
+#
