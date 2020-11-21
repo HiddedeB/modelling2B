@@ -1,8 +1,7 @@
 from PlanetClass import planet
 import warnings, numpy as np, json
-from numba import types, typed
+from numba import types, typed, typeof
 from numba.experimental import jitclass
-import ast
 
 class PlanetaryDataHandler:
 	def __init__(self):
@@ -123,7 +122,8 @@ if not "planet9" in dicts:
 	dicts.append("planet9")
 spec = [(i,dicttype) for i in dicts]
 spec += [('asteroids',types.ListType(dicttype))]
-spec += [('rawdata',types.DictType(dicttype))]
+d = typed.Dict.empty(key_type=types.unicode_type,value_type=dicttype)
+spec += [('rawdata',typeof(d))]
 
 def create_pdh(filename):
 	with open(filename) as file:
@@ -176,9 +176,6 @@ class JitPDH:
 			else:
 				self.planet9 = temp
 
-	def get_planets(self):
-		return np.array([getattr(self,i) for i in self.rawdata])
-
 	def createnewplanet(self,mass=0,radius=0,loanode=0,
 		eccentricity=0,smaxis=0,argperiapsis=0,orbital_inclination=0,mean_longitude=0):
 
@@ -199,6 +196,7 @@ class JitPDH:
 		return True
 
 	def __str__(self):
+		# Dit werkt niet for some reason
 		return "Please don't print me, ask for my rawdata instead. I'll help you a bit though. \n" + str(self.rawdata)
 
 	def set_kuyperbelt(self,total_mass,r_res,range_min,range_max,hom_mode=False):
