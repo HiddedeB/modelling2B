@@ -1,92 +1,194 @@
-import scipy as sc
 import numpy as np
+from data import create_pdh
 from scipy.integrate import solve_ivp
-import astropy.constants as const
-import matplotlib.pyplot as plt
+from scipy.integrate import quad
 from numba import njit
-import copy
-from data import PlanetaryDataHandler
-pdh = PlanetaryDataHandler()
 
+class simulation():
+    '''Class to compute simulation of the orbital elements'''
 
+    def __init__(self, file_name):
+        '''NOTE: Initial function that sets up all the different attributes of our class.
+        :param file_name: File_name directing to data file for planethandler.
+        :type file_name: str
+        '''
 
-if __name__ == "__main__":
-    def static(value):
-        return copy.deepcopy(value)
+        pdh = create_pdh(file_name)
+        self.j = pdh.jupiter
+        self.s = pdh.saturn
+        self.u = pdh.uranus
+        self.n = pdh.neptune
+        self.sun = pdh.sun
+        self.smaxis_vector = np.array([self.j.smaxis, self.s.smaxis, self.u.smaxis, self.n.smaxis])
+        self.mass_vector = np.array([self.j.mass, self.s.mass, self.u.mass, self.n.mass])
+        self.J_2_vector = np.array([14736, 16298, 3343, 3411])
+        self.J_4_vector = np.array([-587, -915, -29, -35])
+        self.n_vector = 2 * np.pi / (self.smaxis_vector**(3 / 2))
 
-    def orbital_velocity(axis, mass, G):
-        return np.sqrt(G/axis*mass)
+    def alpha_matrix(self):
+        '''NOTE: Function to compute the alpha matrix and the alpha bar and alpha product matrix. '''
+        alpha_matrix = np.zeros(4)
+        alpha_bar_times_alpha_matrix = np.zeros(4)
+        for i in range(len(self.smaxis_vector)):
+            current_alpha = self.smaxis_vector[i] / np.delete(self.smaxis_vector, i)
+            current_alpha = np.insert(current_alpha, obj=i, values=0)
+            alpha_matrix = np.vstack((alpha_matrix, current_alpha))
 
-    # Example of 2D 2-body problem earth and sun
+            alpha_bar_times_alpha_matrix = np.vstack((alpha_bar_times_alpha_matrix,
+                                                      np.concatenate((np.repeat(1, i), current_alpha[i:]))
+                                                      * current_alpha))
 
-    # Parameters for the simulator
-    time_frame = np.array([0, 10*365.25*24*3600], dtype=int)
-    step = 1000
-    method = 'RK23'
-    absolute_tolerance = 1e5
-    relative_tolerance = 1e4
+        alpha_matrix = alpha_matrix[1:]
+        alpha_bar_times_alpha_matrix = alpha_bar_times_alpha_matrix[1:]
 
-    # Masses
-    mass_earth = static(pdh.earth.mass)
-    mass_sun = static(pdh.sun.mass)
-    mass_mars = static(pdh.mars.mass)
-    mass_jupiter = static(pdh.jupiter.mass)
-    mass_saturn = static(pdh.saturn.mass)
+        return alpha_matrix, alpha_bar_times_alpha_matrix
 
-    mass = np.array([mass_earth,
-                     mass_mars,
-                     mass_jupiter,
-                     mass_saturn,
-                     mass_sun], dtype=float)
+    @staticmethod
+    def beta_values(alpha_matrix):
+        '''NOTE: function to compute the b_{2/3} values needed for the A and B matrices.
+        :param alpha_matrix: alpha matrix, consisting of all the different alphas, specified by the equations 7.128 and
+        7.129 in Solar System dynamics.
+        :type alpha_matrix: ndarray.
+        '''
 
-    # Initial conditions
-    G = static(const.G.value)
-    earth_axis = static(pdh.earth.smaxis)
-    sun_axis = 0
-    mars_axis = static(pdh.mars.smaxis)
-    jupiter_axis = static(pdh.jupiter.smaxis)
-    saturn_axis = static(pdh.saturn.smaxis)
+        def beta1(alpha):
+            def g(phi, alpha):
+                # Angle phi
+                if alpha != 0:
+                    return (1 / np.pi) * np.cos(phi) / (1 - 2 * alpha * np.cos(phi) + alpha ** 2) ** (3 / 2)
+                else:
+                    return 0
 
-    initial_position = [earth_axis, 0,
-                        -mars_axis, 0,
-                        jupiter_axis, 0,
-                        -saturn_axis, 0,
-                        sun_axis, 0]
-    initial_velocity = [0, 2.9765e4,
-                         0, -orbital_velocity(mars_axis, mass_sun, G),
-                         0, orbital_velocity(jupiter_axis, mass_sun, G),
-                         0, -orbital_velocity(saturn_axis, mass_sun, G),
-                        0, 0]
-    initial_conditions = np.array(initial_position + initial_velocity, dtype=float)
+            return quad(g, 0, 2 * np.pi, args=(alpha))[0]
 
+        def beta2(alpha):
+            def f(phi, alpha):
+                # Angle 2*phi
+                if alpha != 0:
+                    return (1 / np.pi) * np.cos(2 * phi) / (1 - 2 * alpha * np.cos(2 * phi) + alpha ** 2) ** (3 / 2)
+                else:
+                    return 0
+
+            return quad(f, 0, 2 * np.pi, args=(alpha))[0]
+
+        vec_beta1 = np.vectorize(beta1)
+        vec_beta2 = np.vectorize(beta2)
+
+        return np.array([vec_beta1(alpha_matrix), vec_beta2(alpha_matrix)])
+
+    def a_b_matrices(self, alpha_bar_times_alpha_matrix, beta):
+        '''NOTE: Function to compute the A and B matrices needed to build the differential equations.
+        :param alpha_bar_times_alpha_matrix: Outputted as the second argument of function alpha_matrix. This is the
+        product of the regular alpha_matrix and the alpha_bar_matrix as specified by the equations 7.128 and
+        7.129 in Solar System dynamics.
+        :param beta: The array of two beta matrices as generated by the function beta_values.
+        :type alpha_bar_times_alpha_matrix: ndarray.
+        :type beta: ndarray.
+        '''
+
+        # Off-diagonal components
+        sub_matrix = 1/4 * self.mass_vector / (self.sun.mass + self.mass_vector[:, np.newaxis])\
+                     * alpha_bar_times_alpha_matrix * self.n_vector[:, np.newaxis]
+
+        a = -sub_matrix
+        b = sub_matrix * beta[0]
+
+        # Diagonal elements i.e. A_{jj} and B_{jj}, first line calculates extra part, second line the sum part
+        a_d = self.n_vector * ((self.sun.radius / self.smaxis_vector)**2 * (3/2 * self.J_2_vector -
+                               (self.sun.radius / self.smaxis_vector)**2 * (15/4 * self.J_4_vector +
+                                                                            9/8 * self.J_2_vector**2)))
+        a_new = a * beta[0]
+        a_d = a_d + a_new.sum(axis=1)
+
+        b_d = -self.n_vector * ((self.sun.radius / self.smaxis_vector)**2 * (3/2 * self.J_2_vector -
+                                (self.sun.radius / self.smaxis_vector)**2 * (15/4 * self.J_4_vector +
+                                                                             27/8 * self.J_2_vector**2)))
+        b_d = b_d + b.sum(axis=1)
+
+        a_matrix = np.diag(a_d) + a * beta[1]
+        b_matrix = np.diag(b_d) + b
+
+        return a_matrix, b_matrix
+
+    @staticmethod
+    def initial_condition_builder(e, var_omega, I, big_omega):
+        '''NOTE: Initial condition maker, if the initial conditions are not in h, k, p and q form, then this function
+        can be called to transfer them.
+        :param e: The eccentricities of the orbits.
+        :type e: ndarray
+        :param var_omega: The difference between big_omega and omega for every orbit.
+        :type var_omega: ndarray
+        :param I: The angles of the orbit w.r.t. the reference frame.
+        :type I: ndarray
+        :param big_omega: The angles between the ascending node and the reference frame x-hat direction for every orbit
+        :type big_omega: ndarray
+        '''
+
+        h = e * np.sin(var_omega)
+        k = e * np.cos(var_omega)
+        p = I * np.sin(big_omega)
+        q = I * np.cos(big_omega)
+
+        return np.array([h, k, p, q])
+
+    @staticmethod
     @njit
-    def equation_of_speed(t, vec, mass, G):
-        length = int(len(vec)/2)
-        r = np.sqrt(vec[:length:2]**2+vec[1:length:2]**2)
-        x, y = vec[:length:2], vec[1:length:2]
-        a = np.zeros(length)
+    def orbital_calculator(t, vector, a_matrix, b_matrix):
+        '''NOTE: function to run the solver with, vector contains h, k, p, q in that order. Furthermore, the values are
+        taken to go from closes to the sun to most outward.
+        :param a_matrix: The A matrix of the system of equations in eq 7.136 of Solar System Dynamics.
+        :param b_matrix: The B matrix of the system of equations mentioned before.
+        :type a_matrix: ndarray
+        :type b_matrix: ndarray
+        '''
 
-        #maybe matrix voor for loop.
-        for i in range(1, int(length/2)):
-            # Calculation of V via gravitation force (Newtonian)
-            theta = np.arctan2((y-np.roll(y, i)), (x-np.roll(x, i)))
+        # Setting up the differential equations according to 7.25 and 7.26 from Solar System Dynamics. Since the a and
+        # b matrices are both square and contain as many entries as planets, we use this for splitting our data vector.
+        planet_number = a_matrix.shape()[0]
+        h_vector = vector[:planet_number]
+        k_vector = vector[planet_number:2 * planet_number]
+        p_vector = vector[2 * planet_number: 3 * planet_number]
+        q_vector = vector[3 * planet_number:]
 
-            a[::2] = a[::2] - np.roll(mass, i)*G/np.abs(r-np.roll(r, i))**2 * np.cos(theta)
-            a[1::2] = a[1::2] - np.roll(mass, i)*G/np.abs(r-np.roll(r, i))**2 * np.sin(theta)
+        # Differential equations.
+        d_h_matrix = a_matrix * k_vector
+        d_h_vec = d_h_matrix.sum(axis=1)
+        d_k_matrix = a_matrix * h_vector
+        d_k_vec = -d_k_matrix.sum(axis=1)
+        d_p_matrix = b_matrix * q_vector
+        d_p_vec = d_p_matrix.sum(axis=1)
+        d_q_matrix = b_matrix * p_vector
+        d_q_vec = -d_q_matrix.sum(axis=1)
 
-        dv_total = a
-        d_total = vec[length:]
+        return np.array([d_h_vec, d_k_vec, d_p_vec, d_q_vec])
 
-        d_vec = np.concatenate((d_total, dv_total))
-        return d_vec
+    def run(self, time_scale, form_of_ic, initial_conditions, max_step, method, relative_tolerance, absolute_tolerance):
+        ''''NOTE: Function to run this class and compute the simulation, returns the ode_solver solution.
+         :param time_scale: The time interval over which to be simulated.
+         :type time_scale: list
+         :param form_of_ic: The form of the initial conditions. If True, h, k, p, q coordinates, if False, e, var_omega
+         I and big_omega coordinates.
+         :type form_of_ic: bool
+         :param initial_conditions: The initial conditions given in the parameters h, k, p, q or e, var_omega, I and
+         big_omega.
+         :type initial_conditions: 1darry
+         :param max_step: The maximum allowed step size for the simulator.
+         :type max_step: int
+         :param method: Method of the solver.
+         :type method: str
+         :param relative_tolerance: The relative accuracy of the solver.
+         :type relative_tolerance: float
+         :param absolute_tolerance: The absolute tolerance of the solver.
+         :type absolute_tolerance: float
+         '''
 
-    dy = equation_of_speed(time_frame[0], initial_conditions, mass, G)
-    solution = solve_ivp(equation_of_speed, t_span=time_frame, y0=initial_conditions, args=(mass, G), max_step=step,
-                        method=method, rtol=relative_tolerance, atol=absolute_tolerance)
-    data = solution['y']
-    plt.figure()
-    for i in range(len(mass)):
-        plt.plot(data[2*i], data[1+2*i])
-    plt.gca().set_aspect('equal', adjustable='box')
-    plt.show()
+        if not form_of_ic:
+            initial_conditions = self.initial_condition_builder(*initial_conditions)
+        alpha_matrix, alpha_times_alpha_bar_matrix = self.alpha_matrix()
+        beta = self.beta_values(alpha_matrix)
+        a_matrix, b_matrix = self.a_b_matrices(alpha_times_alpha_bar_matrix, beta)
+        solution = solve_ivp(self.orbital_calculator, t_span=time_scale, y0=initial_conditions, args=(a_matrix,
+                            b_matrix), method=method, rtol=relative_tolerance, atol=absolute_tolerance,
+                            max_step=max_step)
+
 
