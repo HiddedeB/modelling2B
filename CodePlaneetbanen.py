@@ -112,6 +112,13 @@ def variable_transfromations(h,k,p,q):
                     np.arcsin(h/np.sqrt(h**2+k**2)), np.arcsin(p/np.sqrt(p**2+q**2))])
 
 
+#N_variable planet simulations
+
+
+
+
+
+
 
 
 
@@ -136,7 +143,6 @@ original_system_mercury = variable_transfromations(z.T[-1][0], z.T[-1][2],
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 theta_values = np.linspace(0,2*np.pi,10**3)
-#matplotlib.use('Agg')
 plt.ioff()
 for i in range(np.size(z[0])):
     fig = plt.figure()
