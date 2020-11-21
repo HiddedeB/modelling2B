@@ -19,8 +19,8 @@ class simulation():
         self.u = pdh.uranus
         self.n = pdh.neptune
         self.sun = pdh.sun
-        self.smaxis_vector = np.array([self.j.smaxis, self.s.smaxis, self.u.smaxis, self.n.smaxis])
-        self.mass_vector = np.array([self.j.mass, self.s.mass, self.u.mass, self.n.mass])
+        self.smaxis_vector = np.array([self.j['smaxis'], self.s['smaxis'], self.u['smaxis'], self.n['smaxis']])
+        self.mass_vector = np.array([self.j['mass'], self.s['mass'], self.u['mass'], self.n['mass']])
         self.J_2_vector = np.array([14736, 16298, 3343, 3411])
         self.J_4_vector = np.array([-587, -915, -29, -35])
         self.n_vector = 2 * np.pi / (self.smaxis_vector**(3 / 2))
@@ -87,21 +87,21 @@ class simulation():
         '''
 
         # Off-diagonal components
-        sub_matrix = 1/4 * self.mass_vector / (self.sun.mass + self.mass_vector[:, np.newaxis])\
+        sub_matrix = 1/4 * self.mass_vector / (self.sun['mass'] + self.mass_vector[:, np.newaxis])\
                      * alpha_bar_times_alpha_matrix * self.n_vector[:, np.newaxis]
 
         a = -sub_matrix
         b = sub_matrix * beta[0]
 
         # Diagonal elements i.e. A_{jj} and B_{jj}, first line calculates extra part, second line the sum part
-        a_d = self.n_vector * ((self.sun.radius / self.smaxis_vector)**2 * (3/2 * self.J_2_vector -
-                               (self.sun.radius / self.smaxis_vector)**2 * (15/4 * self.J_4_vector +
+        a_d = self.n_vector * ((self.sun['radius'] / self.smaxis_vector)**2 * (3/2 * self.J_2_vector -
+                               (self.sun['radius'] / self.smaxis_vector)**2 * (15/4 * self.J_4_vector +
                                                                             9/8 * self.J_2_vector**2)))
         a_new = a * beta[0]
         a_d = a_d + a_new.sum(axis=1)
 
-        b_d = -self.n_vector * ((self.sun.radius / self.smaxis_vector)**2 * (3/2 * self.J_2_vector -
-                                (self.sun.radius / self.smaxis_vector)**2 * (15/4 * self.J_4_vector +
+        b_d = -self.n_vector * ((self.sun['radius'] / self.smaxis_vector)**2 * (3/2 * self.J_2_vector -
+                                (self.sun['radius'] / self.smaxis_vector)**2 * (15/4 * self.J_4_vector +
                                                                              27/8 * self.J_2_vector**2)))
         b_d = b_d + b.sum(axis=1)
 
@@ -195,3 +195,6 @@ class simulation():
 if __name__ == '__main__':
     file_name = 'data.json'
     sim = simulation(file_name=file_name)
+    alpha, alpha_bar_times_alpha = sim.alpha_matrix()
+    beta = sim.beta_values(alpha)
+    a, b = sim.a_b_matrices(alpha_bar_times_alpha, beta)
