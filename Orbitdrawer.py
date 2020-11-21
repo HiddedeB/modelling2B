@@ -1,4 +1,5 @@
-
+import numpy as np
+import matplotlib.pyplot as plt
 
 # mercury Data
 mass_m = 0.33e24 #kg
@@ -43,6 +44,8 @@ def plotelips3d(theta,eccentricity,smaxis,Omega,omega,I):
     ax = fig.add_subplot(111, projection='3d')
     ax.plot(X,Y,Z, c='red')
     plt.show()
+
+
 
 #making plot for 0 to 2pi
 theta_values = np.linspace(0,2*np.pi,1000)
