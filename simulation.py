@@ -213,4 +213,4 @@ if __name__ == '__main__':
     sim = simulation(file_name=file_name)
     alpha, alpha_bar_times_alpha = sim.alpha_matrix()
     beta = sim.beta_values(alpha)
-    a, b = sim.a_b_matrices(alpha_bar_times_alpha, beta)
+    a, b = sim.a_b_matrices(alpha_bar_times_alpha, beta) # TODO add in richardson extrapolation Q(2h)-Q(4h)/Q(h)-Q(2h) = 2^p with p the order, for h we take the step size probably
