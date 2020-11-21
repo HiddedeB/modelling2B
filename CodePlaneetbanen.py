@@ -112,6 +112,13 @@ def variable_transfromations(h,k,p,q):
                     np.arcsin(h/np.sqrt(h**2+k**2)), np.arcsin(p/np.sqrt(p**2+q**2))])
 
 
+#N_variable planet simulations
+
+
+
+
+
+
 
 
 
