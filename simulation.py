@@ -218,11 +218,11 @@ if __name__ == '__main__':
     # orbital inclination is I
     omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
     big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
-    inclination = np.array([sim.j['orbital_inclination'], sim.s['orbital_inclination'], sim.n['orbital_inclination'],
-                            sim.u['orbital_inclination']])
+    inclination = np.array([sim.j['orbital inclination'], sim.s['orbital inclination'], sim.n['orbital inclination'],
+                            sim.u['orbital inclination']])
     eccentricity = np.array([sim.j['eccentricity'], sim.s['eccentricity'], sim.n['eccentricity'], sim.u['eccentricity']])
     var_omega = omega+big_omega
-    initial_conditions = np.concatenate(eccentricity, var_omega, inclination, big_omega)
+    initial_conditions = np.concatenate((eccentricity, var_omega, inclination, big_omega))
 
     t_eval = [0, 365.25*24*3600*10**6]
     max_step = 365.25*24*3600*10**3
@@ -230,4 +230,4 @@ if __name__ == '__main__':
     method = 'RK23'
     a_tol = 10**4
     r_tol = 10**3
-    e, I, var, big_omega = sim.run(time_scale=t_eval, form_of_ic=form_of_ic, initial_conditions=initial_conditions ,max_step=max_step, method=method, relative_tolerance=rtol, absolute_tolerance=a_tol)
+    e, I, var, big_omega = sim.run(time_scale=t_eval, form_of_ic=form_of_ic, initial_conditions=initial_conditions ,max_step=max_step, method=method, relative_tolerance=r_tol, absolute_tolerance=a_tol)
