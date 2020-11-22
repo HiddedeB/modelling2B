@@ -96,13 +96,13 @@ class simulation():
         # Diagonal elements i.e. A_{jj} and B_{jj}, first line calculates extra part, second line the sum part
         a_d = self.n_vector * ((self.sun['radius'] / self.smaxis_vector)**2 * (3/2 * self.J_2_vector -
                                (self.sun['radius'] / self.smaxis_vector)**2 * (15/4 * self.J_4_vector +
-                                                                            9/8 * self.J_2_vector**2)))
+                                                                               9/8 * self.J_2_vector**2)))
         a_new = a * beta[0]
         a_d = a_d + a_new.sum(axis=1)
 
         b_d = -self.n_vector * ((self.sun['radius'] / self.smaxis_vector)**2 * (3/2 * self.J_2_vector -
                                 (self.sun['radius'] / self.smaxis_vector)**2 * (15/4 * self.J_4_vector +
-                                                                             27/8 * self.J_2_vector**2)))
+                                                                                27/8 * self.J_2_vector**2)))
         b_d = b_d + b.sum(axis=1)
 
         a_matrix = np.diag(a_d) + a * beta[1]
@@ -132,7 +132,7 @@ class simulation():
         return np.array([h, k, p, q])
 
     @staticmethod
-    def variable_transfromations(h, k, p, q):
+    def variable_transformations(h, k, p, q):
         '''NOTE: Function to transfer the new made coordinates h, k, p, q to e, I, var_omega and big_omega'''
         return np.array([np.sqrt(h**2 + k**2), np.sqrt(p**2 + q**2), np.arcsin(h/np.sqrt(h**2 + k**2)),
                          np.arcsin(p/np.sqrt(p**2 + q**2))])
@@ -169,7 +169,7 @@ class simulation():
         return np.array([d_h_vec, d_k_vec, d_p_vec, d_q_vec])
 
     def run(self, time_scale, form_of_ic, initial_conditions, max_step, method, relative_tolerance, absolute_tolerance):
-        ''''NOTE: Function to run this class and compute the simulation, returns the ode_solver solution.
+        '''NOTE: Function to run this class and compute the simulation, returns the ode_solver solution.
          :param time_scale: The time interval over which to be simulated.
          :type time_scale: list
          :param form_of_ic: The form of the initial conditions. If True, h, k, p, q coordinates, if False, e, var_omega
@@ -203,10 +203,9 @@ class simulation():
         k = data[planet_number:2 * planet_number, :]
         p = data[2 * planet_number: 3 * planet_number, :]
         q = data[3 * planet_number:, :]
-        e, I, var_omega, big_omega = self.variable_transfromations(h, k, p, q)
+        e, I, var_omega, big_omega = self.variable_transformations(h, k, p, q)
 
         return e, I, var_omega, big_omega, solution
-
 
 if __name__ == '__main__':
     file_name = 'data.json'
@@ -214,3 +213,21 @@ if __name__ == '__main__':
     alpha, alpha_bar_times_alpha = sim.alpha_matrix()
     beta = sim.beta_values(alpha)
     a, b = sim.a_b_matrices(alpha_bar_times_alpha, beta) # TODO add in richardson extrapolation Q(2h)-Q(4h)/Q(h)-Q(2h) = 2^p with p the order, for h we take the step size probably
+    # Longtitude of ascending node loanode in renze ding is de big omega
+    # argperiapsis is de argument van de periapsis dat is de omega
+    # orbital inclination is I
+    omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
+    big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
+    inclination = np.array([sim.j['orbital inclination'], sim.s['orbital inclination'], sim.n['orbital inclination'],
+                            sim.u['orbital inclination']])
+    eccentricity = np.array([sim.j['eccentricity'], sim.s['eccentricity'], sim.n['eccentricity'], sim.u['eccentricity']])
+    var_omega = omega+big_omega
+    initial_conditions = np.concatenate((eccentricity, var_omega, inclination, big_omega))
+
+    t_eval = [0, 365.25*24*3600*10**6]
+    max_step = 365.25*24*3600*10**3
+    form_of_ic = False
+    method = 'RK23'
+    a_tol = 10**4
+    r_tol = 10**3
+    e, I, var, big_omega = sim.run(time_scale=t_eval, form_of_ic=form_of_ic, initial_conditions=initial_conditions ,max_step=max_step, method=method, relative_tolerance=r_tol, absolute_tolerance=a_tol)

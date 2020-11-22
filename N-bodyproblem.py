@@ -16,7 +16,7 @@ alpha_vector = np.array([j.smaxis, s.smaxis, u.smaxis, n.smaxis])
 masses_vector = np.array([j.mass, s.mass, u.mass, n.mass])
 masses_dividor = 1/(sun.mass+masses_vector)
 J_2_vector = np.array([14736, 16298, 3343, 3411])
-J_4_vector =  np.array([-587, -915, -29, -35])
+J_4_vector = np.array([-587, -915, -29, -35])
 
 
 # n_vector, needed for calculating A_jj, A_jk etc later on
@@ -25,56 +25,20 @@ n_vector = 2*np.pi/(alpha_vector**(3/2))
 # Calculating the right alpha elements, alpha and alpha bar for the matrix elements
 
 def alpha_calculator(semi_major):
-    # Calculating alpha for jupiter
-    alpha_jupiter = semi_major[0]/semi_major[1:]
+    alpha_matrix = np.zeros(4)
+    alpha_bar_times_alpha_matrix = np.zeros(4)
+    for i in range(len(semi_major)):
+        current_alpha = semi_major[i] / np.delete(semi_major, i)
+        current_alpha = np.insert(current_alpha, obj=i, values=0)
+        alpha_matrix = np.vstack((alpha_matrix, current_alpha))
 
-    # Calculating alpha for saturn
-    semi_major_s = np.concatenate([semi_major[:1],semi_major[2:]])
-    alpha_saturnus_internal = semi_major[1]/(semi_major_s[0:1]) #internal elements
-    alpha_saturnus_exeternal = semi_major[1]/(semi_major_s[1:]) #external elements
+        alpha_bar_times_alpha_matrix = np.vstack((alpha_bar_times_alpha_matrix,
+                                                  np.concatenate((np.repeat(1, i), current_alpha[i:])) * current_alpha))
 
-    # Calculating alpha for uranus
-    semi_major_u = np.concatenate([semi_major[:2],semi_major[3:]])
-    alpha_uranus_internal = semi_major[2]/(semi_major_u[0:2]) #internal elements
-    alpha_uranus_exeternal = semi_major[2]/(semi_major_u[2:]) #external elements
+    alpha_matrix = alpha_matrix[1:]
+    alpha_bar_times_alpha_matrix = alpha_bar_times_alpha_matrix[1:]
 
-    # Calculating alpha for neptune
-    semi_major_n = semi_major[:3]
-    alpha_neptunus_total = semi_major[3]/(semi_major_n[:4]) #internal elements
-
-    # Calculating alpha_bar for jupiter
-    alpha_bar_jupiter = alpha_jupiter
-
-    # Calculating alpha bar elements for saturn
-    alpha_bar_saturn = np.concatenate([np.ones(1),alpha_saturnus_exeternal])
-
-    # Calculating_alpha_bar elements for uranus
-    alpha_bar_uranus = np.concatenate([np.ones(2), alpha_uranus_exeternal])
-
-    # Calculating_alpha_bar elements for neptunus
-    alpha_bar_neptunus = np.ones(3)
-
-    # Making matrix of these elements for alpha:
-    zero_matrix = np.zeros((4,4))
-    zero_matrix[0,1:] = alpha_jupiter
-    zero_matrix[1,:1] = alpha_saturnus_internal
-    zero_matrix[1,2:] = alpha_saturnus_exeternal
-    zero_matrix[2,0:2] = alpha_uranus_internal
-    zero_matrix[2,3:] = alpha_uranus_exeternal
-    zero_matrix[3,0:3] = alpha_neptunus_total
-    alpha_matrix = zero_matrix
-
-    # Making matrix of these elements for alpha_times_bar:
-    zero_matrix = np.zeros((4,4))
-    zero_matrix[0,1:] = alpha_jupiter * alpha_bar_jupiter
-    zero_matrix[1,:1] = alpha_saturnus_internal * alpha_bar_saturn[:1]
-    zero_matrix[1,2:] = alpha_saturnus_exeternal * alpha_bar_saturn[1:]
-    zero_matrix[2,0:2] = alpha_uranus_internal * alpha_bar_uranus[:2]
-    zero_matrix[2,3:] = alpha_uranus_exeternal*alpha_bar_uranus[2:]
-    zero_matrix[3,0:3] = alpha_neptunus_total * alpha_bar_neptunus
-    alpha_times_bar_matrix = zero_matrix
-
-    return alpha_matrix, alpha_times_bar_matrix
+    return alpha_matrix, alpha_bar_times_alpha_matrix
 
 alpha_matrix,alpha_times_bar_matrix = alpha_calculator(alpha_vector)
 a,b = alpha_calculator(alpha_vector)
