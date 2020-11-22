@@ -168,3 +168,11 @@ for i in range(np.size(z[0])):
     #plt.close(fig)
 
 
+    solutions = scipy.ode_int
+
+    def init(index
+             ):
+        plt.plot(solutions[index])
+    scipy.animate(init, indices)
+
+
