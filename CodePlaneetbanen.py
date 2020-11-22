@@ -147,9 +147,7 @@ plt.ioff()
 for i in range(np.size(z[0])):
     fig = plt.figure()
     ax = fig.gca(projection='3d')
-    # ax.set_zticks([-10**10, 0, 10**10])
-    # ax.set_xticks([-10**10, 0, 10**10])
-    # ax.set_yticks([-10**10, 0, 10**10])
+
     plt.xlim([-2*10**11, 2*10**11])
     plt.ylim([-2*10**11, 2*10**11])
     ax.set_zlim([-2*10**10, 2*10**10])
