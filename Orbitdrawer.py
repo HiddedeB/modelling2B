@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import animation
+import mpl_toolkits.mplot3d.axes3d as p3
 
 def r(theta, eccentricity, smaxis,omega):
     b_squared = (1-eccentricity**2)*smaxis**2
@@ -43,3 +45,48 @@ def plot_elips_3d(theta,eccentricity,smaxis,Omega,omega,I, input,figure):
 
     #plt.show()
     return vector
+
+def animatie(planeetparameters,smallaxis,steps):
+    '''
+    Functie voor het animeren van de planeetbanen.
+    :param planeetparameters: List met de lengte van het aantal planeten dat
+    geanimeerd moet worden. elementen in list bevatten een lijst met de 4
+    getransformeerde parameters van de ellipsbaan voor elke tijdstap.
+    :param smallaxis: List met de smallaxis parameter van elke planeet die
+    geanimeerd moet worden.
+
+
+    '''
+
+    #figuur definieren
+    fig = plt.figure()
+    ax = p3.Axes3D(fig)
+    ax.set_xlim3d([-2 * 10 ** 11, 2 * 10 ** 11])
+    ax.set_xlabel('X')
+    ax.set_ylim3d([-2 * 10 ** 11, 2 * 10 ** 11])
+    ax.set_ylabel('Y')
+    ax.set_zlim3d([-2 * 10 ** 10, 2 * 10 ** 10])
+    ax.set_zlabel('Z')
+
+    plotobjecten = []
+    print(np.size(planeetparameters))
+    for i in range(np.shape(planeetparameters)[0]):
+        plotobjecten.append(ax.plot([],[],[]))
+    print(plotobjecten)
+
+    def animate(i,plotobjecten,planeetparameters,smallaxis):
+        for (line,planeetparam,korteas) in zip(plotobjecten,planeetparameters,smallaxis):
+            theta_values = np.linspace(0, 2 * np.pi, 10 ** 3)
+
+            X, Y, Z, vector = xyz(theta_values, planeetparam[i][0], korteas,
+                                     planeetparam[i][3], planeetparam[i][2],
+                                     planeetparam[i][1])
+            print(line)
+            line[0].set_data([X, Y])
+            line[0].set_3d_properties(Z)
+            print(i)
+
+    anim = animation.FuncAnimation(fig, animate, fargs=(plotobjecten,planeetparameters,smallaxis),
+                                   frames=steps, interval=10, blit=False)
+
+    plt.show()
