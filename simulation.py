@@ -30,7 +30,8 @@ class simulation():
         alpha_matrix = np.zeros(4)
         alpha_bar_times_alpha_matrix = np.zeros(4)
         for i in range(len(self.smaxis_vector)):
-            current_alpha = self.smaxis_vector[i] / np.delete(self.smaxis_vector, i)
+            current_alpha = np.fmin(self.smaxis_vector[i] / np.delete(self.smaxis_vector, i),
+                                    np.delete(self.smaxis_vector, i) / self.smaxis_vector[i])
             current_alpha = np.insert(current_alpha, obj=i, values=0)
             alpha_matrix = np.vstack((alpha_matrix, current_alpha))
 
@@ -129,7 +130,7 @@ class simulation():
         p = I * np.sin(big_omega)
         q = I * np.cos(big_omega)
 
-        return np.concatenate((h,k,p,q))
+        return np.concatenate((h, k, p, q))
 
     @staticmethod
     def variable_transformations(h, k, p, q):
