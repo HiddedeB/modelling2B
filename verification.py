@@ -29,8 +29,8 @@ class simulation():
 
     def alpha_matrix(self):
         '''NOTE: Function to compute the alpha matrix and the alpha bar and alpha product matrix. '''
-        alpha_matrix = np.zeros(4)
-        alpha_bar_times_alpha_matrix = np.zeros(4)
+        alpha_matrix = np.zeros(2)
+        alpha_bar_times_alpha_matrix = np.zeros(2)
         for i in range(len(self.smaxis_vector)):
             current_alpha = np.fmin(self.smaxis_vector[i] / np.delete(self.smaxis_vector, i),
                                     np.delete(self.smaxis_vector, i) / self.smaxis_vector[i])
