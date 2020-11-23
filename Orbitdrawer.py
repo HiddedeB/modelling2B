@@ -4,21 +4,24 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import animation
 import mpl_toolkits.mplot3d.axes3d as p3
 
-def r(theta, eccentricity, smaxis,omega):
-    b_squared = (1-eccentricity**2)*smaxis**2
+
+def r(theta, eccentricity, smaxis, omega):
+    b_squared = (1 - eccentricity ** 2) * smaxis ** 2
     c = eccentricity * smaxis
 
     return b_squared / (smaxis + c * np.cos(theta - omega))
 
-# The x,y,z-coordinates of planetary motion for the right lagrange parameters
-def xyz(theta,eccentricity,smaxis,Omega,omega,I):
-    x = r(theta, eccentricity, smaxis, omega)*(np.cos(Omega)*np.cos(omega+theta) -
-                                               np.sin(Omega)*np.sin(omega+theta)*np.cos(I))
-    y = r(theta, eccentricity, smaxis, omega)*(np.sin(Omega)*np.cos(omega+theta) +
-                                               np.cos(Omega)*np.sin(omega+theta)*np.cos(I))
-    z = r(theta, eccentricity, smaxis, omega)*(np.sin(omega+theta) * np.sin(I))
 
-    return x,y,z, np.array([x,y,z])
+# The x,y,z-coordinates of planetary motion for the right lagrange parameters
+def xyz(theta, eccentricity, smaxis, Omega, omega, I):
+    x = r(theta, eccentricity, smaxis, omega) * (np.cos(Omega) * np.cos(omega + theta) -
+                                                 np.sin(Omega) * np.sin(omega + theta) * np.cos(I))
+    y = r(theta, eccentricity, smaxis, omega) * (np.sin(Omega) * np.cos(omega + theta) +
+                                                 np.cos(Omega) * np.sin(omega + theta) * np.cos(I))
+    z = r(theta, eccentricity, smaxis, omega) * (np.sin(omega + theta) * np.sin(I))
+
+    return x, y, z, np.array([x, y, z])
+
 
 # Plot function for 3d plots of the ellipses
 # fig = plt.figure()
@@ -27,7 +30,7 @@ def xyz(theta,eccentricity,smaxis,Omega,omega,I):
 # theta_values = np.linspace(0,2*np.pi,10**3)
 
 
-def plot_elips_3d(theta,eccentricity,smaxis,Omega,omega,I, input,figure):
+def plot_elips_3d(theta, eccentricity, smaxis, Omega, omega, I, input, figure):
     ''' Functie die de elipsbaan van een planeet tekent in 3D. Als je veel plotjes wilt opslaan kan je beter plt.show() weghalen
     NOTE:
     :param theta: hoeken van ellips die getekend moeten worden. voor gehele ellipse vector van 0 tot 360 graden
@@ -39,14 +42,15 @@ def plot_elips_3d(theta,eccentricity,smaxis,Omega,omega,I, input,figure):
     :param input: kleur voor getekende ellipse
     :param figure: figure waarin je ellipse wilt tekenen
     '''
-    X,Y,Z,vector = xyz(theta,eccentricity,smaxis,Omega,omega, I)
+    X, Y, Z, vector = xyz(theta, eccentricity, smaxis, Omega, omega, I)
 
-    figure.plot(X,Y,Z, c=input)
+    figure.plot(X, Y, Z, c=input)
 
-    #plt.show()
+    # plt.show()
     return vector
 
-def animatie(planeetparameters,smallaxis,steps):
+
+def animatie(planeetparameters, smallaxis, steps):
     '''
     Functie voor het animeren van de planeetbanen.
     :param planeetparameters: List met de lengte van het aantal planeten dat
@@ -58,7 +62,7 @@ def animatie(planeetparameters,smallaxis,steps):
 
     '''
 
-    #figuur definieren
+    # figuur definieren
     fig1 = plt.figure()
     ax = p3.Axes3D(fig1)
     ax.set_xlim3d([-2 * 10 ** 11, 2 * 10 ** 11])
@@ -71,28 +75,33 @@ def animatie(planeetparameters,smallaxis,steps):
     plotobjecten = []
     print(np.size(planeetparameters))
     for i in range(np.shape(planeetparameters)[0]):
-        plotobjecten.append(ax.plot([],[],[]))
-    print(plotobjecten)
-    print('param = '+ str(planeetparameters))
-    def animate(i,plotobjecten,planeetparameters,smallaxis):
+        plotobjecten.append(ax.plot([], [], []))
+    print('plotobjecten = ' + str(plotobjecten))
+    print('param = ' + str(planeetparameters))
+    print('smallaxis = ' + str(smallaxis))
+
+    def animate(i, plotobjecten, planeetparameters, smallaxis):
         print('begin')
         theta_values = np.linspace(0, 2 * np.pi, 10 ** 3)
 
-        for (line,planeetparam,korteas) in zip(plotobjecten,planeetparameters,smallaxis):
+        for (line, planeetparam, korteas) in zip(plotobjecten, planeetparameters, smallaxis):
             print('midden')
 
             X, Y, Z, vector = xyz(theta_values, planeetparam[i][0], korteas,
-                                     planeetparam[i][3], planeetparam[i][2],
-                                     planeetparam[i][1])
+                                  planeetparam[i][3], planeetparam[i][2],
+                                  planeetparam[i][1])
             print(line)
             line[0].set_data([X, Y])
             line[0].set_3d_properties(Z)
-            print(i)
         print('einde')
+        print(i)
+
     print('a')
     print('steps = {}'.format(steps))
-    anim = animation.FuncAnimation(fig1, animate, fargs=(plotobjecten,planeetparameters,smallaxis),
+    animate(i,plotobjecten, planeetparameters, smallaxis)
+    plt.show()
+    anim = animation.FuncAnimation(fig1, animate, fargs=(plotobjecten, planeetparameters, smallaxis),
                                    frames=steps, interval=10, blit=False)
-    anim
+
     print('b')
     plt.show()

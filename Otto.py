@@ -65,8 +65,8 @@ ax.set_zlim3d([-2 * 10 ** 10, 2 * 10 ** 10])
 ax.set_zlabel('Z')
 ax.set_title('3D Test')
 
-line1 = ax.plot([],[],[])
-line2 = ax.plot([],[],[])
+line1 = ax.plot3D([],[],[])
+line2 = ax.plot3D([],[],[])
 
 
 def animate(i,line1,line2):
@@ -78,11 +78,12 @@ def animate(i,line1,line2):
     line2[0].set_3d_properties(Z)
 
 
-#
+
 anim = animation.FuncAnimation(fig, animate, fargs = (line1,line2),
                                frames=steps, interval=10, blit=False)
-#
-# plt.show()
+
+plt.show()
 
 
-Od.animatie([[original_system_mercury],[original_system_venus]],[m.smaxis,v.smaxis],steps)
+Od.animatie([original_system_mercury,original_system_venus],[m.smaxis,v.smaxis],steps)
+#Od.animatie([original_system_venus,],[v.smaxis],steps)
