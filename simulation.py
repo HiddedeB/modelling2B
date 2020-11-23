@@ -3,6 +3,8 @@ from data import create_pdh
 from scipy.integrate import solve_ivp
 from scipy.integrate import quad
 from numba import njit
+import Orbitdrawer as Od
+from matplotlib import animation
 
 class simulation():
     '''Class to compute simulation of the orbital elements'''
@@ -237,3 +239,9 @@ if __name__ == '__main__':
     e, I, var, big_omega, solution = sim.run(time_scale=t_eval, form_of_ic=form_of_ic,
                                              initial_conditions=initial_conditions, max_step=max_step, method=method,
                                              relative_tolerance=r_tol, absolute_tolerance=a_tol)
+
+    smallaxis = [sim.j['smaxis'],sim.s['smaxis'],sim.n['smaxis'],sim.u['smaxis']]
+
+    fig1, animate, plotobjecten = Od.animatieN(e,I,var,big_omega,smallaxis)
+    anim = animation.FuncAnimation(fig1, animate, fargs=(e, I, var, big_omega, smallaxis),
+                                   frames=round(t_eval[1]/max_step), interval=10, blit=False)
