@@ -93,7 +93,7 @@ class simulation():
         sub_matrix = 1/4 * self.mass_vector / (self.sun['mass'] + self.mass_vector[:, np.newaxis])\
                      * alpha_bar_times_alpha_matrix * self.n_vector[:, np.newaxis]
 
-        a = -sub_matrix
+        a = sub_matrix
         b = sub_matrix * beta[0]
 
         # Diagonal elements i.e. A_{jj} and B_{jj}, first line calculates extra part, second line the sum part
@@ -108,7 +108,7 @@ class simulation():
                                                                                 27/8 * self.J_2_vector**2)))
         b_d = b_d + b.sum(axis=1)
 
-        a_matrix = np.diag(a_d) + a * beta[1]
+        a_matrix = np.diag(a_d) - a * beta[1]
         b_matrix = np.diag(b_d) + b
 
         return a_matrix, b_matrix
@@ -242,6 +242,6 @@ if __name__ == '__main__':
 
     smallaxis = [sim.j['smaxis'],sim.s['smaxis'],sim.n['smaxis'],sim.u['smaxis']]
 
-    fig1, animate, plotobjecten = Od.animatieN(e,I,var,big_omega,smallaxis)
-    anim = animation.FuncAnimation(fig1, animate, fargs=(e, I, var, big_omega, smallaxis),
-                                   frames=round(t_eval[1]/max_step), interval=10, blit=False)
+    # fig1, animate, plotobjecten = Od.animatieN(e,I,var,big_omega,smallaxis)
+    # anim = animation.FuncAnimation(fig1, animate, fargs=(e, I, var, big_omega, smallaxis),
+    #                                frames=round(t_eval[1]/max_step), interval=10, blit=False)
