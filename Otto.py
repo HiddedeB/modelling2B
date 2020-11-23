@@ -19,7 +19,7 @@ v=pdh.venus
 
 
 tijd = 3*10**16*365.25*24*60*60
-steps = 5000
+steps = 2
 results = TBP.ODE_solv(m.smaxis,v.smaxis,m.mass,v.mass,pdh.sun.mass,0.2056,0.006772,
          m.loanode,v.loanode,np.deg2rad(m.orbital_inclination),np.deg2rad(v.orbital_inclination),
          m.argperiapsis,v.argperiapsis, time = tijd, t_ev = None)
@@ -78,11 +78,11 @@ def animate(i,line1,line2):
     line2[0].set_3d_properties(Z)
 
 
-
+#
 anim = animation.FuncAnimation(fig, animate, fargs = (line1,line2),
                                frames=steps, interval=10, blit=False)
-
-plt.show()
+#
+# plt.show()
 
 
 Od.animatie([[original_system_mercury],[original_system_venus]],[m.smaxis,v.smaxis],steps)

@@ -59,8 +59,8 @@ def animatie(planeetparameters,smallaxis,steps):
     '''
 
     #figuur definieren
-    fig = plt.figure()
-    ax = p3.Axes3D(fig)
+    fig1 = plt.figure()
+    ax = p3.Axes3D(fig1)
     ax.set_xlim3d([-2 * 10 ** 11, 2 * 10 ** 11])
     ax.set_xlabel('X')
     ax.set_ylim3d([-2 * 10 ** 11, 2 * 10 ** 11])
@@ -73,10 +73,13 @@ def animatie(planeetparameters,smallaxis,steps):
     for i in range(np.shape(planeetparameters)[0]):
         plotobjecten.append(ax.plot([],[],[]))
     print(plotobjecten)
-
+    print('param = '+ str(planeetparameters))
     def animate(i,plotobjecten,planeetparameters,smallaxis):
+        print('begin')
+        theta_values = np.linspace(0, 2 * np.pi, 10 ** 3)
+
         for (line,planeetparam,korteas) in zip(plotobjecten,planeetparameters,smallaxis):
-            theta_values = np.linspace(0, 2 * np.pi, 10 ** 3)
+            print('midden')
 
             X, Y, Z, vector = xyz(theta_values, planeetparam[i][0], korteas,
                                      planeetparam[i][3], planeetparam[i][2],
@@ -85,8 +88,11 @@ def animatie(planeetparameters,smallaxis,steps):
             line[0].set_data([X, Y])
             line[0].set_3d_properties(Z)
             print(i)
-
-    anim = animation.FuncAnimation(fig, animate, fargs=(plotobjecten,planeetparameters,smallaxis),
+        print('einde')
+    print('a')
+    print('steps = {}'.format(steps))
+    anim = animation.FuncAnimation(fig1, animate, fargs=(plotobjecten,planeetparameters,smallaxis),
                                    frames=steps, interval=10, blit=False)
-
+    anim
+    print('b')
     plt.show()

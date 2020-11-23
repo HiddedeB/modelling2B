@@ -1,6 +1,6 @@
 from numba import types, typed, typeof
 from numba.experimental import jitclass
-
+import numpy as np
 
 class planet:
     '''Class to hold all variables related to a certain planet'''
@@ -57,7 +57,7 @@ class planet:
     @pos.setter
     def pos(self, updated_pos):
         self._pos = updated_pos
-        self._history = np.concatenate(self._history, updated_pos)
+    #    self._history = np.concatenate(self._history, updated_pos)
 
     @property
     def velocity(self):
