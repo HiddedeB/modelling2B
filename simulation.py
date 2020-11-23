@@ -129,7 +129,7 @@ class simulation():
         p = I * np.sin(big_omega)
         q = I * np.cos(big_omega)
 
-        return np.array([h, k, p, q])
+        return np.concatenate((h,k,p,q))
 
     @staticmethod
     def variable_transformations(h, k, p, q):
@@ -150,7 +150,7 @@ class simulation():
 
         # Setting up the differential equations according to 7.25 and 7.26 from Solar System Dynamics. Since the a and
         # b matrices are both square and contain as many entries as planets, we use this for splitting our data vector.
-        planet_number = a_matrix.shape()[0]
+        planet_number = a_matrix.shape[0]
         h_vector = vector[:planet_number]
         k_vector = vector[planet_number:2 * planet_number]
         p_vector = vector[2 * planet_number: 3 * planet_number]
@@ -166,7 +166,7 @@ class simulation():
         d_q_matrix = b_matrix * p_vector
         d_q_vec = -d_q_matrix.sum(axis=1)
 
-        return np.array([d_h_vec, d_k_vec, d_p_vec, d_q_vec])
+        return np.concatenate((d_h_vec, d_k_vec, d_p_vec, d_q_vec))
 
     def run(self, time_scale, form_of_ic, initial_conditions, max_step, method, relative_tolerance, absolute_tolerance):
         '''NOTE: Function to run this class and compute the simulation, returns the ode_solver solution.
@@ -189,15 +189,18 @@ class simulation():
          '''
 
         if not form_of_ic:
+            initial_conditions = np.transpose(initial_conditions)
             initial_conditions = self.initial_condition_builder(*initial_conditions)
+        initial_conditions = initial_conditions.flatten()
         alpha_matrix, alpha_times_alpha_bar_matrix = self.alpha_matrix()
         beta = self.beta_values(alpha_matrix)
         a_matrix, b_matrix = self.a_b_matrices(alpha_times_alpha_bar_matrix, beta)
+
         solution = solve_ivp(self.orbital_calculator, t_span=time_scale, y0=initial_conditions, args=(a_matrix,
                             b_matrix), method=method, rtol=relative_tolerance, atol=absolute_tolerance,
                             max_step=max_step)
 
-        planet_number = a_matrix.shape()[0]
+        planet_number = a_matrix.shape[0]
         data = solution['y']
         h = data[:planet_number, :]
         k = data[planet_number:2 * planet_number, :]
@@ -222,7 +225,7 @@ if __name__ == '__main__':
                             sim.u['orbital inclination']])
     eccentricity = np.array([sim.j['eccentricity'], sim.s['eccentricity'], sim.n['eccentricity'], sim.u['eccentricity']])
     var_omega = omega+big_omega
-    initial_conditions = np.concatenate((eccentricity, var_omega, inclination, big_omega))
+    initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
 
     t_eval = [0, 365.25*24*3600*10**6]
     max_step = 365.25*24*3600*10**3
@@ -230,4 +233,6 @@ if __name__ == '__main__':
     method = 'RK23'
     a_tol = 10**4
     r_tol = 10**3
-    e, I, var, big_omega = sim.run(time_scale=t_eval, form_of_ic=form_of_ic, initial_conditions=initial_conditions ,max_step=max_step, method=method, relative_tolerance=r_tol, absolute_tolerance=a_tol)
+    e, I, var, big_omega, solution = sim.run(time_scale=t_eval, form_of_ic=form_of_ic,
+                                             initial_conditions=initial_conditions, max_step=max_step, method=method,
+                                             relative_tolerance=r_tol, absolute_tolerance=a_tol)
