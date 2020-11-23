@@ -241,6 +241,9 @@ if __name__ == '__main__':
 
     smallaxis = [sim.j['smaxis'],sim.s['smaxis'],sim.n['smaxis'],sim.u['smaxis']]
 
-    # fig1, animate, plotobjecten = Od.animatieN(e,I,var,big_omega,smallaxis)
-    # anim = animation.FuncAnimation(fig1, animate, fargs=(e, I, var, big_omega, smallaxis),
-    #                                frames=round(t_eval[1]/max_step), interval=10, blit=False)
+    fig1, animate, plotobjecten = Od.animatieN(e,I,var,big_omega,smallaxis)
+    anim = animation.FuncAnimation(fig1, animate, fargs=(e, I, var, big_omega, smallaxis),
+                                   frames=round(t_eval[1]/max_step), interval=10, blit=False)
+    # Writer = animation.writers['ffmpeg']
+    # writer = Writer(fps=100)
+    # anim.save('yay.mp4',writer=writer)
