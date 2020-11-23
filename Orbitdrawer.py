@@ -152,11 +152,11 @@ def animatieN(e, I, var, big_omega, smallaxis):
     # figuur definieren
     fig1 = plt.figure()
     ax = p3.Axes3D(fig1)
-    ax.set_xlim3d([-2 * 10 ** 18, 2 * 10 ** 18])
+    ax.set_xlim3d([-2 * 10 ** 12, 2 * 10 ** 12])
     ax.set_xlabel('X')
-    ax.set_ylim3d([-2 * 10 ** 18, 2 * 10 ** 18])
+    ax.set_ylim3d([-2 * 10 ** 12, 2 * 10 ** 12])
     ax.set_ylabel('Y')
-    ax.set_zlim3d([-2 * 10 ** 18, 2 * 10 ** 18])
+    ax.set_zlim3d([-2 * 10 ** 12, 2 * 10 ** 12])
     ax.set_zlabel('Z')
 
     plotobjecten = []
