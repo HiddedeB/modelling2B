@@ -219,6 +219,6 @@ class JitPDH:
 			asteroid['mass']=masses[i]
 			asteroid['eccentricity']=_eccentricity
 			asteroid['loanode']=_loanode
-			asteroid['orbital_inclination']=_orbital_inclination
+			asteroid['orbital inclination']=_orbital_inclination
 			asteroid['smaxis']=radii[i]
 			self.asteroids.append(asteroid)
