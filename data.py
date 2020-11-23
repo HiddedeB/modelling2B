@@ -114,7 +114,8 @@ class PlanetaryDataHandler:
 #specify specs
 dict_kv_ty = (types.unicode_type,types.float64)
 dicttype = types.DictType(*dict_kv_ty)
-
+kv_ty2 = (types.unicode_type,types.float64[:])
+dicttype2 = types.DictType(*kv_ty2)
 with open('data.json') as file:
 	dicts = [i for i in json.load(file)]
 
@@ -124,6 +125,7 @@ spec = [(i,dicttype) for i in dicts]
 spec += [('asteroids',types.ListType(dicttype))]
 d = typed.Dict.empty(key_type=types.unicode_type,value_type=dicttype)
 spec += [('rawdata',typeof(d))]
+spec += [('asteroid_attributes',dicttype2)]
 
 def create_pdh(filename):
 	with open(filename) as file:
@@ -152,6 +154,7 @@ class JitPDH:
 		self.neptune = typed.Dict.empty(*dict_kv_ty)
 		self.planet9 = typed.Dict.empty(*dict_kv_ty)
 		self.asteroids = typed.List.empty_list(dicttype)
+		self.asteroid_attributes = typed.Dict.empty(*kv_ty2)
 
 		for i in rawdata:
 			temp = rawdata[i]
@@ -210,10 +213,15 @@ class JitPDH:
 			weights = radii/range_max
 			masses = weights*m1
 		else:
-			masses = np.repeat(total_mass/r_res,r_res)
+			masses = np.repeat(np.array([total_mass/r_res],dtype=np.float64),r_res)
 		_orbital_inclination = 1.8 #https://arxiv.org/abs/1704.02444
 		_loanode = 77 #https://arxiv.org/abs/1704.02444
 		_eccentricity = 0.1 #DES/SSBN07 classification
+		self.asteroid_attributes['mass'] = masses
+		self.asteroid_attributes['smaxis'] = radii
+		self.asteroid_attributes['eccentricity'] = np.repeat(np.array([_eccentricity],dtype=np.float64),r_res)
+		self.asteroid_attributes['loanode'] = np.repeat(np.array([_loanode],dtype=np.float64),r_res)
+		self.asteroid_attributes['orbital inclination'] = np.repeat(np.array([_orbital_inclination],dtype=np.float64),r_res)
 		for i in range(len(radii)):
 			asteroid = typed.Dict()
 			asteroid['mass']=masses[i]
