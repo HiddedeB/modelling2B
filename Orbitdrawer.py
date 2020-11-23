@@ -50,7 +50,62 @@ def plot_elips_3d(theta, eccentricity, smaxis, Omega, omega, I, input, figure):
     return vector
 
 
-def animatie(planeetparameters, smallaxis, steps):
+# def animatie(planeetparameters, smallaxis, steps):
+#     '''
+#     Functie voor het animeren van de planeetbanen.
+#     :param planeetparameters: List met de lengte van het aantal planeten dat
+#     geanimeerd moet worden. elementen in list bevatten een lijst met de 4
+#     getransformeerde parameters van de ellipsbaan voor elke tijdstap.
+#     :param smallaxis: List met de smallaxis parameter van elke planeet die
+#     geanimeerd moet worden.
+#
+#
+#     '''
+#
+#     # figuur definieren
+#     fig1 = plt.figure()
+#     ax = p3.Axes3D(fig1)
+#     ax.set_xlim3d([-2 * 10 ** 11, 2 * 10 ** 11])
+#     ax.set_xlabel('X')
+#     ax.set_ylim3d([-2 * 10 ** 11, 2 * 10 ** 11])
+#     ax.set_ylabel('Y')
+#     ax.set_zlim3d([-2 * 10 ** 10, 2 * 10 ** 10])
+#     ax.set_zlabel('Z')
+#
+#     plotobjecten = []
+#     print(np.size(planeetparameters))
+#     for i in range(np.shape(planeetparameters)[0]):
+#         plotobjecten.append(ax.plot([], [], []))
+#     print('plotobjecten = ' + str(plotobjecten))
+#     print('param = ' + str(planeetparameters))
+#     print('smallaxis = ' + str(smallaxis))
+#
+#     def animate(i, plotobjecten, planeetparameters, smallaxis):
+#         print('begin')
+#         theta_values = np.linspace(0, 2 * np.pi, 10 ** 3)
+#
+#         for (line, planeetparam, korteas) in zip(plotobjecten, planeetparameters, smallaxis):
+#             print('midden')
+#
+#             X, Y, Z, vector = xyz(theta_values, planeetparam[i][0], korteas,
+#                                   planeetparam[i][3], planeetparam[i][2],
+#                                   planeetparam[i][1])
+#             print(line)
+#             line[0].set_data([X, Y])
+#             line[0].set_3d_properties(Z)
+#         print('einde')
+#         print(i)
+#
+#     print('a')
+#     print('steps = {}'.format(steps))
+#     animate(i,plotobjecten, planeetparameters, smallaxis)
+#     plt.show()
+#     anim = animation.FuncAnimation(fig1, animate, fargs=(plotobjecten, planeetparameters, smallaxis),
+#                                    frames=steps, interval=10, blit=False)
+#
+#     plt.show()
+
+def animatieN(planeetparameters, smallaxis, steps):
     '''
     Functie voor het animeren van de planeetbanen.
     :param planeetparameters: List met de lengte van het aantal planeten dat
@@ -73,35 +128,18 @@ def animatie(planeetparameters, smallaxis, steps):
     ax.set_zlabel('Z')
 
     plotobjecten = []
-    print(np.size(planeetparameters))
     for i in range(np.shape(planeetparameters)[0]):
         plotobjecten.append(ax.plot([], [], []))
-    print('plotobjecten = ' + str(plotobjecten))
-    print('param = ' + str(planeetparameters))
-    print('smallaxis = ' + str(smallaxis))
 
     def animate(i, plotobjecten, planeetparameters, smallaxis):
-        print('begin')
         theta_values = np.linspace(0, 2 * np.pi, 10 ** 3)
 
         for (line, planeetparam, korteas) in zip(plotobjecten, planeetparameters, smallaxis):
-            print('midden')
-
             X, Y, Z, vector = xyz(theta_values, planeetparam[i][0], korteas,
                                   planeetparam[i][3], planeetparam[i][2],
                                   planeetparam[i][1])
-            print(line)
             line[0].set_data([X, Y])
             line[0].set_3d_properties(Z)
-        print('einde')
-        print(i)
 
-    print('a')
-    print('steps = {}'.format(steps))
-    animate(i,plotobjecten, planeetparameters, smallaxis)
-    plt.show()
-    anim = animation.FuncAnimation(fig1, animate, fargs=(plotobjecten, planeetparameters, smallaxis),
-                                   frames=steps, interval=10, blit=False)
+    return fig1, animate, plotobjecten
 
-    print('b')
-    plt.show()
