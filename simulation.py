@@ -205,11 +205,11 @@ class simulation():
             free_a_matrix = np.diag(a_d) - a * beta[3]
             free_b_matrix = np.diag(b_d) + b
 
-            return a_matrix, b_matrix, free_a_matrix, free_b_matrix
+            return np.array([a_matrix, b_matrix, free_a_matrix, free_b_matrix])
 
         else:
 
-            return a_matrix, b_matrix
+            return np.array([a_matrix, b_matrix])
 
     @staticmethod
     def initial_condition_builder(e, var_omega, I, big_omega):
