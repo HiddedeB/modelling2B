@@ -106,7 +106,7 @@ class simulation():
         b_d = -self.n_vector * ((self.sun['radius'] / self.smaxis_vector)**2 * (3/2 * self.J_2_vector -
                                 (self.sun['radius'] / self.smaxis_vector)**2 * (15/4 * self.J_4_vector +
                                                                                 27/8 * self.J_2_vector**2)))
-        b_d = b_d + b.sum(axis=1)
+        b_d = b_d - b.sum(axis=1)
 
         a_matrix = np.diag(a_d) - a * beta[1]
         b_matrix = np.diag(b_d) + b
