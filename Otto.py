@@ -39,41 +39,43 @@ for i in range(steps):
 from matplotlib import animation
 
 #Animeren van twee objecten
-# fig = plt.figure()
-# ax = p3.Axes3D(fig)
-# ax.set_xlim3d([-2 * 10 ** 11, 2 * 10 ** 11])
-# ax.set_xlabel('X')
-# ax.set_ylim3d([-2 * 10 ** 11, 2 * 10 ** 11])
-# ax.set_ylabel('Y')
-# ax.set_zlim3d([-2 * 10 ** 10, 2 * 10 ** 10])
-# ax.set_zlabel('Z')
-# ax.set_title('3D Test')
-#
-# line1 = ax.plot3D([],[],[])
-# line2 = ax.plot3D([],[],[])
-#
-#
-# def animate(i,line1,line2):
-#     X, Y, Z, vector = Od.xyz(theta_values,original_system_mercury[i][0],m.smaxis,original_system_mercury[i][3],original_system_mercury[i][2],original_system_mercury[i][1])
-#     line1[0].set_data([X, Y])
-#     line1[0].set_3d_properties(Z)
-#     X, Y, Z, vector = Od.xyz(theta_values,original_system_venus[i][0],v.smaxis,original_system_venus[i][3],original_system_venus[i][2],original_system_venus[i][1])
-#     line2[0].set_data([X, Y])
-#     line2[0].set_3d_properties(Z)
-#
-#
-#
-# anim = animation.FuncAnimation(fig, animate, fargs = (line1,line2),
-#                                frames=steps, interval=10, blit=False)
-#
-# plt.show()
+fig = plt.figure()
+ax = p3.Axes3D(fig)
+ax.set_xlim3d([-2 * 10 ** 11, 2 * 10 ** 11])
+ax.set_xlabel('X')
+ax.set_ylim3d([-2 * 10 ** 11, 2 * 10 ** 11])
+ax.set_ylabel('Y')
+ax.set_zlim3d([-2 * 10 ** 10, 2 * 10 ** 10])
+ax.set_zlabel('Z')
+ax.set_title('3D Test')
+
+line1 = ax.plot3D([],[],[])
+line2 = ax.plot3D([],[],[])
+
+
+def animate(i,line1,line2):
+    X, Y, Z, vector = Od.xyz(theta_values,original_system_mercury[i][0],m.smaxis,original_system_mercury[i][3],original_system_mercury[i][2],original_system_mercury[i][1])
+    line1[0].set_data([X, Y])
+    line1[0].set_3d_properties(Z)
+    X, Y, Z, vector = Od.xyz(theta_values,original_system_venus[i][0],v.smaxis,original_system_venus[i][3],original_system_venus[i][2],original_system_venus[i][1])
+    line2[0].set_data([X, Y])
+    line2[0].set_3d_properties(Z)
+
+
+
+anim = animation.FuncAnimation(fig, animate, fargs = (line1,line2),
+                               frames=steps, interval=10, blit=False)
+
+plt.show()
 
 
 #animeren van N objecten + voorbeeldje mbv mercury en venus
+
+#Voorbeeldje van N objecten simuleren.
 planeetparameters = [original_system_mercury,original_system_venus]
 smallaxis = [m.smaxis,v.smaxis]
 
-fig1, animate, plotobjecten = Od.animatieN(planeetparameters,smallaxis,steps)
+fig1, animate, plotobjecten = Od.animatien(planeetparameters,smallaxis,steps)
 anim = animation.FuncAnimation(fig1, animate, fargs=(plotobjecten, planeetparameters, smallaxis),
                                frames=steps, interval=10, blit=False)
 

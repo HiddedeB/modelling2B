@@ -105,7 +105,7 @@ def plot_elips_3d(theta, eccentricity, smaxis, Omega, omega, I, input, figure):
 #
 #     plt.show()
 
-def animatieN(planeetparameters, smallaxis, steps):
+def animatien(planeetparameters, smallaxis, steps):
     '''
     Functie voor het animeren van de planeetbanen.
     :param planeetparameters: List met de lengte van het aantal planeten dat
@@ -143,3 +143,35 @@ def animatieN(planeetparameters, smallaxis, steps):
 
     return fig1, animate, plotobjecten
 
+
+def animatieN(e, I, var, big_omega, smallaxis):
+    '''
+    Functie voor het animeren van de planeetbanen.
+    '''
+
+    # figuur definieren
+    fig1 = plt.figure()
+    ax = p3.Axes3D(fig1)
+    ax.set_xlim3d([-2 * 10 ** 18, 2 * 10 ** 18])
+    ax.set_xlabel('X')
+    ax.set_ylim3d([-2 * 10 ** 18, 2 * 10 ** 18])
+    ax.set_ylabel('Y')
+    ax.set_zlim3d([-2 * 10 ** 18, 2 * 10 ** 18])
+    ax.set_zlabel('Z')
+
+    plotobjecten = []
+    for i in range(np.shape(e)[0]):
+        plotobjecten.append(ax.plot([], [], []))
+
+    def animate(i, e, I, var, big_omega, smallaxis):
+        theta_values = np.linspace(0, 2 * np.pi, 10 ** 3)
+
+        for (line, eccentriciteit, Inclination, var_omega, Omega, korteas) in zip(plotobjecten, e, I, var, big_omega,
+                                                                                  smallaxis):
+            X, Y, Z, vector = xyz(theta_values, eccentriciteit[i], korteas,
+                                  Omega[i], var_omega[i] - Omega[i],
+                                  Inclination[i])
+            line[0].set_data([X, Y])
+            line[0].set_3d_properties(Z)
+
+    return fig1, animate, plotobjecten
