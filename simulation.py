@@ -192,7 +192,6 @@ class simulation():
          '''
 
         if not form_of_ic:
-            initial_conditions = np.transpose(initial_conditions)
             initial_conditions = self.initial_condition_builder(*initial_conditions)
         initial_conditions = initial_conditions.flatten()
         alpha_matrix, alpha_times_alpha_bar_matrix = self.alpha_matrix()
