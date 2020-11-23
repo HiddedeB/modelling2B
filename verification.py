@@ -21,16 +21,16 @@ class simulation():
         self.u = pdh.uranus
         self.n = pdh.neptune
         self.sun = pdh.sun
-        self.smaxis_vector = np.array([self.j['smaxis'], self.s['smaxis']])
-        self.mass_vector = np.array([self.j['mass'], self.s['mass']])
-        self.J_2_vector = np.array([14736, 16298])
-        self.J_4_vector = np.array([-587, -915])
+        self.smaxis_vector = np.array([self.j['smaxis'], self.s['smaxis'], self.u['smaxis'], self.n['smaxis']])
+        self.mass_vector = np.array([self.j['mass'], self.s['mass'], self.u['mass'], self.n['mass']])
+        self.J_2_vector = np.array([14736, 16298, 3343, 3411])
+        self.J_4_vector = np.array([-587, -915, -29, -35])
         self.n_vector = 2 * np.pi / (self.smaxis_vector**(3 / 2))
 
     def alpha_matrix(self):
         '''NOTE: Function to compute the alpha matrix and the alpha bar and alpha product matrix. '''
-        alpha_matrix = np.zeros(2)
-        alpha_bar_times_alpha_matrix = np.zeros(2)
+        alpha_matrix = np.zeros(4)
+        alpha_bar_times_alpha_matrix = np.zeros(4)
         for i in range(len(self.smaxis_vector)):
             current_alpha = np.fmin(self.smaxis_vector[i] / np.delete(self.smaxis_vector, i),
                                     np.delete(self.smaxis_vector, i) / self.smaxis_vector[i])
@@ -192,7 +192,6 @@ class simulation():
          '''
 
         if not form_of_ic:
-            initial_conditions = np.transpose(initial_conditions)
             initial_conditions = self.initial_condition_builder(*initial_conditions)
         initial_conditions = initial_conditions.flatten()
         alpha_matrix, alpha_times_alpha_bar_matrix = self.alpha_matrix()
@@ -222,10 +221,11 @@ if __name__ == '__main__':
     # Longtitude of ascending node loanode in renze ding is de big omega
     # argperiapsis is de argument van de periapsis dat is de omega
     # orbital inclination is I
-    omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis']])
-    big_omega = np.array([sim.j['loanode'], sim.s['loanode']])
-    inclination = np.array([sim.j['orbital inclination'], sim.s['orbital inclination']])
-    eccentricity = np.array([sim.j['eccentricity'], sim.s['eccentricity']])
+    omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
+    big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
+    inclination = np.array([sim.j['orbital inclination'], sim.s['orbital inclination'], sim.n['orbital inclination'],
+                            sim.u['orbital inclination']])
+    eccentricity = np.array([sim.j['eccentricity'], sim.s['eccentricity'], sim.n['eccentricity'], sim.u['eccentricity']])
     var_omega = omega+big_omega
     initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
 
@@ -239,8 +239,11 @@ if __name__ == '__main__':
                                              initial_conditions=initial_conditions, max_step=max_step, method=method,
                                              relative_tolerance=r_tol, absolute_tolerance=a_tol)
 
-    smallaxis = [sim.j['smaxis'],sim.s['smaxis']]
+    smallaxis = [sim.j['smaxis'],sim.s['smaxis'],sim.n['smaxis'],sim.u['smaxis']]
 
-    # fig1, animate, plotobjecten = Od.animatieN(e,I,var,big_omega,smallaxis)
-    # anim = animation.FuncAnimation(fig1, animate, fargs=(e, I, var, big_omega, smallaxis),
-    #                                frames=round(t_eval[1]/max_step), interval=10, blit=False)
+    fig1, animate, plotobjecten = Od.animatieN(e,I,var,big_omega,smallaxis)
+    anim = animation.FuncAnimation(fig1, animate, fargs=(e, I, var, big_omega, smallaxis),
+                                   frames=round(t_eval[1]/max_step), interval=10, blit=False)
+    Writer = animation.writers['ffmpeg']
+    writer = Writer(fps=100)
+    anim.save('yay.mp4',writer=writer)
