@@ -119,7 +119,7 @@ class simulation():
             def g(phi, alpha):
                 # Angle phi
                 if alpha != 0:
-                    return (1 / np.pi) * np.cos(phi) / (1 - 2 * alpha * np.cos(phi) + alpha**2)**(3/2)
+                    return (1 / np.pi) * np.cos(phi) / (1 - 2 * alpha * np.cos(phi) + alpha ** 2) ** (3 / 2)
                 else:
                     return 0
 
@@ -129,7 +129,7 @@ class simulation():
             def f(phi, alpha):
                 # Angle 2*phi
                 if alpha != 0:
-                    return (1 / np.pi) * np.cos(2 * phi) / (1 - 2 * alpha * np.cos(2 * phi) + alpha**2)**(3/2)
+                    return (1 / np.pi) * np.cos(2 * phi) / (1 - 2 * alpha * np.cos(2 * phi) + alpha ** 2) ** (3 / 2)
                 else:
                     return 0
 
@@ -142,7 +142,8 @@ class simulation():
             if 'free_alpha' not in kwargs:
                 raise ValueError('Trying to run kyperbelt simulation without free_alpha matrix')
             return np.array([vec_beta1(alpha_matrix), vec_beta2(alpha_matrix), vec_beta1(kwargs['free_alpha']),
-                             vec_beta2(kwargs['free_alpha'])])  # Heb de laatste entry van de array verandert van vec_beta2(kwargs['free_alpha_bar']) naar vec_beta2(kwargs['free_alpha'])
+                             vec_beta2(kwargs[
+                                           'free_alpha'])])  # Heb de laatste entry van de array verandert van vec_beta2(kwargs['free_alpha_bar']) naar vec_beta2(kwargs['free_alpha'])
 
         else:
             return np.array([vec_beta1(alpha_matrix), vec_beta2(alpha_matrix)])
@@ -171,15 +172,19 @@ class simulation():
         b = sub_matrix * beta[0]
 
         # Diagonal elements i.e. A_{jj} and B_{jj}, first line calculates extra part, second line the sum part
-        a_d = self.n_vector * ((self.sun['radius'] / self.smaxis_vector)**2 * (3/2 * self.J_2_vector -
-                               (self.sun['radius'] / self.smaxis_vector)**2 * (15/4 * self.J_4_vector +
-                                                                               9/8 * self.J_2_vector**2)))
+        a_d = self.n_vector * ((self.sun['radius'] / self.smaxis_vector) ** 2 * (3 / 2 * self.J_2_vector -
+                                                                                 (self.sun[
+                                                                                      'radius'] / self.smaxis_vector) ** 2 * (
+                                                                                         15 / 4 * self.J_4_vector +
+                                                                                         9 / 8 * self.J_2_vector ** 2)))
         a_new = a * beta[0]
         a_d = a_d + a_new.sum(axis=1)
 
-        b_d = -self.n_vector * ((self.sun['radius'] / self.smaxis_vector)**2 * (3/2 * self.J_2_vector -
-                                (self.sun['radius'] / self.smaxis_vector)**2 * (15/4 * self.J_4_vector +
-                                                                                27/8 * self.J_2_vector**2)))
+        b_d = -self.n_vector * ((self.sun['radius'] / self.smaxis_vector) ** 2 * (3 / 2 * self.J_2_vector -
+                                                                                  (self.sun[
+                                                                                       'radius'] / self.smaxis_vector) ** 2 * (
+                                                                                          15 / 4 * self.J_4_vector +
+                                                                                          27 / 8 * self.J_2_vector ** 2)))
         b_d = b_d - b.sum(axis=1)
 
         a_matrix = np.diag(a_d) - a * beta[1]
@@ -194,15 +199,19 @@ class simulation():
             a = sub_matrix
             b = sub_matrix * beta[2]
 
-            a_d = self.free_n_vector * ((self.sun['radius'] / self.asteroid_smaxis)**2 * (3/2 * self.J_2_vector -
-                                        (self.sun['radius'] / self.asteroid_smaxis)**2 * (15/4 * self.J_4_vector +
-                                                                                          9/8 * self.J_2_vector**2)))
+            a_d = self.free_n_vector * ((self.sun['radius'] / self.asteroid_smaxis) ** 2 * (3 / 2 * self.J_2_vector -
+                                                                                            (self.sun[
+                                                                                                 'radius'] / self.asteroid_smaxis) ** 2 * (
+                                                                                                    15 / 4 * self.J_4_vector +
+                                                                                                    9 / 8 * self.J_2_vector ** 2)))
             a_new = a * beta[2]
             a_d = a_d + a_new.sum(axis=1)
 
-            b_d = -self.free_n_vector * ((self.sun['radius'] / self.asteroid_smaxis)**2 * (3/2 * self.J_2_vector -
-                                         (self.sun['radius'] / self.asteroid_smaxis)**2 * (15/4 * self.J_4_vector +
-                                                                                           27/8 * self.J_2_vector**2)))
+            b_d = -self.free_n_vector * ((self.sun['radius'] / self.asteroid_smaxis) ** 2 * (3 / 2 * self.J_2_vector -
+                                                                                             (self.sun[
+                                                                                                  'radius'] / self.asteroid_smaxis) ** 2 * (
+                                                                                                     15 / 4 * self.J_4_vector +
+                                                                                                     27 / 8 * self.J_2_vector ** 2)))
 
             b_d = b_d - b.sum(axis=1)
 
@@ -290,6 +299,7 @@ class simulation():
             d_p_free_vec = d_p_free_matrix.sum(axis=1)
             d_q_free_matrix = free_b_matrix * free_p_vector
             d_q_free_vec = -d_q_free_matrix.sum(axis=1)
+
             return np.concatenate((d_h_vec, d_k_vec, d_p_vec, d_q_vec, d_h_free_vec, d_k_free_vec, d_p_free_vec,
                                    d_q_free_vec))
 
@@ -338,10 +348,16 @@ class simulation():
          :param kyperbelt: If False, run regular simulation, if True run kyperbelt simulations.
          :type kyperbelt: bool
          '''
+        if kyperbelt:
+            if not form_of_ic:
+                initial_conditionsp = self.initial_condition_builder(*initial_conditions[0])
+                initial_conditionsk = self.initial_condition_builder(*initial_conditions[1])
+            initial_conditions = np.concatenate((initial_conditionsp.flatten(),initial_conditionsk.flatten()))
 
-        if not form_of_ic:
-            initial_conditions = self.initial_condition_builder(*initial_conditions)
-        initial_conditions = initial_conditions.flatten()
+        else:
+            if not form_of_ic:
+                initial_conditions = self.initial_condition_builder(*initial_conditions)
+            initial_conditions = initial_conditions.flatten()
         alpha_array = self.alpha_matrix(kyperbelt)
 
         if kyperbelt:
@@ -381,58 +397,140 @@ class simulation():
 
 
 if __name__ == '__main__':
-    file_name = 'data.json'
     kyperbelt = True
-    sim = simulation(file_name=file_name, kyperbelt=kyperbelt, hom_mode=True, total_mass=10000, r_res=4,
-                     range_min=10**12, range_max=10**14)
 
-    # Test matrices
-    # alpha, alpha_bar_times_alpha = sim.alpha_matrix(kyperbelt=False)    #, free_alpha, free_alpha_bar_times_alpha
-    # beta = sim.beta_values(alpha, kyperbelt=False)#, free_alpha=free_alpha)
-    # a, b = sim.a_b_matrices(alpha_bar_times_alpha, beta, kyperbelt=False)#, , free_a, free_b
-    #                                         #free_alpha_bar_matrix=free_alpha_bar_times_alpha)  # TODO add in richardson extrapolation Q(2h)-Q(4h)/Q(h)-Q(2h) = 2^p with p the order, for h we take the step size probably
+    if kyperbelt:
+        file_name = 'data.json'
+        sim = simulation(file_name=file_name, kyperbelt=kyperbelt, hom_mode=True, total_mass=10000, r_res=20, range_min=10 ** 12,
+                         range_max=10 ** 14)
+        omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
+        big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
+        inclination = np.array(
+            [sim.j['orbital inclination'], sim.s['orbital inclination'], sim.n['orbital inclination'],
+             sim.u['orbital inclination']])
+        eccentricity = np.array(
+            [sim.j['eccentricity'], sim.s['eccentricity'], sim.n['eccentricity'], sim.u['eccentricity']])
+
+        # omega = np.concatenate((omega, sim.asteroid_argperiapsis))
+        # big_omega = np.concatenate((big_omega, sim.asteroid_big_omega))
+        # inclination = np.concatenate((inclination, sim.asteroid_inclination))
+        # eccentricity = np.concatenate((eccentricity, sim.asteroid_eccentricity))
+
+        omegak = sim.asteroid_argperiapsis
+        big_omegak = sim.asteroid_big_omega
+        inclinationk = sim.asteroid_inclination
+        eccentricityk = sim.asteroid_eccentricity
+        var_omegak = omegak+big_omegak
+
+        var_omega = omega + big_omega
+        initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
+        initial_conditionsk = np.vstack((eccentricityk, var_omegak, inclinationk, big_omegak))
+        t_eval = [0, 365.25 * 24 * 3600 * 10 ** 12]
+        max_step = 365.25 * 24 * 3600 * 10 ** 9
+        form_of_ic = False
+        method = 'RK23'
+        a_tol = 10 ** 4
+        r_tol = 10 ** 3
+        e, I, var_omega, big_omega, free_e, free_I, free_var_omega, free_big_omega, solution = sim.run(time_scale=t_eval, form_of_ic=form_of_ic,
+                                                       initial_conditions=(initial_conditions,initial_conditionsk), max_step=max_step,
+                                                       method=method,
+                                                       relative_tolerance=r_tol, absolute_tolerance=a_tol,
+                                                       kyperbelt=kyperbelt)  # , free_e, free_I, free_var_omega, free_big_omega
+
+        smallaxis = [sim.j['smaxis'], sim.s['smaxis'], sim.n['smaxis'], sim.u['smaxis']]
+
+        e = np.concatenate((e,free_e))
+        I = np.concatenate((I,free_I))
+        var_omega = np.concatenate((var_omega,free_var_omega))
+        big_omega = np.concatenate((big_omega,free_big_omega))
+        smallaxis = np.concatenate((np.array(smallaxis),sim.asteroid_smaxis))
+
+        fig1, animate, plotobjecten = Od.animatieN(e, I, var_omega, big_omega, smallaxis)
+        anim = animation.FuncAnimation(fig1, animate, fargs=(e, I, var_omega, big_omega, smallaxis),
+                                       frames=round(t_eval[1] / max_step), interval=10, blit=False)
+    else:
+        file_name = 'data.json'
+        sim = simulation(file_name=file_name, kyperbelt=kyperbelt, hom_mode=True, total_mass=10000, r_res=4, range_min=10 ** 12,
+                         range_max=10 ** 14)
+        omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
+        big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
+        inclination = np.array(
+            [sim.j['orbital inclination'], sim.s['orbital inclination'], sim.n['orbital inclination'],
+             sim.u['orbital inclination']])
+        eccentricity = np.array(
+            [sim.j['eccentricity'], sim.s['eccentricity'], sim.n['eccentricity'], sim.u['eccentricity']])
 
 
 
-    # Longtitude of ascending node loanode in renze ding is de big omega
-    # argperiapsis is de argument van de periapsis dat is de omega
-    # orbital inclination is I
-    # Simulation
-    omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
-    omega = np.concatenate((omega, sim.asteroid_argperiapsis))
-    big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
-    big_omega = np.concatenate((big_omega, sim.asteroid_big_omega))
-    inclination = np.array([sim.j['orbital inclination'], sim.s['orbital inclination'], sim.n['orbital inclination'],
-                            sim.u['orbital inclination']])
-    inclination = np.concatenate((inclination, sim.asteroid_inclination))
-    eccentricity = np.array(
-        [sim.j['eccentricity'], sim.s['eccentricity'], sim.n['eccentricity'], sim.u['eccentricity']])
-    eccentricity = np.concatenate((eccentricity, sim.asteroid_eccentricity))
+        var_omega = omega + big_omega
+        initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
+        t_eval = [0, 365.25 * 24 * 3600 * 10 ** 12]
+        max_step = 365.25 * 24 * 3600 * 10 ** 9
+        form_of_ic = False
+        method = 'RK23'
+        a_tol = 10 ** 4
+        r_tol = 10 ** 3
+        e, I, var_omega, big_omega, solution = sim.run(time_scale=t_eval, form_of_ic=form_of_ic,
+                                                       initial_conditions=initial_conditions, max_step=max_step,
+                                                       method=method,
+                                                       relative_tolerance=r_tol, absolute_tolerance=a_tol,
+                                                       kyperbelt=kyperbelt)
 
-    var_omega = omega + big_omega
-    initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
-    t_eval = [0, 365.25 * 24 * 3600 * 10 ** 12]
-    max_step = 365.25 * 24 * 3600 * 10 ** 9
-    form_of_ic = False
-    method = 'RK23'
-    a_tol = 10 ** 4
-    r_tol = 10 ** 3
-    e, I, var_omega, big_omega, free_e, free_I, free_var_omega, free_big_omega, solution = sim.run(time_scale=t_eval,
-                                                                                                   form_of_ic=form_of_ic,
-                                             initial_conditions=initial_conditions, max_step=max_step, method=method,
-                                             relative_tolerance=r_tol, absolute_tolerance=a_tol, kyperbelt=kyperbelt)
+        smallaxis = [sim.j['smaxis'], sim.s['smaxis'], sim.n['smaxis'], sim.u['smaxis']]
 
-    # e = np.concatenate((e,free_e))
-    # I = np.concatenate((I,free_I))
-    # var_omega = np.concatenate((var_omega,free_var_omega))
-    # big_omega = np.concatenate((big_omega,free_big_omega))
 
-    smallaxis = [sim.j['smaxis'],sim.s['smaxis'],sim.n['smaxis'],sim.u['smaxis']]
-    # smallaxis = np.concatenate((np.array(smallaxis),sim.asteroid_smaxis))
-
-    fig1, animate, plotobjecten = Od.animatieN(e,I,var_omega,big_omega,smallaxis)
+    fig1, animate, plotobjecten = Od.animatieN(e, I, var_omega, big_omega, smallaxis)
     anim = animation.FuncAnimation(fig1, animate, fargs=(e, I, var_omega, big_omega, smallaxis),
-                                   frames=round(t_eval[1]/max_step), interval=10, blit=False)
-    # Writer = animation.writers['ffmpeg']
-    # writer = Writer(fps=100)
-    # anim.save('yay.mp4',writer=writer)
+                                    frames=round(t_eval[1] / max_step), interval=10, blit=False)
+
+
+
+
+    # #testen:
+    # # alpha, alpha_bar_times_alpha = sim.alpha_matrix(kyperbelt=False)    #, free_alpha, free_alpha_bar_times_alpha
+    # # beta = sim.beta_values(alpha, kyperbelt=False)#, free_alpha=free_alpha)
+    # # a, b = sim.a_b_matrices(alpha_bar_times_alpha, beta, kyperbelt=False)#, , free_a, free_b
+    # #                                         #free_alpha_bar_matrix=free_alpha_bar_times_alpha)  # TODO add in richardson extrapolation Q(2h)-Q(4h)/Q(h)-Q(2h) = 2^p with p the order, for h we take the step size probably
+    #
+    #
+    # # Longtitude of ascending node loanode in renze ding is de big omega
+    # # argperiapsis is de argument van de periapsis dat is de omega
+    # # orbital inclination is I
+    # omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
+    # big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
+    # inclination = np.array([sim.j['orbital inclination'], sim.s['orbital inclination'], sim.n['orbital inclination'],
+    #                         sim.u['orbital inclination']])
+    # eccentricity = np.array([sim.j['eccentricity'], sim.s['eccentricity'], sim.n['eccentricity'], sim.u['eccentricity']])
+    #
+    # # omega = np.concatenate((omega, sim.asteroid_argperiapsis))
+    # # big_omega = np.concatenate((big_omega, sim.asteroid_big_omega))
+    # # inclination = np.concatenate((inclination, sim.asteroid_inclination))
+    # # eccentricity = np.concatenate((eccentricity, sim.asteroid_eccentricity))
+    #
+    #
+    # var_omega = omega + big_omega
+    # initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
+    # t_eval = [0, 365.25 * 24 * 3600 * 10 ** 12]
+    # max_step = 365.25 * 24 * 3600 * 10 ** 9
+    # form_of_ic = False
+    # method = 'RK23'
+    # a_tol = 10 ** 4
+    # r_tol = 10 ** 3
+    # e, I, var_omega, big_omega, solution = sim.run(time_scale=t_eval, form_of_ic=form_of_ic,
+    #                                          initial_conditions=initial_conditions, max_step=max_step, method=method,
+    #                                          relative_tolerance=r_tol, absolute_tolerance=a_tol, kyperbelt=False)   #, free_e, free_I, free_var_omega, free_big_omega
+    #
+    # smallaxis = [sim.j['smaxis'],sim.s['smaxis'],sim.n['smaxis'],sim.u['smaxis']]
+    #
+    # # e = np.concatenate((e,free_e))
+    # # I = np.concatenate((I,free_I))
+    # # var_omega = np.concatenate((var_omega,free_var_omega))
+    # # big_omega = np.concatenate((big_omega,free_big_omega))
+    # # smallaxis = np.concatenate((np.array(smallaxis),sim.asteroid_smaxis))
+    #
+    # fig1, animate, plotobjecten = Od.animatieN(e,I,var_omega,big_omega,smallaxis)
+    # anim = animation.FuncAnimation(fig1, animate, fargs=(e, I, var_omega, big_omega, smallaxis),
+    #                                frames=round(t_eval[1]/max_step), interval=10, blit=False)
+    # # Writer = animation.writers['ffmpeg']
+    # # writer = Writer(fps=100)
+    # # anim.save('yay.mp4',writer=writer)
