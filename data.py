@@ -101,9 +101,9 @@ class PlanetaryDataHandler:
 			masses = weights*m1
 		else:
 			masses = np.repeat(total_mass/r_res,r_res)
-		_orbital_inclination = 1.8 #https://arxiv.org/abs/1704.02444
-		_loanode = 77 #https://arxiv.org/abs/1704.02444
-		_eccentricity = 0.1 #DES/SSBN07 classification
+		_orbital_inclination = 1.8 #https://arxiv.org/abs/1704.02444 	I
+		_loanode = 77 #https://arxiv.org/abs/1704.02444					big Omega
+		_eccentricity = 0.1 #DES/SSBN07 classification					e
 		roids = np.array([])
 		for i in range(len(radii)):
 			asteroid = planet(mass=masses[i],radius=0,eccentricity=_eccentricity,loanode=_loanode,orbital_inclination=_orbital_inclination,
