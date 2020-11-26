@@ -56,8 +56,10 @@ class simulation():
         self.sun = pdh.sun
         self.smaxis_vector = np.array([self.j['smaxis'], self.s['smaxis'], self.u['smaxis'], self.n['smaxis']])
         self.mass_vector = np.array([self.j['mass'], self.s['mass'], self.u['mass'], self.n['mass']])
-        self.J_2_vector = np.array([14736, 16298, 3343, 3411])
-        self.J_4_vector = np.array([-587, -915, -29, -35])
+        self.J_2_vector = np.array([14736, 16298, 3343, 3411]) * 10**(-6)
+        self.J_2 = 2.198 * 10**(-7)
+        self.J_4 = -4.805 * 10**(-9)
+        self.J_4_vector = np.array([-587, -915, -29, -35]) * 10**(-6)
         self.n_vector = 2 * np.pi / (self.smaxis_vector ** (3 / 2))
         self.planet_number = len(self.smaxis_vector)
 
@@ -87,21 +89,23 @@ class simulation():
             free_alpha = np.zeros((self.asteroid_number, self.planet_number))
             free_alpha_bar_times_alpha = np.zeros((self.asteroid_number, self.planet_number))
 
-            free_alpha = free_alpha + np.fmin(self.asteroid_smaxis / self.smaxis_vector,
-                                              self.smaxis_vector / self.asteroid_smaxis)
+            free_alpha = free_alpha + np.fmin(self.asteroid_smaxis[:, np.newaxis] / self.smaxis_vector,
+                                              self.smaxis_vector / self.asteroid_smaxis[:, np.newaxis])
 
-            free_alpha_bar_times_alpha = free_alpha_bar_times_alpha + np.fmin(self.asteroid_smaxis / self.smaxis_vector,
-                                                                              self.smaxis_vector / self.asteroid_smaxis)
+            free_alpha_bar_times_alpha = free_alpha_bar_times_alpha + np.fmin(self.asteroid_smaxis[:, np.newaxis] /
+                                                                              self.smaxis_vector,
+                                                                              self.smaxis_vector /
+                                                                              self.asteroid_smaxis[:, np.newaxis])
 
             free_smaxis_array = np.array([self.asteroid_smaxis, ] * self.planet_number).transpose()
             smaxis_array = np.array([self.smaxis_vector, ] * self.asteroid_number)
 
             free_alpha_bar_times_alpha[free_smaxis_array < smaxis_array] = 1
 
-            return np.array([alpha_matrix, alpha_bar_times_alpha_matrix, free_alpha, free_alpha_bar_times_alpha])
+            return np.array([alpha_matrix, alpha_bar_times_alpha_matrix, free_alpha, free_alpha_bar_times_alpha], dtype=np.ndarray)
 
         else:
-            return np.array([alpha_matrix, alpha_bar_times_alpha_matrix])
+            return np.array([alpha_matrix, alpha_bar_times_alpha_matrix], dtype=np.ndarray)
 
     @staticmethod
     def beta_values(alpha_matrix, kyperbelt=False, **kwargs):
@@ -119,7 +123,7 @@ class simulation():
             def g(phi, alpha):
                 # Angle phi
                 if alpha != 0:
-                    return (1 / np.pi) * np.cos(phi) / (1 - 2 * alpha * np.cos(phi) + alpha ** 2) ** (3 / 2)
+                    return (1 / np.pi) * np.cos(phi) / (1 - 2 * alpha * np.cos(phi) + alpha**2)**(3/2)
                 else:
                     return 0
 
@@ -129,7 +133,7 @@ class simulation():
             def f(phi, alpha):
                 # Angle 2*phi
                 if alpha != 0:
-                    return (1 / np.pi) * np.cos(2 * phi) / (1 - 2 * alpha * np.cos(2 * phi) + alpha ** 2) ** (3 / 2)
+                    return (1 / np.pi) * np.cos(2 * phi) / (1 - 2 * alpha * np.cos(2 * phi) + alpha**2)**(3/2)
                 else:
                     return 0
 
@@ -142,8 +146,7 @@ class simulation():
             if 'free_alpha' not in kwargs:
                 raise ValueError('Trying to run kyperbelt simulation without free_alpha matrix')
             return np.array([vec_beta1(alpha_matrix), vec_beta2(alpha_matrix), vec_beta1(kwargs['free_alpha']),
-                             vec_beta2(kwargs[
-                                           'free_alpha'])])  # Heb de laatste entry van de array verandert van vec_beta2(kwargs['free_alpha_bar']) naar vec_beta2(kwargs['free_alpha'])
+                             vec_beta2(kwargs['free_alpha'])], dtype=np.ndarray)  # Heb de laatste entry van de array verandert van vec_beta2(kwargs['free_alpha_bar']) naar vec_beta2(kwargs['free_alpha'])
 
         else:
             return np.array([vec_beta1(alpha_matrix), vec_beta2(alpha_matrix)])
@@ -172,19 +175,22 @@ class simulation():
         b = sub_matrix * beta[0]
 
         # Diagonal elements i.e. A_{jj} and B_{jj}, first line calculates extra part, second line the sum part
-        a_d = self.n_vector * ((self.sun['radius'] / self.smaxis_vector) ** 2 * (3 / 2 * self.J_2_vector -
-                                                                                 (self.sun[
-                                                                                      'radius'] / self.smaxis_vector) ** 2 * (
-                                                                                         15 / 4 * self.J_4_vector +
-                                                                                         9 / 8 * self.J_2_vector ** 2)))
+        # a_d = self.n_vector * ((self.sun['radius'] / self.smaxis_vector)**2 * (3 / 2 * self.J_2_vector -
+        #                        (self.sun['radius'] / self.smaxis_vector)**2 * (15/4 * self.J_4_vector +
+        #                                                                        9/8 * self.J_2_vector**2)))
+        a_d = self.n_vector * ((self.sun['radius'] / self.smaxis_vector)**2 * (3/2 * self.J_2 -
+                               (self.sun['radius'] / self.smaxis_vector)**2 * (15/4 * self.J_4 +
+                                                                               9/8 * self.J_2**2)))
+
         a_new = a * beta[0]
         a_d = a_d + a_new.sum(axis=1)
 
-        b_d = -self.n_vector * ((self.sun['radius'] / self.smaxis_vector) ** 2 * (3 / 2 * self.J_2_vector -
-                                                                                  (self.sun[
-                                                                                       'radius'] / self.smaxis_vector) ** 2 * (
-                                                                                          15 / 4 * self.J_4_vector +
-                                                                                          27 / 8 * self.J_2_vector ** 2)))
+        # b_d = -self.n_vector * ((self.sun['radius'] / self.smaxis_vector)**2 * (3/2 * self.J_2_vector -
+        #                         (self.sun['radius'] / self.smaxis_vector)**2 * (15/4 * self.J_4_vector +
+        #                                                                         27/8 * self.J_2_vector**2)))
+        b_d = -self.n_vector * ((self.sun['radius'] / self.smaxis_vector)**2 * (3/2 * self.J_2 -
+                                (self.sun['radius'] / self.smaxis_vector)**2 * (15/4 * self.J_4 +
+                                                                                27/8 * self.J_2**2)))
         b_d = b_d - b.sum(axis=1)
 
         a_matrix = np.diag(a_d) - a * beta[1]
@@ -199,30 +205,41 @@ class simulation():
             a = sub_matrix
             b = sub_matrix * beta[2]
 
-            a_d = self.free_n_vector * ((self.sun['radius'] / self.asteroid_smaxis) ** 2 * (3 / 2 * self.J_2_vector -
-                                                                                            (self.sun[
-                                                                                                 'radius'] / self.asteroid_smaxis) ** 2 * (
-                                                                                                    15 / 4 * self.J_4_vector +
-                                                                                                    9 / 8 * self.J_2_vector ** 2)))
+            # a_d = self.free_n_vector * ((self.sun['radius'] / self.asteroid_smaxis[:, np.newaxis])**2 * (3/2 * self.J_2_vector -
+            #                             (self.sun['radius'] / self.asteroid_smaxis[:, np.newaxis])**2 * (15/4 * self.J_4_vector +
+            #                                                                               9/8 * self.J_2_vector**2)))
+            a_d = self.free_n_vector * ((self.sun['radius'] / self.asteroid_smaxis)**2 * (3/2 * self.J_2 -
+                                        (self.sun['radius'] / self.asteroid_smaxis)**2 * (15/4 * self.J_4 +
+                                                                                          9/8 * self.J_2**2)))
+
+
             a_new = a * beta[2]
             a_d = a_d + a_new.sum(axis=1)
 
-            b_d = -self.free_n_vector * ((self.sun['radius'] / self.asteroid_smaxis) ** 2 * (3 / 2 * self.J_2_vector -
-                                                                                             (self.sun[
-                                                                                                  'radius'] / self.asteroid_smaxis) ** 2 * (
-                                                                                                     15 / 4 * self.J_4_vector +
-                                                                                                     27 / 8 * self.J_2_vector ** 2)))
+            # b_d = -self.free_n_vector[:, np.newaxis] * ((self.sun['radius'] / self.asteroid_smaxis[:, np.newaxis])**2 * (3/2 * self.J_2_vector -
+            #                              (self.sun['radius'] / self.asteroid_smaxis[:, np.newaxis])**2 * (15/4 * self.J_4_vector +
+            #                                                                                27/8 * self.J_2_vector ** 2)))
+            b_d = -self.free_n_vector * ((self.sun['radius'] / self.asteroid_smaxis)**2 * (3/2 * self.J_2 -
+                                         (self.sun['radius'] / self.asteroid_smaxis)**2 * (15/4 * self.J_4 +
+                                                                                           27/8 * self.J_2 ** 2)))
 
             b_d = b_d - b.sum(axis=1)
+            free_a_matrix = np.zeros((self.asteroid_number, self.planet_number+1))
+            free_a_matrix[:, 0] = a_d
+            free_a_matrix[:, 1:] = a * beta[3]
 
-            free_a_matrix = np.diag(a_d) - a * beta[3]
-            free_b_matrix = np.diag(b_d) + b
+            free_b_matrix = np.zeros((self.asteroid_number, self.planet_number + 1))
+            free_b_matrix[:, 0] = b_d
+            free_b_matrix[:, 1:] = b
 
-            return np.array([a_matrix, b_matrix, free_a_matrix, free_b_matrix])
+            # free_a_matrix = a_d - a * beta[3]
+            # free_b_matrix = b_d + b
+
+            return np.array([a_matrix, b_matrix, free_a_matrix, free_b_matrix], dtype=np.ndarray)
 
         else:
 
-            return np.array([a_matrix, b_matrix])
+            return np.array([a_matrix, b_matrix], dtype=np.ndarray)
 
     @staticmethod
     def initial_condition_builder(e, var_omega, I, big_omega):
@@ -291,13 +308,13 @@ class simulation():
             free_q_vector = vector[3 * amount_of_particles: 4 * amount_of_particles]
 
             # Differential equations.
-            d_h_free_matrix = free_a_matrix * free_k_vector
+            d_h_free_matrix = free_a_matrix * free_k_vector[:, np.newaxis]
             d_h_free_vec = d_h_free_matrix.sum(axis=1)
-            d_k_free_matrix = free_a_matrix * free_h_vector
+            d_k_free_matrix = free_a_matrix * free_h_vector[:, np.newaxis]
             d_k_free_vec = -d_k_free_matrix.sum(axis=1)
-            d_p_free_matrix = free_b_matrix * free_q_vector
+            d_p_free_matrix = free_b_matrix * free_q_vector[:, np.newaxis]
             d_p_free_vec = d_p_free_matrix.sum(axis=1)
-            d_q_free_matrix = free_b_matrix * free_p_vector
+            d_q_free_matrix = free_b_matrix * free_p_vector[:, np.newaxis]
             d_q_free_vec = -d_q_free_matrix.sum(axis=1)
 
             return np.concatenate((d_h_vec, d_k_vec, d_p_vec, d_q_vec, d_h_free_vec, d_k_free_vec, d_p_free_vec,
@@ -401,7 +418,7 @@ if __name__ == '__main__':
 
     if kyperbelt:
         file_name = 'data.json'
-        sim = simulation(file_name=file_name, kyperbelt=kyperbelt, hom_mode=True, total_mass=10000, r_res=20, range_min=10 ** 12,
+        sim = simulation(file_name=file_name, kyperbelt=kyperbelt, hom_mode=True, total_mass=10000, r_res=10, range_min=10**12,
                          range_max=10 ** 14)
         omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
         big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
@@ -445,12 +462,9 @@ if __name__ == '__main__':
         big_omega = np.concatenate((big_omega,free_big_omega))
         smallaxis = np.concatenate((np.array(smallaxis),sim.asteroid_smaxis))
 
-        fig1, animate, plotobjecten = Od.animatieN(e, I, var_omega, big_omega, smallaxis)
-        anim = animation.FuncAnimation(fig1, animate, fargs=(e, I, var_omega, big_omega, smallaxis),
-                                       frames=round(t_eval[1] / max_step), interval=10, blit=False)
     else:
         file_name = 'data.json'
-        sim = simulation(file_name=file_name, kyperbelt=kyperbelt, hom_mode=True, total_mass=10000, r_res=4, range_min=10 ** 12,
+        sim = simulation(file_name=file_name, kyperbelt=kyperbelt, hom_mode=True, total_mass=10000, r_res=20, range_min=10 ** 12,
                          range_max=10 ** 14)
         omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
         big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
