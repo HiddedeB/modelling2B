@@ -242,7 +242,7 @@ class simulation():
             return np.array([a_matrix, b_matrix], dtype=np.ndarray)
 
     @staticmethod
-    def initial_condition_builder(e, var_omega, I, big_omega):
+    def initial_condition_builder(e, var_omega, I, big_omega, radians):
         '''NOTE: Initial condition maker, if the initial conditions are not in h, k, p and q form, then this function
         can be called to transfer them.
         :param e: The eccentricities of the orbits.
@@ -253,7 +253,13 @@ class simulation():
         :type I: np.ndarray
         :param big_omega: The angles between the ascending node and the reference frame x-hat direction for every orbit.
         :type big_omega: np.ndarray
+        :param radians: If True values are in radians, if False they are in degrees.
+        :type radians: bool
         '''
+        if not radians:
+            var_omega = var_omega / 180 * np.pi
+            I = I / 180 * np.pi
+            big_omega = big_omega / 180 * np.pi
 
         h = e * np.sin(var_omega)
         k = e * np.cos(var_omega)
@@ -269,7 +275,7 @@ class simulation():
                          np.arcsin(p / np.sqrt(p ** 2 + q ** 2))])
 
     @staticmethod
-    # @njit
+    @njit
     def orbital_calculator(t, vector, *args):
         '''NOTE: function to run the solver with, vector contains h, k, p, q in that order. Furthermore, the values are
         taken to go from closest to the sun to most outward.
@@ -308,13 +314,13 @@ class simulation():
             free_q_vector = vector[3 * amount_of_particles: 4 * amount_of_particles]
 
             # Differential equations.
-            d_h_free_matrix = free_a_matrix * free_k_vector[:, np.newaxis]
+            d_h_free_matrix = free_a_matrix * np.expand_dims(free_k_vector, 1)
             d_h_free_vec = d_h_free_matrix.sum(axis=1)
-            d_k_free_matrix = free_a_matrix * free_h_vector[:, np.newaxis]
+            d_k_free_matrix = free_a_matrix * np.expand_dims(free_h_vector, 1)
             d_k_free_vec = -d_k_free_matrix.sum(axis=1)
-            d_p_free_matrix = free_b_matrix * free_q_vector[:, np.newaxis]
+            d_p_free_matrix = free_b_matrix * np.expand_dims(free_q_vector, 1)
             d_p_free_vec = d_p_free_matrix.sum(axis=1)
-            d_q_free_matrix = free_b_matrix * free_p_vector[:, np.newaxis]
+            d_q_free_matrix = free_b_matrix * np.expand_dims(free_p_vector, 1)
             d_q_free_vec = -d_q_free_matrix.sum(axis=1)
 
             return np.concatenate((d_h_vec, d_k_vec, d_p_vec, d_q_vec, d_h_free_vec, d_k_free_vec, d_p_free_vec,
@@ -348,9 +354,10 @@ class simulation():
         '''NOTE: Function to run this class and compute the simulation, returns the ode_solver solution.
          :param time_scale: The time interval over which to be simulated.
          :type time_scale: list
-         :param form_of_ic: The form of the initial conditions. If True, h, k, p, q coordinates, if False, e, var_omega
-         I and big_omega coordinates.
-         :type form_of_ic: bool
+         :param form_of_ic: The form of the initial conditions. On the first entry if True, h, k, p, q coordinates, if
+         False, e, var_omega I and big_omega coordinates. On the second entry, True implies big_omega and inclination,
+         var_omega are in radians if False they are in degrees.
+         :type form_of_ic: np.ndarray
          :param initial_conditions: The initial conditions given in the parameters h, k, p, q or e, var_omega, I and
          big_omega.
          :type initial_conditions: 1darry
@@ -366,14 +373,14 @@ class simulation():
          :type kyperbelt: bool
          '''
         if kyperbelt:
-            if not form_of_ic:
-                initial_conditionsp = self.initial_condition_builder(*initial_conditions[0])
-                initial_conditionsk = self.initial_condition_builder(*initial_conditions[1])
+            if not form_of_ic[0]:
+                initial_conditionsp = self.initial_condition_builder(*initial_conditions[0], form_of_ic[1])
+                initial_conditionsk = self.initial_condition_builder(*initial_conditions[1], form_of_ic[1])
             initial_conditions = np.concatenate((initial_conditionsp.flatten(),initial_conditionsk.flatten()))
 
         else:
-            if not form_of_ic:
-                initial_conditions = self.initial_condition_builder(*initial_conditions)
+            if not form_of_ic[0]:
+                initial_conditions = self.initial_condition_builder(*initial_conditions, form_of_ic[1])
             initial_conditions = initial_conditions.flatten()
         alpha_array = self.alpha_matrix(kyperbelt)
 
@@ -418,7 +425,7 @@ if __name__ == '__main__':
 
     if kyperbelt:
         file_name = 'data.json'
-        sim = simulation(file_name=file_name, kyperbelt=kyperbelt, hom_mode=True, total_mass=10000, r_res=10, range_min=10**12,
+        sim = simulation(file_name=file_name, kyperbelt=kyperbelt, hom_mode=True, total_mass=10000, r_res=5, range_min=10**12,
                          range_max=10 ** 14)
         omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
         big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
@@ -442,9 +449,9 @@ if __name__ == '__main__':
         var_omega = omega + big_omega
         initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
         initial_conditionsk = np.vstack((eccentricityk, var_omegak, inclinationk, big_omegak))
-        t_eval = [0, 365.25 * 24 * 3600 * 10 ** 12]
-        max_step = 365.25 * 24 * 3600 * 10 ** 9
-        form_of_ic = False
+        t_eval = [0, 365.25 * 24 * 3600 * 10 ** 9]
+        max_step = 365.25 * 24 * 3600 * 10 ** 4
+        form_of_ic = np.array([False, False])
         method = 'RK23'
         a_tol = 10 ** 4
         r_tol = 10 ** 3
