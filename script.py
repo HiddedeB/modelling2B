@@ -13,7 +13,7 @@ kyperbelt = True
 if kyperbelt:
     file_name = 'data.json'
     sim = ST.simulation(file_name=file_name, kyperbelt=kyperbelt, hom_mode=True, total_mass=10000, r_res=5, range_min=10**12,
-                     range_max=10 ** 14)
+                     range_max=10 ** 13)
     omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
     big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
     inclination = np.array(
@@ -34,7 +34,7 @@ if kyperbelt:
     initial_conditionsk = np.vstack((eccentricityk, var_omegak, inclinationk, big_omegak))
 
     t_eval = [0, 365.25 * 24 * 3600 * 10 ** 14]
-    max_step = 365.25 * 24 * 3600 * 10 ** 10
+    max_step = 365.25 * 24 * 3600 * 10 ** 11
     form_of_ic = np.array([False, False])
     method = 'RK23'
     a_tol = 10 ** 4
@@ -69,8 +69,8 @@ else:
 
     var_omega = omega + big_omega
     initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
-    t_eval = [0, 365.25 * 24 * 3600 * 10 ** 15]
-    max_step = 365.25 * 24 * 3600 * 10 ** 13
+    t_eval = [0, 365.25 * 24 * 3600 * 10 ** 14]
+    max_step = 365.25 * 24 * 3600 * 10 ** 12
     form_of_ic = np.array([False])
     method = 'RK23'
     a_tol = 10 ** 4
@@ -85,12 +85,9 @@ else:
 
 
 tekenen = Od.visualisatie()
-tekenen.animatieN(e, I, var_omega, big_omega, smallaxis)
+#tekenen.animatieN(e, I, var_omega, big_omega, smallaxis)
 tekenen.PlotParamsVsTijd((e,I,var_omega,big_omega),solution.t,('e','I','var_omega','big_omega'))
-
-# fig1, animate, plotobjecten = Od.animatieN(e, I, var_omega, big_omega, smallaxis)
-# anim = animation.FuncAnimation(fig1, animate, fargs=(e, I, var_omega, big_omega, smallaxis),
-#                                 frames=round(t_eval[1] / max_step), interval=5, blit=False)
+tekenen.ParamVsA(var_omega,smallaxis,('var_omega'))
 
 # Writer = animation.writers['ffmpeg']
 # writer = Writer(fps=100)

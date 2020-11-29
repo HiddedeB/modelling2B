@@ -161,7 +161,7 @@ class visualisatie():
         # plt.show()
         return vector
 
-    def animate(self, i, e, I, var, big_omega, smallaxis):
+    def animateN(self, i, e, I, var, big_omega, smallaxis):
         '''Update functie voor animatieN functie'''
         self.theta_values = np.linspace(0, 2 * np.pi, 10 ** 3)
 
@@ -180,8 +180,8 @@ class visualisatie():
         '''
 
         # figuur definieren
-        self.figure = plt.figure()
-        self.ax = p3.Axes3D(self.figure)
+        self.figureN = plt.figure()
+        self.ax = p3.Axes3D(self.figureN)
         self.ax.set_xlim3d([-2 * 10 ** 12, 2 * 10 ** 12])
         self.ax.set_xlabel('X')
         self.ax.set_ylim3d([-2 * 10 ** 12, 2 * 10 ** 12])
@@ -194,7 +194,7 @@ class visualisatie():
             self.plotobjecten.append(self.ax.plot([], [], []))
 
 
-        self.anim = animation.FuncAnimation(self.figure, self.animate, fargs=(e, I, var, big_omega, smallaxis),
+        self.anim = animation.FuncAnimation(self.figureN, self.animateN, fargs=(e, I, var, big_omega, smallaxis),
                                        frames=round(np.shape(e)[1]), interval=1, blit=False)
         #plt.show()
 
@@ -208,7 +208,7 @@ class visualisatie():
         :type paramname: tuple
         '''
 
-        self.figure = plt.figure()
+        self.figureT = plt.figure()
 
         j = 1
         for i in param:
@@ -217,5 +217,37 @@ class visualisatie():
             plt.xlabel('time [years]')
             plt.ylabel(paramname[j-1])
             j += 1
+
+    def animate(self,i , param, smallaxis):
+        '''NOTE: function used to animate the plot object in ParamVsA'''
+        for (line,parameter, a) in zip(self.plotobjecten,param,smallaxis):
+            line[0].set_data([a,parameter[i]])
+
+    def ParamVsA(self,param,smallaxis,paramnaam):
+        ''' NOTE: a function to plot a specific parameter against the size of the small axis.
+        :param param: parameter that needs to be plotted against a. an (n,t) array with n objects plotted over time t
+        :type param: np.ndarray()
+        :param smallaxis: list containing the smallaxis (a) parameters
+        :type smallaxis: list
+        :param paramnaam: string of parameter name that needs to be plotted
+        :type paramnaam: str
+        '''
+        self.figureP = plt.figure()
+
+        j = 1
+        # for i in param:
+        plt.subplot(len(param),1,j)
+        self.ax = plt.axes(xlim=(10**11, 10**13), ylim=(min(0,param.min()),param.max()))
+        self.ax.set_ylabel(paramnaam[0])
+        self.ax.set_xlabel('a')
+
+        self.plotobjecten = []
+        for i in range(np.shape(param)[0]):
+            self.plotobjecten.append(self.ax.plot([], [],'o'))
+
+        self.anim = animation.FuncAnimation(self.figureP, self.animate, fargs=(param,smallaxis),
+                                       frames=round(np.shape(param)[1]), interval=1, blit=False)
+
+
 
 
