@@ -1,0 +1,62 @@
+{
+	"Sedna":{
+		"mass":-1.0,
+		"radius":5e5, 
+		"smaxis":7.58e13, 
+		"period":11400, 
+		"orbital inclination":11.9, 
+		"eccentricity":0.85,
+		"loanode":144.5, 
+		"argperiapsis":311.5
+	},
+	"2012VP113":{
+		"mass":-1.0,
+		"radius":3e5, 
+		"smaxis":3.979e13, 
+		"period":4300, 
+		"orbital inclination":24.1, 
+		"eccentricity":0.69,
+		"loanode":90.8, 
+		"argperiapsis":292.8
+	},
+	"2013RF98":{
+		"mass":-1.0,
+		"radius":3.5e4, 
+		"smaxis":5.45e13, 
+		"period":6900, 
+		"orbital inclination":29.6, 
+		"eccentricity":0.9,
+		"loanode":67.6, 
+		"argperiapsis":311.8
+	},
+	"2004VN112":{
+		"mass":-1.0,
+		"radius":1e5, 
+		"smaxis":4.89e13, 
+		"period":5900, 
+		"orbital inclination":25.6, 
+		"eccentricity":0.85,
+		"loanode":66, 
+		"argperiapsis":327.1
+	},
+	"2007TG422":{
+		"mass":-1.0,
+		"radius":1e5, 
+		"smaxis":7.52e13, 
+		"period":11300, 
+		"orbital inclination":18.6, 
+		"eccentricity":0.93,
+		"loanode":112.9, 
+		"argperiapsis":285.7
+	},
+	"2010GB174":{
+		"mass":-1.0,
+		"radius":1e4, 
+		"smaxis":5.25e13, 
+		"period":6600, 
+		"orbital inclination":21.5, 
+		"eccentricity":0.87,
+		"loanode":130.6, 
+		"argperiapsis":347.8
+	}
+}
