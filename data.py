@@ -127,8 +127,8 @@ d = typed.Dict.empty(key_type=types.unicode_type,value_type=dicttype)
 spec += [('rawdata',typeof(d))]
 spec += [('asteroid_attributes',dicttype2)]
 
-def create_pdh(filename):
-	with open(filename) as file:
+def create_pdh(filename1,filename2=False):
+	with open(filename1) as file:
 		data = json.load(file)
 	tojitclass = typed.Dict()
 	for i in data:
@@ -136,6 +136,15 @@ def create_pdh(filename):
 		for j in data[i]:
 			temp[j]=data[i][j]
 		tojitclass[i]=temp
+	if filename2:
+		with open(filename2) as file:
+			data = json.load(file)
+		for i in data:
+			temp = typed.Dict()
+			for j in data[i]:
+				temp[j]=float(data[i][j])
+			tojitclass[i]=temp
+	print('yay')
 	return JitPDH(tojitclass)
 
 @jitclass(spec)
@@ -155,6 +164,12 @@ class JitPDH:
 		self.planet9 = typed.Dict.empty(*dict_kv_ty)
 		self.asteroids = typed.List.empty_list(dicttype)
 		self.asteroid_attributes = typed.Dict.empty(*kv_ty2)
+		self.asteroid_attributes['mass']=np.zeros(0,dtype=np.float64)
+		self.asteroid_attributes['eccentricity']=np.zeros(0,dtype=np.float64)
+		self.asteroid_attributes['loanode']=np.zeros(0,dtype=np.float64)
+		self.asteroid_attributes['smaxis']=np.zeros(0,dtype=np.float64)
+		self.asteroid_attributes['orbital inclination']=np.zeros(0,dtype=np.float64)
+		self.asteroid_attributes['argperiapsis']=np.zeros(0,dtype=np.float64)
 
 		for i in rawdata:
 			temp = rawdata[i]
@@ -202,11 +217,22 @@ class JitPDH:
 		# Dit werkt niet for some reason
 		return "Please don't print me, ask for my rawdata instead. I'll help you a bit though. \n" + str(self.rawdata)
 
-	def set_kuyperbelt(self,total_mass,r_res,range_min,range_max,hom_mode=False):
+	def add_etnos(self):
+		for i in self.rawdata:
+			if i not in ['sun','mercury','venus','earth','mars','jupiter','uranus','neptune','saturn','planet9']:
+				self.asteroids.append(self.rawdata[i])
+				temp = self.asteroid_attributes
+				self.asteroid_attributes['mass'] = np.append(temp['mass'],self.rawdata[i]['mass'])
+				self.asteroid_attributes['smaxis'] = np.append(temp['smaxis'],self.rawdata[i]['smaxis'])
+				self.asteroid_attributes['eccentricity'] = np.append(temp['eccentricity'],self.rawdata[i]['eccentricity'])
+				self.asteroid_attributes['loanode'] = np.append(temp['loanode'],self.rawdata[i]['loanode'])
+				self.asteroid_attributes['orbital inclination'] = np.append(temp['orbital inclination'],self.rawdata[i]['orbital inclination'])
+				self.asteroid_attributes['argperiapsis'] = np.append(temp['argperiapsis'],self.rawdata[i]['argperiapsis'])
+
+	def add_kuyperbelt(self,total_mass,r_res,range_min,range_max,hom_mode=False):
 		"""Creates an array of planet objects for the euler lagrange method
 		hom_mode False divides their mass evenly over orbits, True divides it homogeneously in
 		the radial direction."""
-		self.asteroids = typed.List.empty_list(dicttype)
 		radii = np.linspace(range_min,range_max,r_res)
 		if hom_mode:
 			m1 = total_mass*range_min/np.sum(radii)
@@ -233,3 +259,6 @@ class JitPDH:
 			asteroid['orbital inclination']=_orbital_inclination
 			asteroid['smaxis']=radii[i]
 			self.asteroids.append(asteroid)
+
+	def reset_asteroids(self):
+		self.asteroids = typed.List.empty_list(dicttype)

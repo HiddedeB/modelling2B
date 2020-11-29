@@ -10,7 +10,7 @@ from matplotlib import animation
 class simulation():
     '''Class to compute simulation of the orbital elements'''
 
-    def __init__(self, file_name, **kwargs):
+    def __init__(self, file_name, etnos_file=False, **kwargs):
         '''NOTE: Initial function that sets up all the different attributes of our class.
         :param file_name: File_name directing to data file for planethandler.
         :type file_name: str
@@ -28,8 +28,10 @@ class simulation():
         :param **range_max: Maximum distance of kyperbelt.
         :type **range_max: float
         '''
-
-        pdh = create_pdh(file_name)
+        if not etnos_file:
+            pdh = create_pdh(file_name)
+        else:
+            pdh = create_pdh(file_name,etnos_file)
 
         if 'kyperbelt' in kwargs:
             if 'hom_mode' in kwargs:
@@ -37,7 +39,7 @@ class simulation():
             else:
                 hom_mode = False
 
-            pdh.set_kuyperbelt(kwargs['total_mass'], kwargs['r_res'], kwargs['range_min'], kwargs['range_max'],
+            pdh.add_kuyperbelt(kwargs['total_mass'], kwargs['r_res'], kwargs['range_min'], kwargs['range_max'],
                                hom_mode)
 
             self.asteroid_smaxis = pdh.asteroid_attributes['smaxis']

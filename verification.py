@@ -214,7 +214,8 @@ class simulation():
 
 if __name__ == '__main__':
     file_name = 'data.json'
-    sim = simulation(file_name=file_name)
+    etnos_file = 'eTNOs.json'
+    sim = simulation(file_name=file_name,etnos_file=etnos_file)
     alpha, alpha_bar_times_alpha = sim.alpha_matrix()
     beta = sim.beta_values(alpha)
     a, b = sim.a_b_matrices(alpha_bar_times_alpha, beta) # TODO add in richardson extrapolation Q(2h)-Q(4h)/Q(h)-Q(2h) = 2^p with p the order, for h we take the step size probably
