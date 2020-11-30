@@ -30,6 +30,19 @@ class simulation():
         '''
 
         G = 6.67430 * 10**(-11)
+        self.j = pdh.jupiter
+        self.s = pdh.saturn
+        self.u = pdh.uranus
+        self.n = pdh.neptune
+        self.sun = pdh.sun
+        self.smaxis_vector = np.array([self.j['smaxis'], self.s['smaxis'], self.u['smaxis'], self.n['smaxis']])
+        self.mass_vector = np.array([self.j['mass'], self.s['mass'], self.u['mass'], self.n['mass']])
+        self.J_2_vector = np.array([14736, 16298, 3343, 3411]) * 10 ** (-6)
+        self.J_2 = 2.198 * 10 ** (-7)  # J_2 of the sun
+        self.J_4 = -4.805 * 10 ** (-9)  # J_4 of the sun
+        self.J_4_vector = np.array([-587, -915, -29, -35]) * 10 ** (-6)
+        self.n_vector = G * self.sun['mass'] / (self.smaxis_vector ** (3 / 2))
+        self.planet_number = len(self.smaxis_vector)
 
         if not etnos_file:
             pdh = create_pdh(file_name)
@@ -53,20 +66,6 @@ class simulation():
             self.asteroid_inclination = pdh.asteroid_attributes['orbital inclination']
             self.asteroid_eccentricity = pdh.asteroid_attributes['eccentricity']
             self.free_n_vector = G * self.sun['mass'] / (self.asteroid_smaxis ** (3 / 2))
-
-        self.j = pdh.jupiter
-        self.s = pdh.saturn
-        self.u = pdh.uranus
-        self.n = pdh.neptune
-        self.sun = pdh.sun
-        self.smaxis_vector = np.array([self.j['smaxis'], self.s['smaxis'], self.u['smaxis'], self.n['smaxis']])
-        self.mass_vector = np.array([self.j['mass'], self.s['mass'], self.u['mass'], self.n['mass']])
-        self.J_2_vector = np.array([14736, 16298, 3343, 3411]) * 10**(-6)
-        self.J_2 = 2.198 * 10**(-7)  # J_2 of the sun
-        self.J_4 = -4.805 * 10**(-9)  # J_4 of the sun
-        self.J_4_vector = np.array([-587, -915, -29, -35]) * 10**(-6)
-        self.n_vector = G * self.sun['mass'] / (self.smaxis_vector ** (3 / 2))
-        self.planet_number = len(self.smaxis_vector)
 
     def alpha_matrix(self, kyperbelt=False):
         '''NOTE: Function to compute the alpha matrix and the alpha bar and alpha product matrix.
