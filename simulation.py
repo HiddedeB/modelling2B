@@ -29,6 +29,12 @@ class simulation():
         :type **range_max: float
         '''
 
+
+        if not etnos_file:
+            pdh = create_pdh(file_name)
+        else:
+            pdh = create_pdh(file_name,etnos_file)
+
         G = 6.67430 * 10**(-11)
         self.j = pdh.jupiter
         self.s = pdh.saturn
@@ -41,13 +47,10 @@ class simulation():
         self.J_2 = 2.198 * 10 ** (-7)  # J_2 of the sun
         self.J_4 = -4.805 * 10 ** (-9)  # J_4 of the sun
         self.J_4_vector = np.array([-587, -915, -29, -35]) * 10 ** (-6)
-        self.n_vector = G * self.sun['mass'] / (self.smaxis_vector ** (3 / 2))
+        #self.n_vector = G * self.sun['mass'] / (self.smaxis_vector ** (3 / 2))
+        self.n_vector = np.pi * 2 / (self.smaxis_vector ** (3 / 2))
         self.planet_number = len(self.smaxis_vector)
 
-        if not etnos_file:
-            pdh = create_pdh(file_name)
-        else:
-            pdh = create_pdh(file_name,etnos_file)
 
         if 'kyperbelt' in kwargs:
             if 'hom_mode' in kwargs:
@@ -65,7 +68,8 @@ class simulation():
             self.asteroid_big_omega = pdh.asteroid_attributes['loanode']
             self.asteroid_inclination = pdh.asteroid_attributes['orbital inclination']
             self.asteroid_eccentricity = pdh.asteroid_attributes['eccentricity']
-            self.free_n_vector = G * self.sun['mass'] / (self.asteroid_smaxis ** (3 / 2))
+            #self.free_n_vector = G * self.sun['mass'] / (self.asteroid_smaxis ** (3 / 2))
+            self.free_n_vector = 2 * np.pi / (self.asteroid_smaxis ** (3 / 2))
 
     def alpha_matrix(self, kyperbelt=False):
         '''NOTE: Function to compute the alpha matrix and the alpha bar and alpha product matrix.
@@ -279,7 +283,7 @@ class simulation():
                          np.arcsin(p / np.sqrt(p ** 2 + q ** 2))])
 
     @staticmethod
-    @njit
+    #@njit
     def orbital_calculator(t, vector, *args):
         '''NOTE: function to run the solver with, vector contains h, k, p, q in that order. Furthermore, the values are
         taken to go from closest to the sun to most outward.
@@ -425,7 +429,7 @@ class simulation():
 
 
 if __name__ == '__main__':
-    kyperbelt = True
+    kyperbelt = False
 
     if kyperbelt:
         file_name = 'data.json'
@@ -491,7 +495,7 @@ if __name__ == '__main__':
         initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
         t_eval = [0, 365.25 * 24 * 3600 * 10 ** 12]
         max_step = 365.25 * 24 * 3600 * 10 ** 9
-        form_of_ic = False
+        form_of_ic = np.array([False, False])
         method = 'RK23'
         a_tol = 10 ** 4
         r_tol = 10 ** 3

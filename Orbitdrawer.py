@@ -217,6 +217,7 @@ class visualisatie():
             plt.xlabel('time [years]')
             plt.ylabel(paramname[j-1])
             j += 1
+        plt.legend(['Jupiter','Saturn','Uranus','Neptune'])
 
     def animate(self,i , param, smallaxis):
         '''NOTE: function used to animate the plot object in ParamVsA'''
@@ -244,6 +245,7 @@ class visualisatie():
         self.plotobjecten = []
         for i in range(np.shape(param)[0]):
             self.plotobjecten.append(self.ax.plot([], [],'o'))
+        plt.legend(['Jupiter','Saturn','Uranus','Neptune'])
 
         self.anim = animation.FuncAnimation(self.figureP, self.animate, fargs=(param,smallaxis),
                                        frames=round(np.shape(param)[1]), interval=1, blit=False)

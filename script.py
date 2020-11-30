@@ -8,7 +8,7 @@ import Orbitdrawer as Od
 from matplotlib import animation
 from matplotlib import pyplot as plt
 
-kyperbelt = True
+kyperbelt = False
 
 if kyperbelt:
     file_name = 'data.json'
@@ -34,7 +34,7 @@ if kyperbelt:
     initial_conditionsk = np.vstack((eccentricityk, var_omegak, inclinationk, big_omegak))
 
     t_eval = [0, 365.25 * 24 * 3600 * 10 ** 14]
-    max_step = 365.25 * 24 * 3600 * 10 ** 11
+    max_step = 365.25 * 24 * 3600 * 10 ** 12
     form_of_ic = np.array([False, False])
     method = 'RK23'
     a_tol = 10 ** 4
@@ -87,7 +87,7 @@ else:
 tekenen = Od.visualisatie()
 #tekenen.animatieN(e, I, var_omega, big_omega, smallaxis)
 tekenen.PlotParamsVsTijd((e,I,var_omega,big_omega),solution.t,('e','I','var_omega','big_omega'))
-tekenen.ParamVsA(var_omega,smallaxis,('var_omega'))
+#tekenen.ParamVsA(e,smallaxis,('e'))
 
 # Writer = animation.writers['ffmpeg']
 # writer = Writer(fps=100)
