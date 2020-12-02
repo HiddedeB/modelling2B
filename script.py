@@ -8,11 +8,10 @@ import Orbitdrawer as Od
 from matplotlib import animation
 from matplotlib import pyplot as plt
 
-kyperbelt = False
-
-if kyperbelt:
+kuiperbelt = True
+if kuiperbelt:
     file_name = 'data.json'
-    sim = ST.simulation(file_name=file_name, kyperbelt=kyperbelt, hom_mode=True, total_mass=10000, r_res=5, range_min=10**12,
+    sim = ST.simulation(file_name=file_name, kuiperbelt=kuiperbelt, hom_mode=True, total_mass=10000, r_res=5, range_min=10**12,
                      range_max=10 ** 13)
     omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
     big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
@@ -43,7 +42,7 @@ if kyperbelt:
                                                    initial_conditions=(initial_conditions,initial_conditionsk), max_step=max_step,
                                                    method=method,
                                                    relative_tolerance=r_tol, absolute_tolerance=a_tol,
-                                                   kyperbelt=kyperbelt)  # , free_e, free_I, free_var_omega, free_big_omega
+                                                   kuiperbelt=kuiperbelt)  # , free_e, free_I, free_var_omega, free_big_omega
 
     smallaxis = [sim.j['smaxis'], sim.s['smaxis'], sim.n['smaxis'], sim.u['smaxis']]
 
@@ -55,7 +54,7 @@ if kyperbelt:
 
 else:
     file_name = 'data.json'
-    sim = ST.simulation(file_name=file_name, kyperbelt=kyperbelt, hom_mode=True, total_mass=10000, r_res=5, range_min=10 ** 13,
+    sim = ST.simulation(file_name=file_name, kuiperbelt=kuiperbelt, hom_mode=True, total_mass=10000, r_res=5, range_min=10 ** 13,
                      range_max=10 ** 14)
     omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
     big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
@@ -79,7 +78,7 @@ else:
                                                    initial_conditions=initial_conditions, max_step=max_step,
                                                    method=method,
                                                    relative_tolerance=r_tol, absolute_tolerance=a_tol,
-                                                   kyperbelt=kyperbelt)
+                                                   kuiperbelt=kuiperbelt)
 
     smallaxis = [sim.j['smaxis'], sim.s['smaxis'], sim.n['smaxis'], sim.u['smaxis']]
 
@@ -89,6 +88,4 @@ tekenen = Od.visualisatie()
 tekenen.PlotParamsVsTijd((e,I,var_omega,big_omega),solution.t,('e','I','var_omega','big_omega'))
 #tekenen.ParamVsA(e,smallaxis,('e'))
 
-# Writer = animation.writers['ffmpeg']
-# writer = Writer(fps=100)
-# anim.save('yay.mp4',writer=writer)
+plt.show()

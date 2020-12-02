@@ -144,7 +144,6 @@ def create_pdh(filename1,filename2=False):
 			for j in data[i]:
 				temp[j]=float(data[i][j])
 			tojitclass[i]=temp
-	print('yay')
 	return JitPDH(tojitclass)
 
 @jitclass(spec)
@@ -229,7 +228,7 @@ class JitPDH:
 				self.asteroid_attributes['orbital inclination'] = np.append(temp['orbital inclination'],self.rawdata[i]['orbital inclination'])
 				self.asteroid_attributes['argperiapsis'] = np.append(temp['argperiapsis'],self.rawdata[i]['argperiapsis'])
 
-	def add_kuyperbelt(self,total_mass,r_res,range_min,range_max,hom_mode=False):
+	def add_kuiperbelt(self,total_mass,r_res,range_min,range_max,hom_mode=False):
 		"""Creates an array of planet objects for the euler lagrange method
 		hom_mode False divides their mass evenly over orbits, True divides it homogeneously in
 		the radial direction."""
