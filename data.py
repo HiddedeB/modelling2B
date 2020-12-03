@@ -3,7 +3,8 @@ import warnings, numpy as np, json
 from numba import types, typed, typeof
 from numba.experimental import jitclass
 
-class PlanetaryDataHandler:
+# Deprecated
+# class PlanetaryDataHandler:
 	def __init__(self):
 		with open('data.json') as file:
 			self.rawdata = json.load(file)

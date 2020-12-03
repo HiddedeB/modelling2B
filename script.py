@@ -32,10 +32,10 @@ if kuiperbelt:
     initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
     initial_conditionsk = np.vstack((eccentricityk, var_omegak, inclinationk, big_omegak))
 
-    t_eval = [0, 365.25 * 24 * 3600 * 10 ** 14]
-    max_step = 365.25 * 24 * 3600 * 10 ** 12
+    t_eval = [0, 14 * 365.25 * 24 * 3600 * 10 ** 9]
+    max_step = 365.25 * 24 * 3600 * 10 ** 6
     form_of_ic = np.array([False, False])
-    method = 'RK23'
+    method = 'Radau'
     a_tol = 10 ** 4
     r_tol = 10 ** 3
     e, I, var_omega, big_omega, free_e, free_I, free_var_omega, free_big_omega, solution = sim.run(time_scale=t_eval, form_of_ic=form_of_ic,
@@ -69,7 +69,7 @@ else:
     var_omega = omega + big_omega
     initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
     t_eval = [0, 365.25 * 24 * 3600 * 10 ** 14]
-    max_step = 365.25 * 24 * 3600 * 10 ** 12
+    max_step = 365.25 * 24 * 3600 * 10 ** 10
     form_of_ic = np.array([False])
     method = 'RK23'
     a_tol = 10 ** 4
