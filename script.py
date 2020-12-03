@@ -11,8 +11,8 @@ from matplotlib import pyplot as plt
 kuiperbelt = True
 if kuiperbelt:
     file_name = 'data.json'
-    sim = ST.simulation(file_name=file_name, kuiperbelt=kuiperbelt, hom_mode=True, total_mass=10000, r_res=5, range_min=10**12,
-                     range_max=10 ** 13)
+    sim = ST.simulation(file_name=file_name, kuiperbelt=kuiperbelt, hom_mode=True, total_mass=10000, r_res=5, range_min=50,
+                     range_max=500)
     omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
     big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
     inclination = np.array(
@@ -35,7 +35,7 @@ if kuiperbelt:
     t_eval = [0, 14 * 365.25 * 24 * 3600 * 10 ** 9]
     max_step = 365.25 * 24 * 3600 * 10 ** 6
     form_of_ic = np.array([False, False])
-    method = 'Radau'
+    method = 'RK23'
     a_tol = 10 ** 4
     r_tol = 10 ** 3
     e, I, var_omega, big_omega, free_e, free_I, free_var_omega, free_big_omega, solution = sim.run(time_scale=t_eval, form_of_ic=form_of_ic,
