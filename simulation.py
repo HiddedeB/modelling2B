@@ -49,7 +49,7 @@ class simulation():
         self.J_4 = -4.805 * 10 ** (-9)  # J_4 of the sun
         self.J_4_vector = np.array([-587, -915, -29, -35]) * 10 ** (-6)
         self.n_vector = np.sqrt(G * self.sun['mass'] / (self.smaxis_vector**3))
-        self.n_vector = np.pi * 2 / (self.smaxis_vector ** (3 / 2))
+        # self.n_vector = np.pi * 2 / (self.smaxis_vector ** (3 / 2))
         self.planet_number = len(self.smaxis_vector)
 
 
@@ -70,7 +70,7 @@ class simulation():
             self.asteroid_inclination = pdh.asteroid_attributes['orbital inclination']
             self.asteroid_eccentricity = pdh.asteroid_attributes['eccentricity']
             self.free_n_vector = np.sqrt(G * self.sun['mass'] / (self.asteroid_smaxis**3))
-            self.free_n_vector = 2 * np.pi / (self.asteroid_smaxis ** (3 / 2))
+            # self.free_n_vector = 2 * np.pi / (self.asteroid_smaxis ** (3 / 2))
 
     def alpha_matrix(self, kuiperbelt=False):
         '''NOTE: Function to compute the alpha matrix and the alpha bar and alpha product matrix.
