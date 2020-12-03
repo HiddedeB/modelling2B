@@ -1,11 +1,11 @@
 {
 	"sun":{
 		"mass":1.0,
-		"radius":6.957e8
+		"radius":0.00465
 	},
 	"mercury":{
 		"mass":1.659e-7,
-		"radius":2.44e6, 
+		"radius":1.631e-5, 
 		"smaxis":0.3870989, 
 		"period":0.241, 
 		"orbital inclination":7, 
@@ -16,7 +16,7 @@
 	},
 	"venus":{
 		"mass":2.4478e-6, 
-		"radius":6.05e6, 
+		"radius":4.044e-5, 
 		"smaxis":0.72326, 
 		"period":0.615198, 
 		"orbital inclination":3.394, 
@@ -27,7 +27,7 @@
 	},
 	"earth":{
 		"mass":3.003e-6, 
-		"radius":6.371e6, 
+		"radius":4.2586e-5, 
 		"smaxis":1.0, 
 		"period":1, 
 		"orbital inclination":0, 
@@ -38,7 +38,7 @@
 	},
 	"mars":{
 		"mass":3.228e-6, 
-		"radius":3.389e6, 
+		"radius":2.265e-5, 
 		"smaxis":1.5237, 
 		"period":1.88, 
 		"orbital inclination":1.85, 
@@ -49,7 +49,7 @@
 	},
 	"jupiter":{
 		"mass":0.00095458888, 
-		"radius":69.911e6, 
+		"radius":0.0004673, 
 		"smaxis":5.1996, 
 		"period":11.862, 
 		"orbital inclination":1.303, 
@@ -60,7 +60,7 @@
 	},
 	"saturn":{
 		"mass":0.00028581, 
-		"radius":58.232e6, 
+		"radius":0.00038925, 
 		"smaxis":9.5824, 
 		"period":29.4571, 
 		"orbital inclination":2.485, 
@@ -71,7 +71,7 @@
 	},
 	"uranus":{
 		"mass":4.3656e-5, 
-		"radius":25.362e6, 
+		"radius":0.0001695, 
 		"smaxis":19.2179, 
 		"period":84.0205, 
 		"orbital inclination":0.773, 
@@ -82,7 +82,7 @@
 	},
 	"neptune":{
 		"mass":5.1496e-5, 
-		"radius":24.622e6, 
+		"radius":0.00016458, 
 		"smaxis":29.709, 
 		"period":164.8, 
 		"orbital inclination":1.768, 

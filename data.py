@@ -4,7 +4,8 @@ from numba import types, typed, typeof
 from numba.experimental import jitclass
 
 # Deprecated
-# class PlanetaryDataHandler:
+'''
+class PlanetaryDataHandler:
 	def __init__(self):
 		with open('data.json') as file:
 			self.rawdata = json.load(file)
@@ -111,7 +112,7 @@ from numba.experimental import jitclass
 				smaxis=radii[i])
 			roids = np.append(roids,asteroid)
 		setattr(self,"asteroids_array",roids)
-
+'''
 #specify specs
 dict_kv_ty = (types.unicode_type,types.float64)
 dicttype = types.DictType(*dict_kv_ty)
