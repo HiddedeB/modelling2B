@@ -36,14 +36,14 @@ class simulation():
             pdh = create_pdh(file_name,etnos_file)
 
         # G = 6.67430 * 10**(-11)
-        G = 3.963e-14
+        G = 39.47692641 # units van au^3/y^2 M_sun        #3.963e-14
         self.j = pdh.jupiter
         self.s = pdh.saturn
         self.u = pdh.uranus
         self.n = pdh.neptune
         self.sun = pdh.sun
-        self.smaxis_vector = np.array([self.j['smaxis'], self.s['smaxis'], self.u['smaxis'], self.n['smaxis']])
-        self.mass_vector = np.array([self.j['mass'], self.s['mass'], self.u['mass'], self.n['mass']])
+        self.smaxis_vector = np.array([self.j['smaxis'], self.s['smaxis']]) #, self.u['smaxis'], self.n['smaxis']])
+        self.mass_vector = np.array([self.j['mass'], self.s['mass']]) #, self.u['mass'], self.n['mass']])
         self.J_2_vector = np.array([14736, 16298, 3343, 3411]) * 10 ** (-6)
         self.J_2 = 2.198 * 10 ** (-7)  # J_2 of the sun
         self.J_4 = -4.805 * 10 ** (-9)  # J_4 of the sun
@@ -106,8 +106,8 @@ class simulation():
                                                                               self.smaxis_vector /
                                                                               self.asteroid_smaxis[:, np.newaxis])
 
-            free_smaxis_array = np.array([self.asteroid_smaxis, ] * self.planet_number,dtype=np.float64).transpose()
-            smaxis_array = np.array([self.smaxis_vector, ] * self.asteroid_number,dtype=np.float64)
+            free_smaxis_array = np.array([self.asteroid_smaxis, ] * self.planet_number, dtype=np.float64).transpose()
+            smaxis_array = np.array([self.smaxis_vector, ] * self.asteroid_number, dtype=np.float64)
 
             free_alpha_bar_times_alpha[free_smaxis_array < smaxis_array] = 1
 
@@ -158,7 +158,7 @@ class simulation():
                              vec_beta2(kwargs['free_alpha'])], dtype=np.ndarray)  # Heb de laatste entry van de array veranderd van vec_beta2(kwargs['free_alpha_bar']) naar vec_beta2(kwargs['free_alpha'])
 
         else:
-            return np.array([vec_beta1(alpha_matrix), vec_beta2(alpha_matrix)],dtype=np.ndarray)
+            return np.array([vec_beta1(alpha_matrix), vec_beta2(alpha_matrix)], dtype=np.ndarray)
 
     def a_b_matrices(self, alpha_bar_times_alpha_matrix, beta, kuiperbelt=False, **kwargs):
         '''NOTE: Function to compute the A and B matrices needed to build the differential equations.
@@ -233,10 +233,10 @@ class simulation():
                                                                                            27/8 * self.J_2 ** 2)))
 
             b_d = b_d - b.sum(axis=1)
-            free_a_matrix = np.zeros((self.asteroid_number, self.planet_number+1),dtype=np.float64)
+            free_a_matrix = np.zeros((self.asteroid_number, self.planet_number+1), dtype=np.float64)
             free_a_matrix[:, 0] = a_d
             free_a_matrix[:, 1:] = a * beta[3]
-            free_b_matrix = np.zeros((self.asteroid_number, self.planet_number + 1),dtype=np.float64)
+            free_b_matrix = np.zeros((self.asteroid_number, self.planet_number + 1), dtype=np.float64)
             free_b_matrix[:, 0] = b_d
             free_b_matrix[:, 1:] = b
 
@@ -247,7 +247,9 @@ class simulation():
 
         else:
 
-            return np.array([np.array([np.array(i,dtype=np.float64) for i in a_matrix]), np.array([np.array(i,dtype=np.float64) for i in b_matrix]),np.array([],dtype=np.ndarray)], dtype=np.ndarray)[0:2]
+            return np.array([np.array([np.array(i,dtype=np.float64) for i in a_matrix]),
+                             np.array([np.array(i,dtype=np.float64) for i in b_matrix]),
+                             np.array([],dtype=np.ndarray)], dtype=np.ndarray)[0:2]
 
     @staticmethod
     def initial_condition_builder(e, var_omega, I, big_omega, radians):
@@ -291,7 +293,6 @@ class simulation():
         :type *args: np.ndarray
         '''
         a_matrix = args[0]
-        # print(np.array_repr(a_matrix))
         b_matrix = args[1]
 
         # Setting up the differential equations according to 7.25 and 7.26 from Solar System Dynamics. Since the a and
@@ -363,7 +364,7 @@ class simulation():
         d_p_vec = d_p_matrix.sum(axis=1)
         d_q_matrix = b_matrix * p_vector
         d_q_vec = -d_q_matrix.sum(axis=1)
-        
+
         return np.concatenate((d_h_vec, d_k_vec, d_p_vec, d_q_vec))
 
     def order_of_error(self, time_scale, form_of_ic, initial_conditions, max_step, method, relative_tolerance,
@@ -460,7 +461,7 @@ class simulation():
 
 
 if __name__ == '__main__':
-    kuiperbelt = True
+    kuiperbelt = False  #True
 
     if kuiperbelt:
         file_name = 'data.json'
@@ -512,13 +513,15 @@ if __name__ == '__main__':
         file_name = 'data.json'
         sim = simulation(file_name=file_name, kuiperbelt=kuiperbelt, hom_mode=True, total_mass=10000, r_res=20, range_min=10 ** 12,
                          range_max=10 ** 14)
-        omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
-        big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
+        omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis']]) #, sim.n['argperiapsis'], sim.u['argperiapsis']])
+        big_omega = np.array([sim.j['loanode'], sim.s['loanode']]) #, sim.n['loanode'], sim.u['loanode']])
         inclination = np.array(
-            [sim.j['orbital inclination'], sim.s['orbital inclination'], sim.n['orbital inclination'],
-             sim.u['orbital inclination']])
+            [sim.j['orbital inclination'], sim.s['orbital inclination']])
+             #    , sim.n['orbital inclination'],
+             # sim.u['orbital inclination']])
         eccentricity = np.array(
-            [sim.j['eccentricity'], sim.s['eccentricity'], sim.n['eccentricity'], sim.u['eccentricity']])
+            [sim.j['eccentricity'], sim.s['eccentricity']])
+        #, sim.n['eccentricity'], sim.u['eccentricity']])
 
 
 
@@ -536,7 +539,7 @@ if __name__ == '__main__':
                                                        relative_tolerance=r_tol, absolute_tolerance=a_tol,
                                                        kuiperbelt=kuiperbelt)
 
-        smallaxis = [sim.j['smaxis'], sim.s['smaxis'], sim.n['smaxis'], sim.u['smaxis']]
+        smallaxis = [sim.j['smaxis'], sim.s['smaxis']] #, sim.n['smaxis'], sim.u['smaxis']]
 
 
     fig1, animate, plotobjecten = Od.animatieN(e, I, var_omega, big_omega, smallaxis)
