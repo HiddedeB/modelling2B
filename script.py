@@ -8,7 +8,7 @@ import Orbitdrawer as Od
 from matplotlib import animation
 from matplotlib import pyplot as plt
 
-kuiperbelt = True
+kuiperbelt = False
 if kuiperbelt:
     file_name = 'data.json'
     sim = ST.simulation(file_name=file_name, kuiperbelt=kuiperbelt, hom_mode=True, total_mass=10000, r_res=5, range_min=50,
@@ -75,7 +75,7 @@ else:
     a_tol = 10 ** 4
     r_tol = 10 ** 3
     e, I, var_omega, big_omega, solution = sim.run(time_scale=t_eval, form_of_ic=form_of_ic,
-                                                   initial_conditions=initial_conditions, max_step=max_step,
+                                                   initial_conditions=(initial_conditions), max_step=max_step,
                                                    method=method,
                                                    relative_tolerance=r_tol, absolute_tolerance=a_tol,
                                                    kuiperbelt=kuiperbelt)

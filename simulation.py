@@ -44,11 +44,26 @@ class simulation():
         self.sun = pdh.sun
         self.smaxis_vector = np.array([self.j['smaxis'], self.s['smaxis']]) #, self.u['smaxis'], self.n['smaxis']])
         self.mass_vector = np.array([self.j['mass'], self.s['mass']]) #, self.u['mass'], self.n['mass']])
+
+        # self.smaxis_vector = np.array([self.j['smaxis'], self.s['smaxis'], self.u['smaxis'], self.n['smaxis']])
+        # self.mass_vector = np.array([self.j['mass'], self.s['mass'], self.u['mass'], self.n['mass']])
+
+
+        if 'planet9' in kwargs:
+            pdh.createnewplanet(15.015e-6, 12.742e6, 1000, 0.2, 400,
+                                 150, 15, 0)    #mass, radius, loanode, eccentricity, smaxis, argperiapsis,
+                                                #orbital_inclination, mean_longitude
+            self.planet9 = pdh.planet9
+            self.smaxis_vector = np.append(self.smaxis_vector, self.planet9['smaxis'])
+            self.mass_vector = np.append(self.mass_vector, self.planet9['mass'])
+
+
+
         self.J_2_vector = np.array([14736, 16298, 3343, 3411]) * 10 ** (-6)
         self.J_2 = 2.198 * 10 ** (-7)  # J_2 of the sun
         self.J_4 = -4.805 * 10 ** (-9)  # J_4 of the sun
         self.J_4_vector = np.array([-587, -915, -29, -35]) * 10 ** (-6)
-        self.n_vector = np.sqrt(G * self.sun['mass'] / (self.smaxis_vector**3))
+        self.n_vector = np.sqrt(G * self.sun['mass'] / (self.smaxis_vector**3))*180/np.pi
         # self.n_vector = np.pi * 2 / (self.smaxis_vector ** (3 / 2))
         self.planet_number = len(self.smaxis_vector)
 
@@ -142,7 +157,7 @@ class simulation():
             def f(phi, alpha):
                 # Angle 2*phi
                 if alpha != 0:
-                    return (1 / np.pi) * np.cos(2 * phi) / (1 - 2 * alpha * np.cos(2 * phi) + alpha**2)**(3/2)
+                    return (1 / np.pi) * np.cos(2 * phi) / (1 - 2 * alpha * np.cos(phi) + alpha**2)**(3/2)
                 else:
                     return 0
 
@@ -187,6 +202,7 @@ class simulation():
         # a_d = self.n_vector * ((self.sun['radius'] / self.smaxis_vector)**2 * (3 / 2 * self.J_2_vector -
         #                        (self.sun['radius'] / self.smaxis_vector)**2 * (15/4 * self.J_4_vector +
         #                                                                        9/8 * self.J_2_vector**2)))
+
         a_d = self.n_vector * ((self.sun['radius'] / self.smaxis_vector)**2 * (3/2 * self.J_2 -
                                (self.sun['radius'] / self.smaxis_vector)**2 * (15/4 * self.J_4 +
                                                                                9/8 * self.J_2**2)))
@@ -465,32 +481,37 @@ if __name__ == '__main__':
 
     if kuiperbelt:
         file_name = 'data.json'
-        sim = simulation(file_name=file_name, kuiperbelt=kuiperbelt, hom_mode=True, total_mass=10000, r_res=5, range_min=10**12,
-                         range_max=10 ** 14)
+        sim = simulation(file_name=file_name, kuiperbelt=kuiperbelt, hom_mode=True, total_mass=10000, r_res=1, range_min=10**14,
+                         range_max=10 ** 15)# , planet9 = True)
+
         omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
         big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
-        inclination = np.array(
-            [sim.j['orbital inclination'], sim.s['orbital inclination'], sim.n['orbital inclination'],
-             sim.u['orbital inclination']])
-        eccentricity = np.array(
-            [sim.j['eccentricity'], sim.s['eccentricity'], sim.n['eccentricity'], sim.u['eccentricity']])
+        inclination = np.array([sim.j['orbital inclination'], sim.s['orbital inclination'], sim.n['orbital inclination'],
+                                sim.u['orbital inclination']])
+        eccentricity = np.array([sim.j['eccentricity'], sim.s['eccentricity'], sim.n['eccentricity'], sim.u['eccentricity']])
+        smallaxis = [sim.j['smaxis'], sim.s['smaxis'], sim.n['smaxis'], sim.u['smaxis']]
 
-        # omega = np.concatenate((omega, sim.asteroid_argperiapsis))
-        # big_omega = np.concatenate((big_omega, sim.asteroid_big_omega))
-        # inclination = np.concatenate((inclination, sim.asteroid_inclination))
-        # eccentricity = np.concatenate((eccentricity, sim.asteroid_eccentricity))
+
+        #Toevoegen van planet9 parameters
+        # omega = np.append(omega, sim.planet9['argperiapsis'])
+        # big_omega = np.append(big_omega, sim.planet9['loanode'])
+        # inclination = np.append(inclination, sim.planet9['orbital inclination'])
+        # eccentricity = np.append(eccentricity, sim.planet9['eccentricity'])
+        # smallaxis = np.append(smallaxis, sim.planet9['smaxis'])
+
 
         omegak = sim.asteroid_argperiapsis
         big_omegak = sim.asteroid_big_omega
         inclinationk = sim.asteroid_inclination
         eccentricityk = sim.asteroid_eccentricity
-        var_omegak = omegak+big_omegak
+        var_omegak = omegak + big_omegak
+        smallaxis = np.append(smallaxis,sim.asteroid_smaxis)
 
         var_omega = omega + big_omega
         initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
         initial_conditionsk = np.vstack((eccentricityk, var_omegak, inclinationk, big_omegak))
-        t_eval = [0, 365.25 * 24 * 3600 * 10 ** 9]
-        max_step = 365.25 * 24 * 3600 * 10 ** 4
+        t_eval = [0, 365.25 * 24 * 3600 * 10 ** 5]
+        max_step = 365.25 * 24 * 3600 * 10 ** 1
         form_of_ic = np.array([False, False])
         method = 'RK23'
         a_tol = 10 ** 4
@@ -499,19 +520,19 @@ if __name__ == '__main__':
                                                        initial_conditions=(initial_conditions,initial_conditionsk), max_step=max_step,
                                                        method=method,
                                                        relative_tolerance=r_tol, absolute_tolerance=a_tol,
-                                                       kuiperbelt=kuiperbelt)  # , free_e, free_I, free_var_omega, free_big_omega
+                                                       kuiperbelt=kuiperbelt)
 
-        smallaxis = [sim.j['smaxis'], sim.s['smaxis'], sim.n['smaxis'], sim.u['smaxis']]
+
+
 
         e = np.concatenate((e,free_e))
         I = np.concatenate((I,free_I))
         var_omega = np.concatenate((var_omega,free_var_omega))
         big_omega = np.concatenate((big_omega,free_big_omega))
-        smallaxis = np.concatenate((np.array(smallaxis),sim.asteroid_smaxis))
 
     else:
         file_name = 'data.json'
-        sim = simulation(file_name=file_name, kuiperbelt=kuiperbelt, hom_mode=True, total_mass=10000, r_res=20, range_min=10 ** 12,
+        sim = simulation(file_name=file_name, kuiperbelt=kuiperbelt, hom_mode=True, total_mass=10000, r_res=2, range_min=10 ** 12,
                          range_max=10 ** 14)
         omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis']]) #, sim.n['argperiapsis'], sim.u['argperiapsis']])
         big_omega = np.array([sim.j['loanode'], sim.s['loanode']]) #, sim.n['loanode'], sim.u['loanode']])
@@ -527,14 +548,14 @@ if __name__ == '__main__':
 
         var_omega = omega + big_omega
         initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
-        t_eval = [0, 365.25 * 24 * 3600 * 10 ** 12]
-        max_step = 365.25 * 24 * 3600 * 10 ** 9
+        t_eval = [0, 10 ** 12]
+        max_step = 10 ** 9
         form_of_ic = np.array([False, False])
         method = 'RK23'
         a_tol = 10 ** 4
         r_tol = 10 ** 3
         e, I, var_omega, big_omega, solution = sim.run(time_scale=t_eval, form_of_ic=form_of_ic,
-                                                       initial_conditions=initial_conditions, max_step=max_step,
+                                                       initial_conditions=(initial_conditions), max_step=max_step,
                                                        method=method,
                                                        relative_tolerance=r_tol, absolute_tolerance=a_tol,
                                                        kuiperbelt=kuiperbelt)
