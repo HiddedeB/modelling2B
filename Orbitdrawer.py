@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import animation
 import mpl_toolkits.mplot3d.axes3d as p3
-
+import matplotlib.gridspec as gridspec
 
 def r(theta, eccentricity, smaxis, omega):
     b_squared = (1 - eccentricity ** 2) * smaxis ** 2
@@ -182,11 +182,11 @@ class visualisatie():
         # figuur definieren
         self.figureN = plt.figure()
         self.ax = p3.Axes3D(self.figureN)
-        self.ax.set_xlim3d([-2 * 10 ** 12, 2 * 10 ** 12])
+        self.ax.set_xlim3d([-10, 10])
         self.ax.set_xlabel('X')
-        self.ax.set_ylim3d([-2 * 10 ** 12, 2 * 10 ** 12])
+        self.ax.set_ylim3d([-10, 10])
         self.ax.set_ylabel('Y')
-        self.ax.set_zlim3d([-2 * 10 ** 12, 2 * 10 ** 12])
+        self.ax.set_zlim3d([-10, 10])
         self.ax.set_zlabel('Z')
 
         self.plotobjecten = []
@@ -209,15 +209,33 @@ class visualisatie():
         '''
 
         self.figureT = plt.figure()
+        self.grid = self.figureT.add_gridspec(np.shape(param)[0],2)
+        self.axs = self.grid.subplots()
+        plt.legend(['Jupiter','Saturn','Uranus','Neptune','planet9'])
 
         j = 1
         for i in param:
-            plt.subplot(len(param),1,j)
-            plt.plot(tijd/(365.25*24*60*60), i.T)
-            plt.xlabel('time [years]')
-            plt.ylabel(paramname[j-1])
+            self.axs[j-1,0].plot(tijd,i.T[:,0:5])
+            self.axs[j - 1, 0].set(xlabel='time [years]', ylabel = paramname[j-1])
+
+            self.axs[j-1,1].plot(tijd,i.T[:,6:])
+            self.axs[j - 1, 1].set(xlabel='time [years]')
+
             j += 1
-        plt.legend(['Jupiter','Saturn','Uranus','Neptune'])
+
+
+            # plt.subplot(len(param),1,j)
+            # plt.plot(tijd, i.T[:,0:4])
+            # plt.xlabel('time [years]')
+            # plt.ylabel(paramname[j-1])
+            #
+            # plt.subplot(len(param),2,j)
+            # plt.plot(tijd, i.T[:,5:])
+            # plt.xlabel('time [years]')
+            # plt.ylabel(paramname[j-1])
+            #
+            #
+            # j += 1
 
     def animate(self,i , param, smallaxis):
         '''NOTE: function used to animate the plot object in ParamVsA'''

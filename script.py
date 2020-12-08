@@ -68,9 +68,9 @@ else:
 
     var_omega = omega + big_omega
     initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
-    t_eval = [0, 365.25 * 24 * 3600 * 10 ** 14]
-    max_step = 365.25 * 24 * 3600 * 10 ** 10
-    form_of_ic = np.array([False])
+    t_eval = [0, 10 ** 6]
+    max_step = 10 ** 3
+    form_of_ic = np.array([False,False])
     method = 'RK23'
     a_tol = 10 ** 4
     r_tol = 10 ** 3
@@ -83,9 +83,9 @@ else:
     smallaxis = [sim.j['smaxis'], sim.s['smaxis'], sim.n['smaxis'], sim.u['smaxis']]
 
 
-tekenen = Od.visualisatie()
-#tekenen.animatieN(e, I, var_omega, big_omega, smallaxis)
-tekenen.PlotParamsVsTijd((e,I,var_omega,big_omega),solution.t,('e','I','var_omega','big_omega'))
+# tekenen = Od.visualisatie()
+# # tekenen.animatieN(e, I, var_omega, big_omega, smallaxis)
+# tekenen.PlotParamsVsTijd((e, I, var_omega, big_omega), solution.t, ('e', 'I', 'var_omega', 'big_omega'))
 #tekenen.ParamVsA(e,smallaxis,('e'))
 
 plt.show()

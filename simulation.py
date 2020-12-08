@@ -5,6 +5,7 @@ from scipy.integrate import quad
 from numba import njit, types, jit
 import Orbitdrawer as Od
 from matplotlib import animation
+import Orbitdrawer as Od
 
 
 class simulation():
@@ -42,8 +43,8 @@ class simulation():
         self.u = pdh.uranus
         self.n = pdh.neptune
         self.sun = pdh.sun
-        self.smaxis_vector = np.array([self.j['smaxis'], self.s['smaxis']]) #, self.u['smaxis'], self.n['smaxis']])
-        self.mass_vector = np.array([self.j['mass'], self.s['mass']]) #, self.u['mass'], self.n['mass']])
+        self.smaxis_vector = np.array([self.j['smaxis'], self.s['smaxis'], self.u['smaxis'], self.n['smaxis']])
+        self.mass_vector = np.array([self.j['mass'], self.s['mass'], self.u['mass'], self.n['mass']])
 
         # self.smaxis_vector = np.array([self.j['smaxis'], self.s['smaxis'], self.u['smaxis'], self.n['smaxis']])
         # self.mass_vector = np.array([self.j['mass'], self.s['mass'], self.u['mass'], self.n['mass']])
@@ -63,7 +64,7 @@ class simulation():
         self.J_2 = 2.198 * 10 ** (-7)  # J_2 of the sun
         self.J_4 = -4.805 * 10 ** (-9)  # J_4 of the sun
         self.J_4_vector = np.array([-587, -915, -29, -35]) * 10 ** (-6)
-        self.n_vector = np.sqrt(G * self.sun['mass'] / (self.smaxis_vector**3))*180/np.pi
+        self.n_vector = np.sqrt(G * self.sun['mass'] / (self.smaxis_vector**3))
         # self.n_vector = np.pi * 2 / (self.smaxis_vector ** (3 / 2))
         self.planet_number = len(self.smaxis_vector)
 
@@ -477,12 +478,12 @@ class simulation():
 
 
 if __name__ == '__main__':
-    kuiperbelt = False  #True
+    kuiperbelt = True  #True
 
     if kuiperbelt:
         file_name = 'data.json'
-        sim = simulation(file_name=file_name, kuiperbelt=kuiperbelt, hom_mode=True, total_mass=10000, r_res=1, range_min=10**14,
-                         range_max=10 ** 15)# , planet9 = True)
+        sim = simulation(file_name=file_name, kuiperbelt=kuiperbelt, hom_mode=True, total_mass=10000, r_res=8, range_min=40,
+                         range_max=100, planet9 = True)
 
         omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
         big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
@@ -493,11 +494,11 @@ if __name__ == '__main__':
 
 
         #Toevoegen van planet9 parameters
-        # omega = np.append(omega, sim.planet9['argperiapsis'])
-        # big_omega = np.append(big_omega, sim.planet9['loanode'])
-        # inclination = np.append(inclination, sim.planet9['orbital inclination'])
-        # eccentricity = np.append(eccentricity, sim.planet9['eccentricity'])
-        # smallaxis = np.append(smallaxis, sim.planet9['smaxis'])
+        omega = np.append(omega, sim.planet9['argperiapsis'])
+        big_omega = np.append(big_omega, sim.planet9['loanode'])
+        inclination = np.append(inclination, sim.planet9['orbital inclination'])
+        eccentricity = np.append(eccentricity, sim.planet9['eccentricity'])
+        smallaxis = np.append(smallaxis, sim.planet9['smaxis'])
 
 
         omegak = sim.asteroid_argperiapsis
@@ -510,8 +511,8 @@ if __name__ == '__main__':
         var_omega = omega + big_omega
         initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
         initial_conditionsk = np.vstack((eccentricityk, var_omegak, inclinationk, big_omegak))
-        t_eval = [0, 365.25 * 24 * 3600 * 10 ** 5]
-        max_step = 365.25 * 24 * 3600 * 10 ** 1
+        t_eval = [0, 10 ** 4]
+        max_step =  10 ** 2
         form_of_ic = np.array([False, False])
         method = 'RK23'
         a_tol = 10 ** 4
@@ -534,22 +535,22 @@ if __name__ == '__main__':
         file_name = 'data.json'
         sim = simulation(file_name=file_name, kuiperbelt=kuiperbelt, hom_mode=True, total_mass=10000, r_res=2, range_min=10 ** 12,
                          range_max=10 ** 14)
-        omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis']]) #, sim.n['argperiapsis'], sim.u['argperiapsis']])
-        big_omega = np.array([sim.j['loanode'], sim.s['loanode']]) #, sim.n['loanode'], sim.u['loanode']])
+        omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
+        big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
         inclination = np.array(
-            [sim.j['orbital inclination'], sim.s['orbital inclination']])
-             #    , sim.n['orbital inclination'],
-             # sim.u['orbital inclination']])
+            [sim.j['orbital inclination'], sim.s['orbital inclination']
+                 , sim.n['orbital inclination'],
+              sim.u['orbital inclination']])
         eccentricity = np.array(
-            [sim.j['eccentricity'], sim.s['eccentricity']])
-        #, sim.n['eccentricity'], sim.u['eccentricity']])
+            [sim.j['eccentricity'], sim.s['eccentricity']
+        , sim.n['eccentricity'], sim.u['eccentricity']])
 
 
 
         var_omega = omega + big_omega
         initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
-        t_eval = [0, 10 ** 12]
-        max_step = 10 ** 9
+        t_eval = [0, 10 ** 9]
+        max_step = 10 ** 3
         form_of_ic = np.array([False, False])
         method = 'RK23'
         a_tol = 10 ** 4
@@ -560,15 +561,16 @@ if __name__ == '__main__':
                                                        relative_tolerance=r_tol, absolute_tolerance=a_tol,
                                                        kuiperbelt=kuiperbelt)
 
-        smallaxis = [sim.j['smaxis'], sim.s['smaxis']] #, sim.n['smaxis'], sim.u['smaxis']]
+        smallaxis = [sim.j['smaxis'], sim.s['smaxis'], sim.n['smaxis'], sim.u['smaxis']]
 
 
-    fig1, animate, plotobjecten = Od.animatieN(e, I, var_omega, big_omega, smallaxis)
-    anim = animation.FuncAnimation(fig1, animate, fargs=(e, I, var_omega, big_omega, smallaxis),
-                                    frames=round(t_eval[1] / max_step), interval=10, blit=False)
+    # fig1, animate, plotobjecten = Od.animatieN(e, I, var_omega, big_omega, smallaxis)
+    # anim = animation.FuncAnimation(fig1, animate, fargs=(e, I, var_omega, big_omega, smallaxis),
+    #                                 frames=round(t_eval[1] / max_step), interval=10, blit=False)
 
-
-
+    tekenen = Od.visualisatie()
+    #tekenen.animatieN(e, I, var_omega, big_omega, smallaxis)
+    tekenen.PlotParamsVsTijd((e, I, var_omega, big_omega), solution.t, ('e', 'I', 'var_omega', 'big_omega'))
 
     # #testen:
     # # alpha, alpha_bar_times_alpha = sim.alpha_matrix(kuiperbelt=False)    #, free_alpha, free_alpha_bar_times_alpha
