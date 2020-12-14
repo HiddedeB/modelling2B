@@ -70,23 +70,28 @@ class simulation():
 
 
         if 'kuiperbelt' in kwargs:
-            if 'hom_mode' in kwargs:
-                hom_mode = kwargs['hom_mode']
-            else:
-                hom_mode = False
+            if kwargs['kuiperbelt']:
+                if 'hom_mode' in kwargs:
+                    hom_mode = kwargs['hom_mode']
+                else:
+                    hom_mode = False
+                try:
+                    if kwargs['etnos']:
+                        pdh.add_etnos()
+                except KeyError:
+                    pass
+                pdh.add_kuiperbelt(kwargs['total_mass'], kwargs['r_res'], kwargs['range_min'], kwargs['range_max'],
+                                   hom_mode)
 
-            pdh.add_kuiperbelt(kwargs['total_mass'], kwargs['r_res'], kwargs['range_min'], kwargs['range_max'],
-                               hom_mode)
-
-            self.asteroid_smaxis = pdh.asteroid_attributes['smaxis']
-            self.asteroid_number = len(self.asteroid_smaxis)
-            self.asteroid_mass = pdh.asteroid_attributes['mass']
-            self.asteroid_argperiapsis = pdh.asteroid_attributes['argperiapsis']
-            self.asteroid_big_omega = pdh.asteroid_attributes['loanode']
-            self.asteroid_inclination = pdh.asteroid_attributes['orbital inclination']
-            self.asteroid_eccentricity = pdh.asteroid_attributes['eccentricity']
-            self.free_n_vector = np.sqrt(G * self.sun['mass'] / (self.asteroid_smaxis**3))
-            # self.free_n_vector = 2 * np.pi / (self.asteroid_smaxis ** (3 / 2))
+                self.asteroid_smaxis = pdh.asteroid_attributes['smaxis']
+                self.asteroid_number = len(self.asteroid_smaxis)
+                self.asteroid_mass = pdh.asteroid_attributes['mass']
+                self.asteroid_argperiapsis = pdh.asteroid_attributes['argperiapsis']
+                self.asteroid_big_omega = pdh.asteroid_attributes['loanode']
+                self.asteroid_inclination = pdh.asteroid_attributes['orbital inclination']
+                self.asteroid_eccentricity = pdh.asteroid_attributes['eccentricity']
+                self.free_n_vector = np.sqrt(G * self.sun['mass'] / (self.asteroid_smaxis**3))
+                # self.free_n_vector = 2 * np.pi / (self.asteroid_smaxis ** (3 / 2))
 
     def alpha_matrix(self, kuiperbelt=False):
         '''NOTE: Function to compute the alpha matrix and the alpha bar and alpha product matrix.
@@ -482,7 +487,7 @@ if __name__ == '__main__':
 
     if kuiperbelt:
         file_name = 'data.json'
-        sim = simulation(file_name=file_name, kuiperbelt=kuiperbelt, hom_mode=True, total_mass=10000, r_res=8, range_min=40,
+        sim = simulation(file_name=file_name, kuiperbelt=kuiperbelt,etnos=True, hom_mode=True, total_mass=10000, r_res=8, range_min=40,
                          range_max=100, planet9 = True)
 
         omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
