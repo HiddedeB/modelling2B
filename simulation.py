@@ -492,7 +492,7 @@ class simulation():
 
 if __name__ == '__main__':
     kuiperbelt = True
-    order_test = True
+    order_test = False
 
     if kuiperbelt:
         file_name = 'data.json'
