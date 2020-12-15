@@ -2,10 +2,11 @@ import numpy as np
 from data import create_pdh
 from scipy.integrate import solve_ivp
 from scipy.integrate import quad
-from numba import njit, types, jit
+from numba import njit
 import Orbitdrawer as Od
 from matplotlib import animation
 import Orbitdrawer as Od
+import math
 
 
 class simulation():
@@ -37,7 +38,7 @@ class simulation():
             pdh = create_pdh(file_name,etnos_file)
 
         # G = 6.67430 * 10**(-11)
-        G = 39.47692641 # units van au^3/y^2 M_sun        #3.963e-14
+        G = 39.47692641  # units van au^3/y^2 M_sun
         self.j = pdh.jupiter
         self.s = pdh.saturn
         self.u = pdh.uranus
@@ -46,14 +47,9 @@ class simulation():
         self.smaxis_vector = np.array([self.j['smaxis'], self.s['smaxis'], self.u['smaxis'], self.n['smaxis']])
         self.mass_vector = np.array([self.j['mass'], self.s['mass'], self.u['mass'], self.n['mass']])
 
-        # self.smaxis_vector = np.array([self.j['smaxis'], self.s['smaxis'], self.u['smaxis'], self.n['smaxis']])
-        # self.mass_vector = np.array([self.j['mass'], self.s['mass'], self.u['mass'], self.n['mass']])
-
-
         if 'planet9' in kwargs:
-            pdh.createnewplanet(15.015e-6, 12.742e6, 1000, 0.2, 400,
-                                 150, 15, 0)    #mass, radius, loanode, eccentricity, smaxis, argperiapsis,
-                                                #orbital_inclination, mean_longitude
+            pdh.createnewplanet(15.015e-6, 12.742e6, 1000, 0.2, 400, 150, 15, 0)    #mass, radius, loanode, eccentricity
+            # , smaxis, argperiapsis, orbital_inclination, mean_longitude
             self.planet9 = pdh.planet9
             self.smaxis_vector = np.append(self.smaxis_vector, self.planet9['smaxis'])
             self.mass_vector = np.append(self.mass_vector, self.planet9['mass'])
@@ -65,7 +61,6 @@ class simulation():
         self.J_4 = -4.805 * 10 ** (-9)  # J_4 of the sun
         self.J_4_vector = np.array([-587, -915, -29, -35]) * 10 ** (-6)
         self.n_vector = np.sqrt(G * self.sun['mass'] / (self.smaxis_vector**3))
-        # self.n_vector = np.pi * 2 / (self.smaxis_vector ** (3 / 2))
         self.planet_number = len(self.smaxis_vector)
 
 
@@ -204,11 +199,6 @@ class simulation():
         a = sub_matrix
         b = sub_matrix * beta[0]
 
-        # Diagonal elements i.e. A_{jj} and B_{jj}, first line calculates extra part, second line the sum part
-        # a_d = self.n_vector * ((self.sun['radius'] / self.smaxis_vector)**2 * (3 / 2 * self.J_2_vector -
-        #                        (self.sun['radius'] / self.smaxis_vector)**2 * (15/4 * self.J_4_vector +
-        #                                                                        9/8 * self.J_2_vector**2)))
-
         a_d = self.n_vector * ((self.sun['radius'] / self.smaxis_vector)**2 * (3/2 * self.J_2 -
                                (self.sun['radius'] / self.smaxis_vector)**2 * (15/4 * self.J_4 +
                                                                                9/8 * self.J_2**2)))
@@ -216,9 +206,6 @@ class simulation():
         a_new = a * beta[0]
         a_d = a_d + a_new.sum(axis=1)
 
-        # b_d = -self.n_vector * ((self.sun['radius'] / self.smaxis_vector)**2 * (3/2 * self.J_2_vector -
-        #                         (self.sun['radius'] / self.smaxis_vector)**2 * (15/4 * self.J_4_vector +
-        #                                                                         27/8 * self.J_2_vector**2)))
         b_d = -self.n_vector * ((self.sun['radius'] / self.smaxis_vector)**2 * (3/2 * self.J_2 -
                                 (self.sun['radius'] / self.smaxis_vector)**2 * (15/4 * self.J_4 +
                                                                                 27/8 * self.J_2**2)))
@@ -236,9 +223,6 @@ class simulation():
             a = sub_matrix
             b = sub_matrix * beta[2]
 
-            # a_d = self.free_n_vector * ((self.sun['radius'] / self.asteroid_smaxis[:, np.newaxis])**2 * (3/2 * self.J_2_vector -
-            #                             (self.sun['radius'] / self.asteroid_smaxis[:, np.newaxis])**2 * (15/4 * self.J_4_vector +
-            #                                                                               9/8 * self.J_2_vector**2)))
             a_d = self.free_n_vector * ((self.sun['radius'] / self.asteroid_smaxis)**2 * (3/2 * self.J_2 -
                                         (self.sun['radius'] / self.asteroid_smaxis)**2 * (15/4 * self.J_4 +
                                                                                           9/8 * self.J_2**2)))
@@ -247,12 +231,9 @@ class simulation():
             a_new = a * beta[2]
             a_d = a_d + a_new.sum(axis=1)
 
-            # b_d = -self.free_n_vector[:, np.newaxis] * ((self.sun['radius'] / self.asteroid_smaxis[:, np.newaxis])**2 * (3/2 * self.J_2_vector -
-            #                              (self.sun['radius'] / self.asteroid_smaxis[:, np.newaxis])**2 * (15/4 * self.J_4_vector +
-            #                                                                                27/8 * self.J_2_vector ** 2)))
             b_d = -self.free_n_vector * ((self.sun['radius'] / self.asteroid_smaxis)**2 * (3/2 * self.J_2 -
                                          (self.sun['radius'] / self.asteroid_smaxis)**2 * (15/4 * self.J_4 +
-                                                                                           27/8 * self.J_2 ** 2)))
+                                                                                           27/8 * self.J_2**2)))
 
             b_d = b_d - b.sum(axis=1)
             free_a_matrix = np.zeros((self.asteroid_number, self.planet_number+1), dtype=np.float64)
@@ -261,9 +242,6 @@ class simulation():
             free_b_matrix = np.zeros((self.asteroid_number, self.planet_number + 1), dtype=np.float64)
             free_b_matrix[:, 0] = b_d
             free_b_matrix[:, 1:] = b
-
-            # free_a_matrix = a_d - a * beta[3]
-            # free_b_matrix = b_d + b
 
             return np.array([a_matrix, b_matrix, free_a_matrix, free_b_matrix], dtype=np.ndarray)
 
@@ -305,6 +283,8 @@ class simulation():
         '''NOTE: Function to transfer the new made coordinates h, k, p, q to e, I, var_omega and big_omega'''
         return np.array([np.sqrt(h ** 2 + k ** 2), np.sqrt(p ** 2 + q ** 2), np.arcsin(h / np.sqrt(h ** 2 + k ** 2)),
                          np.arcsin(p / np.sqrt(p ** 2 + q ** 2))])
+
+    # There are two functions, to get numba to work this was needed.
 
     @staticmethod
     @njit
@@ -394,20 +374,43 @@ class simulation():
         '''NOTE: Function to compute the order of error, we still need to figure out error in which part of the method,
         for now lets assume the error is in the step size, not fully done yet, actively being worked on.'''
 
-        solutions = np.array([], dtype=float)
-        for i in range(1, 5):
-            if i == 3:
-                pass
-            elif i == 4:
-                pass
-            else:
-                solution = self.run(time_scale, form_of_ic, initial_conditions, max_step, method, relative_tolerance,
-                                    absolute_tolerance, kuiperbelt)
-                solutions = np.vstack(solutions, solution)
+        multipliers = np.array([1, 2, 4], dtype=np.float64)*max_step
+        size = np.array([], dtype=np.float64)
+        make_array = True
+        for multiplier in multipliers[::-1]:
+                solution = self.run(time_scale, form_of_ic, initial_conditions, multiplier, method, relative_tolerance,
+                                    absolute_tolerance, kuiperbelt, )
 
-        order = np.round(np.log((solutions[1] - solutions[2]) / (solutions[0] - solutions[1])) / np.log(2))
+                solution = solution[:-1]
 
-        return order
+                size_of_solution = math.floor(len(solution[0][0, :])/10)*10  # Modulo 10 such that the calculations are
+                # nicer.
+                size = np.append(size, size_of_solution)  # Remember the sizes to check correctness.
+                new_size = size_of_solution // size[0]      # Step size for our solution.
+                solution = np.array([solution[i][:, :size_of_solution:int(new_size)] for i in range(len(solution))],
+                                    dtype=np.ndarray)
+                if make_array:
+                    solutions = solution
+                    make_array = False
+                else:
+                    solutions = np.concatenate((solutions, solution), axis=0)
+
+        # Notice that the for loop is reversed in order, hence the first four elements represent the largest step size.
+        # Also cut off the initial conditions, they result in automatic errors.
+        q_4h = solutions[:4, :, 1].astype('float64')
+        q_2h = solutions[4:8, :, 1].astype('float64')
+        q_h = solutions[8:12, :, 1].astype('float64')
+        # Hardcoded sizes, since we always use 4 attributes.
+        # Q(2h)-Q(4h)/Q(h)-Q(2h) = 2^p Richardson error formula, now reversed to find p.
+        q_lower = q_h - q_2h
+        q_upper = q_2h - q_4h
+        q_lower[q_lower==0] = 0.1  # Low number to eliminate it from the p array
+        q_upper[q_upper==0] = 1.0*10**3  # High number to eliminate it from the p-array
+        order = np.round(np.log(np.abs(q_upper / q_lower)) / np.log(2))
+        if np.any(order<0):
+            print('shiiitt')
+
+        return size, solutions, order
 
     def run(self, time_scale, form_of_ic, initial_conditions, max_step, method, relative_tolerance, absolute_tolerance,
             kuiperbelt=False):
@@ -420,7 +423,7 @@ class simulation():
          :type form_of_ic: np.ndarray
          :param initial_conditions: The initial conditions given in the parameters h, k, p, q or e, var_omega, I and
          big_omega.
-         :type initial_conditions: 1darry
+         :type initial_conditions: np.ndarray
          :param max_step: The maximum allowed step size for the simulator.
          :type max_step: int
          :param method: Method of the solver.
@@ -432,6 +435,7 @@ class simulation():
          :param kuiperbelt: If False, run regular simulation, if True run kuiperbelt simulations.
          :type kuiperbelt: bool
          '''
+
         if kuiperbelt:
             if not form_of_ic[0]:
                 initial_conditionsp = self.initial_condition_builder(*initial_conditions[0], form_of_ic[0])
@@ -454,7 +458,8 @@ class simulation():
             matrix_array = self.a_b_matrices(alpha_array[1], beta, kuiperbelt)
 
         solution = solve_ivp(orbital_calculator, t_span=time_scale, y0=initial_conditions, args=(*matrix_array,),
-                             method=method, rtol=relative_tolerance, atol=absolute_tolerance, max_step=max_step)
+                             method=method, rtol=relative_tolerance, atol=absolute_tolerance, max_step=max_step,
+                             first_step=max_step)
 
         planet_number = self.planet_number
         data = solution['y']
@@ -474,16 +479,20 @@ class simulation():
                                                                                            free_q)
             print('kuiperbelt simulation ran succesfully, returning array of parameters seperated for planets and then '
                   'kuiperbelt')
-            return np.array([e, I, var_omega, big_omega, free_e, free_I, free_var_omega, free_big_omega, solution],
-                            dtype=np.ndarray)
+            e = np.concatenate((e, free_e))
+            I = np.concatenate((I, free_I))
+            var_omega = np.concatenate((var_omega, free_var_omega))
+            big_omega = np.concatenate((big_omega, free_big_omega))
 
         else:
             print('Regular simulation ran succesfully returning values.')
-            return np.array([e, I, var_omega, big_omega, solution], dtype=np.ndarray)
+
+        return np.array([e, I, var_omega, big_omega, solution], dtype=np.ndarray)
 
 
 if __name__ == '__main__':
-    kuiperbelt = True  #True
+    kuiperbelt = True
+    order_test = True
 
     if kuiperbelt:
         file_name = 'data.json'
@@ -511,31 +520,30 @@ if __name__ == '__main__':
         inclinationk = sim.asteroid_inclination
         eccentricityk = sim.asteroid_eccentricity
         var_omegak = omegak + big_omegak
-        smallaxis = np.append(smallaxis,sim.asteroid_smaxis)
+        smallaxis = np.append(smallaxis, sim.asteroid_smaxis)
 
         var_omega = omega + big_omega
         initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
         initial_conditionsk = np.vstack((eccentricityk, var_omegak, inclinationk, big_omegak))
-        t_eval = [0, 10 ** 4]
-        max_step =  10 ** 2
+        t_eval = [0, 40*10**4]
+        max_step = 1000
         form_of_ic = np.array([False, False])
-        method = 'RK23'
-        a_tol = 10 ** 4
-        r_tol = 10 ** 3
-        e, I, var_omega, big_omega, free_e, free_I, free_var_omega, free_big_omega, solution = sim.run(time_scale=t_eval, form_of_ic=form_of_ic,
+        method = 'DOP853'
+        r_tol = 10 ** -4
+        a_tol = 10 ** -3
+
+        if not order_test:
+
+            e, I, var_omega, big_omega, solution = sim.run(time_scale=t_eval, form_of_ic=form_of_ic,
                                                        initial_conditions=(initial_conditions,initial_conditionsk), max_step=max_step,
                                                        method=method,
                                                        relative_tolerance=r_tol, absolute_tolerance=a_tol,
                                                        kuiperbelt=kuiperbelt)
-
-
-
-
-        e = np.concatenate((e,free_e))
-        I = np.concatenate((I,free_I))
-        var_omega = np.concatenate((var_omega,free_var_omega))
-        big_omega = np.concatenate((big_omega,free_big_omega))
-
+        else:
+            length, solutions, order = sim.order_of_error(time_scale=t_eval, form_of_ic=form_of_ic,
+                                           initial_conditions=(initial_conditions, initial_conditionsk),
+                                           max_step=max_step, method=method, relative_tolerance=r_tol,
+                                           absolute_tolerance=a_tol, kuiperbelt=kuiperbelt)
     else:
         file_name = 'data.json'
         sim = simulation(file_name=file_name, kuiperbelt=kuiperbelt, hom_mode=True, total_mass=10000, r_res=2, range_min=10 ** 12,
@@ -573,9 +581,9 @@ if __name__ == '__main__':
     # anim = animation.FuncAnimation(fig1, animate, fargs=(e, I, var_omega, big_omega, smallaxis),
     #                                 frames=round(t_eval[1] / max_step), interval=10, blit=False)
 
-    tekenen = Od.visualisatie()
-    #tekenen.animatieN(e, I, var_omega, big_omega, smallaxis)
-    tekenen.PlotParamsVsTijd((e, I, var_omega, big_omega), solution.t, ('e', 'I', 'var_omega', 'big_omega'))
+        tekenen = Od.visualisatie()
+        #tekenen.animatieN(e, I, var_omega, big_omega, smallaxis)
+        tekenen.PlotParamsVsTijd((e, I, var_omega, big_omega), solution.t, ('e', 'I', 'var_omega', 'big_omega'))
 
     # #testen:
     # # alpha, alpha_bar_times_alpha = sim.alpha_matrix(kuiperbelt=False)    #, free_alpha, free_alpha_bar_times_alpha
