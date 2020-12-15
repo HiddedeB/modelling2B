@@ -170,9 +170,8 @@ class simulation():
         if kuiperbelt:
             if 'free_alpha' not in kwargs:
                 raise ValueError('Trying to run kuiperbelt simulation without free_alpha matrix')
-            out = np.array([vec_beta1(alpha_matrix), vec_beta2(alpha_matrix), vec_beta1(kwargs['free_alpha']),
+            return np.array([vec_beta1(alpha_matrix), vec_beta2(alpha_matrix), vec_beta1(kwargs['free_alpha']),
                              vec_beta2(kwargs['free_alpha'])], dtype=np.ndarray)  # Heb de laatste entry van de array veranderd van vec_beta2(kwargs['free_alpha_bar']) naar vec_beta2(kwargs['free_alpha'])
-            return out
 
         else:
             return np.array([vec_beta1(alpha_matrix), vec_beta2(alpha_matrix)], dtype=np.ndarray)

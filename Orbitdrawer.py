@@ -224,18 +224,18 @@ class visualisatie():
             j += 1
 
 
-            plt.subplot(len(param),1,j)
-            plt.plot(tijd, i.T[:,0:4])
-            plt.xlabel('time [years]')
-            plt.ylabel(paramname[j-1])
-
-            plt.subplot(len(param),2,j)
-            plt.plot(tijd, i.T[:,5:])
-            plt.xlabel('time [years]')
-            plt.ylabel(paramname[j-1])
-
-
-            j += 1
+            # plt.subplot(len(param),1,j)
+            # plt.plot(tijd, i.T[:,0:4])
+            # plt.xlabel('time [years]')
+            # plt.ylabel(paramname[j-1])
+            #
+            # plt.subplot(len(param),2,j)
+            # plt.plot(tijd, i.T[:,5:])
+            # plt.xlabel('time [years]')
+            # plt.ylabel(paramname[j-1])
+            #
+            #
+            # j += 1
 
     def animate(self,i , param, smallaxis):
         '''NOTE: function used to animate the plot object in ParamVsA'''
