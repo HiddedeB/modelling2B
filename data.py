@@ -192,7 +192,7 @@ class JitPDH:
 				self.uranus = temp
 			elif i == "neptune":
 				self.neptune = temp
-			else:
+			elif i == "planet9":
 				self.planet9 = temp
 
 	def createnewplanet(self,mass=0,radius=0,loanode=0,
@@ -203,7 +203,6 @@ class JitPDH:
 		Keyword arguments can only be specified as non-keyword because of JIT.
 		Use createnewplanet(1,2) for a planet with mass 1 and radius 2.
 		"""
-		name = "planet9"
 		self.planet9['mass']=mass
 		self.planet9['radius']=radius
 		self.planet9['loanode']=loanode
@@ -212,7 +211,6 @@ class JitPDH:
 		self.planet9['argperiapsis']=argperiapsis
 		self.planet9['orbital inclination']=orbital_inclination
 		self.planet9['mean longitude']=mean_longitude
-		return True
 
 	def __str__(self):
 		# Dit werkt niet for some reason
@@ -263,3 +261,13 @@ class JitPDH:
 
 	def reset_asteroids(self):
 		self.asteroids = typed.List.empty_list(dicttype)
+		self.asteroid_attributes = typed.Dict.empty(*kv_ty2)
+		self.asteroid_attributes['mass']=np.zeros(0,dtype=np.float64)
+		self.asteroid_attributes['eccentricity']=np.zeros(0,dtype=np.float64)
+		self.asteroid_attributes['loanode']=np.zeros(0,dtype=np.float64)
+		self.asteroid_attributes['smaxis']=np.zeros(0,dtype=np.float64)
+		self.asteroid_attributes['orbital inclination']=np.zeros(0,dtype=np.float64)
+		self.asteroid_attributes['argperiapsis']=np.zeros(0,dtype=np.float64)
+
+if __name__=='__main__':
+	pdh = create_pdh('data.json','etnos.json')
