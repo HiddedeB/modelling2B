@@ -198,7 +198,7 @@ class visualisatie():
                                        frames=round(np.shape(e)[1]), interval=1, blit=False)
         #plt.show()
 
-    def PlotParamsVsTijd(self,param, tijd, paramname):
+    def PlotParamsVsTijd(self,param, tijd, paramname,splitsen = True):
         '''NOTE: a funtion to plot multiple parameters against time.
         :param param: tuple of parameters to plot. formatted as outputted by simulation.run()
         :type param: tuple
@@ -207,35 +207,39 @@ class visualisatie():
         :param paramname: tuple containing names of parameters as strings
         :type paramname: tuple
         '''
+        if splitsen:
+            self.figureT = plt.figure()
+            self.grid = self.figureT.add_gridspec(np.shape(param)[0],2)
+            self.axs = self.grid.subplots()
+            plt.legend(['Jupiter','Saturn','Uranus','Neptune','planet9'])
 
-        self.figureT = plt.figure()
-        self.grid = self.figureT.add_gridspec(np.shape(param)[0],2)
-        self.axs = self.grid.subplots()
-        plt.legend(['Jupiter','Saturn','Uranus','Neptune','planet9'])
+            j = 1
+            for i in param:
+                self.axs[j-1,0].plot(tijd,i.T[:,0:5])
+                self.axs[j - 1, 0].set(xlabel='time [years]', ylabel = paramname[j-1])
 
-        j = 1
-        for i in param:
-            self.axs[j-1,0].plot(tijd,i.T[:,0:5])
-            self.axs[j - 1, 0].set(xlabel='time [years]', ylabel = paramname[j-1])
+                self.axs[j-1,1].plot(tijd,i.T[:,6:])
+                self.axs[j - 1, 1].set(xlabel='time [years]')
 
-            self.axs[j-1,1].plot(tijd,i.T[:,6:])
-            self.axs[j - 1, 1].set(xlabel='time [years]')
+                j += 1
+        else:
+            j = 1
+            for i in param:
+                plt.subplot(len(param),1,j)
+                plt.plot(tijd, i.T[:,0:5])
+                plt.xlabel('time [years]')
+                plt.ylabel(paramname[j-1])
+
+                # plt.subplot(len(param),2,j)
+                # plt.plot(tijd, i.T[:,5:])
+                # plt.xlabel('time [years]')
+                # plt.ylabel(paramname[j])
+
+                j += 1
+            plt.legend(['Jupiter','Saturn','Uranus','Neptune','planet9'])
+
 
             j += 1
-
-
-            # plt.subplot(len(param),1,j)
-            # plt.plot(tijd, i.T[:,0:4])
-            # plt.xlabel('time [years]')
-            # plt.ylabel(paramname[j-1])
-            #
-            # plt.subplot(len(param),2,j)
-            # plt.plot(tijd, i.T[:,5:])
-            # plt.xlabel('time [years]')
-            # plt.ylabel(paramname[j-1])
-            #
-            #
-            # j += 1
 
     def animate(self,i , param, smallaxis):
         '''NOTE: function used to animate the plot object in ParamVsA'''
