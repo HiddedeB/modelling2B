@@ -245,12 +245,12 @@ class JitPDH:
 		_loanode = 77 #https://arxiv.org/abs/1704.02444
 		_eccentricity = 0.1 #DES/SSBN07 classification
 		_argperiapsis = 270 #Nergens op gebaseerd
-		self.asteroid_attributes['mass'] = masses
-		self.asteroid_attributes['smaxis'] = radii
-		self.asteroid_attributes['eccentricity'] = np.repeat(np.array([_eccentricity],dtype=np.float64),r_res)
-		self.asteroid_attributes['loanode'] = np.repeat(np.array([_loanode],dtype=np.float64),r_res)
-		self.asteroid_attributes['orbital inclination'] = np.repeat(np.array([_orbital_inclination],dtype=np.float64),r_res)
-		self.asteroid_attributes['argperiapsis'] = np.repeat(np.array([_argperiapsis],dtype=np.float64),r_res)
+		self.asteroid_attributes['mass'] = np.append(self.asteroid_attributes['mass'],masses)
+		self.asteroid_attributes['smaxis'] = np.append(self.asteroid_attributes['smaxis'],radii)
+		self.asteroid_attributes['eccentricity'] = np.append(self.asteroid_attributes['eccentricity'],np.repeat(np.array([_eccentricity],dtype=np.float64),r_res))
+		self.asteroid_attributes['loanode'] = np.append(self.asteroid_attributes['loanode'],np.repeat(np.array([_loanode],dtype=np.float64),r_res))
+		self.asteroid_attributes['orbital inclination'] = np.append(self.asteroid_attributes['orbital inclination'],np.repeat(np.array([_orbital_inclination],dtype=np.float64),r_res))
+		self.asteroid_attributes['argperiapsis'] = np.append(self.asteroid_attributes['argperiapsis'],np.repeat(np.array([_argperiapsis],dtype=np.float64),r_res))
 		for i in range(len(radii)):
 			asteroid = typed.Dict()
 			asteroid['mass']=masses[i]

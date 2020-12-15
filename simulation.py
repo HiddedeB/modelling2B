@@ -585,7 +585,6 @@ if __name__ == '__main__':
         tekenen = Od.visualisatie()
         #tekenen.animatieN(e, I, var_omega, big_omega, smallaxis)
         tekenen.PlotParamsVsTijd((e, I, var_omega, big_omega), solution.t, ('e', 'I', 'var_omega', 'big_omega'))
-        plt.show()
 
     # #testen:
     # # alpha, alpha_bar_times_alpha = sim.alpha_matrix(kuiperbelt=False)    #, free_alpha, free_alpha_bar_times_alpha
