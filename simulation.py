@@ -496,7 +496,8 @@ if __name__ == '__main__':
 
     if kuiperbelt:
         file_name = 'data.json'
-        sim = simulation(file_name=file_name, kuiperbelt=kuiperbelt,etnos=True, hom_mode=True, total_mass=10000, r_res=8, range_min=40,
+        etnos_file_name = 'etnos.json'
+        sim = simulation(file_name=file_name,etnos_file=etnos_file_name, kuiperbelt=kuiperbelt,etnos=True, hom_mode=True, total_mass=10000, r_res=8, range_min=40,
                          range_max=100, planet9 = True)
 
         omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
