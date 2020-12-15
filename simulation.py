@@ -48,7 +48,7 @@ class simulation():
         self.mass_vector = np.array([self.j['mass'], self.s['mass'], self.u['mass'], self.n['mass']])
 
         if 'planet9' in kwargs:
-            pdh.createnewplanet(15.015e-6, 12.742e6, 1000, 0.2, 400, 150, 15, 0)    #mass, radius, loanode, eccentricity
+            pdh.createnewplanet(30.03e-6, 1e-5, 100/180*np.pi, 0.6, 700, 140/180*np.pi, 30/180*np.pi, 0)    #mass, radius, loanode, eccentricity
             # , smaxis, argperiapsis, orbital_inclination, mean_longitude
             self.planet9 = pdh.planet9
             self.smaxis_vector = np.append(self.smaxis_vector, self.planet9['smaxis'])
@@ -585,6 +585,7 @@ if __name__ == '__main__':
         tekenen = Od.visualisatie()
         #tekenen.animatieN(e, I, var_omega, big_omega, smallaxis)
         tekenen.PlotParamsVsTijd((e, I, var_omega, big_omega), solution.t, ('e', 'I', 'var_omega', 'big_omega'))
+        plt.show()
 
     # #testen:
     # # alpha, alpha_bar_times_alpha = sim.alpha_matrix(kuiperbelt=False)    #, free_alpha, free_alpha_bar_times_alpha
