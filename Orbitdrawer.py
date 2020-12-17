@@ -190,7 +190,7 @@ class visualisatie():
         self.ax.set_zlabel('Z')
 
         self.plotobjecten = []
-        for i in range(np.shape(e)[0]):
+        for i in range(np.shape(e)[0]+1):
             self.plotobjecten.append(self.ax.plot([], [], []))
 
 
@@ -198,48 +198,76 @@ class visualisatie():
                                        frames=round(np.shape(e)[1]), interval=1, blit=False)
         #plt.show()
 
-    def PlotParamsVsTijd(self,param, tijd, paramname,splitsen = True):
-        '''NOTE: a funtion to plot multiple parameters against time.
+    def PlotParamsVsTijd(self,param, tijd, paramname, alleenplaneten = False, planet9 = False):
+        '''NOTE: a function to plot multiple parameters against time.
         :param param: tuple of parameters to plot. formatted as outputted by simulation.run()
         :type param: tuple
         :param tijd: time of simulation
         :type *args: np.array
         :param paramname: tuple containing names of parameters as strings
         :type paramname: tuple
+        :param alleenplaneten: True geeft de parameter geplot tegen de tijd voor alleen de planeten (4 of 5). False geeft
+        twee kolommen waarbij de linker de planeten bevat en de rechter de andere objecten
+        :type alleenplaneten: Boolean
+        :param planet9: boolean die aangeeft of planet 9 wel of niet in de simulatie zit.
+        :type planet9: boolean
         '''
-        if splitsen:
+        if not alleenplaneten:
             self.figureT = plt.figure()
-            self.grid = self.figureT.add_gridspec(np.shape(param)[0],2)
+            self.grid = self.figureT.add_gridspec(len(paramname),2)
             self.axs = self.grid.subplots()
-            plt.legend(['Jupiter','Saturn','Uranus','Neptune','planet9'])
+            if planet9:
+                nrplanets = 5
+            else:
+                nrplanets = 4
+            if len(paramname) == 1:
+                self.axs[0].plot(tijd,param.T[:,0:nrplanets])
+                self.axs[0].set(xlabel='time [years]', ylabel = paramname[0])
 
-            j = 1
-            for i in param:
-                self.axs[j-1,0].plot(tijd,i.T[:,0:5])
-                self.axs[j - 1, 0].set(xlabel='time [years]', ylabel = paramname[j-1])
+                self.axs[1].plot(tijd,param.T[:,nrplanets:])
+                self.axs[1].set(xlabel='time [years]')
+            else:
+                j = 1
+                for i in param:
+                    self.axs[j-1,0].plot(tijd,i.T[:,0:nrplanets])
+                    self.axs[j - 1, 0].set(xlabel='time [years]', ylabel = paramname[j-1])
 
-                self.axs[j-1,1].plot(tijd,i.T[:,6:])
-                self.axs[j - 1, 1].set(xlabel='time [years]')
+                    self.axs[j-1,1].plot(tijd,i.T[:,nrplanets:])
+                    self.axs[j - 1, 1].set(xlabel='time [years]')
 
-                j += 1
+                    j += 1
+            if planet9:
+                self.figureT.legend(['Jupiter','Saturn','Uranus','Neptune','planet9'],loc = 'upper left')
+            else:
+                self.figureT.legend(['Jupiter','Saturn','Uranus','Neptune'],loc = 'upper left')
+
         else:
-            j = 1
-            for i in param:
-                plt.subplot(len(param),1,j)
-                plt.plot(tijd, i.T[:,0:5])
+
+            if planet9:
+                nrplanets = 5
+            else:
+                nrplanets = 4
+
+            if len(paramname) == 1:
+                plt.plot(tijd, param.T[:,0:nrplanets])
                 plt.xlabel('time [years]')
-                plt.ylabel(paramname[j-1])
+                plt.ylabel(paramname)
+            else:
+                j = 1
+                for i in param:
 
-                # plt.subplot(len(param),2,j)
-                # plt.plot(tijd, i.T[:,5:])
-                # plt.xlabel('time [years]')
-                # plt.ylabel(paramname[j])
+                    plt.subplot(len(param),1,j)
+                    plt.plot(tijd, i.T[:,0:nrplanets])
+                    plt.xlabel('time [years]')
+                    plt.ylabel(paramname[j-1])
 
-                j += 1
-            plt.legend(['Jupiter','Saturn','Uranus','Neptune','planet9'])
+                    j += 1
+            if planet9:
+                plt.legend(['Jupiter','Saturn','Uranus','Neptune','planet9'],loc = 'upper left')
+            else:
+                plt.legend(['Jupiter','Saturn','Uranus','Neptune'],loc = 'upper left')
 
 
-            j += 1
 
     def animate(self,i , param, smallaxis):
         '''NOTE: function used to animate the plot object in ParamVsA'''

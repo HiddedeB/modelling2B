@@ -47,7 +47,7 @@ class simulation():
         self.smaxis_vector = np.array([self.j['smaxis'], self.s['smaxis'], self.u['smaxis'], self.n['smaxis']])
         self.mass_vector = np.array([self.j['mass'], self.s['mass'], self.u['mass'], self.n['mass']])
 
-        if 'planet9' in kwargs:
+        if kwargs['planet9']:
             pdh.createnewplanet(30.03e-6, 1e-5, 100/180*np.pi, 0.6, 700, 140/180*np.pi, 30/180*np.pi, 0)    #mass, radius, loanode, eccentricity
             # , smaxis, argperiapsis, orbital_inclination, mean_longitude
             self.planet9 = pdh.planet9
@@ -70,23 +70,23 @@ class simulation():
                     hom_mode = kwargs['hom_mode']
                 else:
                     hom_mode = False
-                try:
-                    if kwargs['etnos']:
-                        pdh.add_etnos()
-                except KeyError:
-                    pass
                 pdh.add_kuiperbelt(kwargs['total_mass'], kwargs['r_res'], kwargs['range_min'], kwargs['range_max'],
                                    hom_mode)
 
-                self.asteroid_smaxis = pdh.asteroid_attributes['smaxis']
-                self.asteroid_number = len(self.asteroid_smaxis)
-                self.asteroid_mass = pdh.asteroid_attributes['mass']
-                self.asteroid_argperiapsis = pdh.asteroid_attributes['argperiapsis']
-                self.asteroid_big_omega = pdh.asteroid_attributes['loanode']
-                self.asteroid_inclination = pdh.asteroid_attributes['orbital inclination']
-                self.asteroid_eccentricity = pdh.asteroid_attributes['eccentricity']
-                self.free_n_vector = np.sqrt(G * self.sun['mass'] / (self.asteroid_smaxis**3))
-                # self.free_n_vector = 2 * np.pi / (self.asteroid_smaxis ** (3 / 2))
+        if 'etnos' in kwargs:
+            if kwargs['etnos']:
+                pdh.add_etnos()
+
+        if 'kuiperbelt' in kwargs or 'etnos' in kwargs:
+            self.asteroid_smaxis = pdh.asteroid_attributes['smaxis']
+            self.asteroid_number = len(self.asteroid_smaxis)
+            self.asteroid_mass = pdh.asteroid_attributes['mass']
+            self.asteroid_argperiapsis = pdh.asteroid_attributes['argperiapsis']
+            self.asteroid_big_omega = pdh.asteroid_attributes['loanode']
+            self.asteroid_inclination = pdh.asteroid_attributes['orbital inclination']
+            self.asteroid_eccentricity = pdh.asteroid_attributes['eccentricity']
+            self.free_n_vector = np.sqrt(G * self.sun['mass'] / (self.asteroid_smaxis**3))
+            # self.free_n_vector = 2 * np.pi / (self.asteroid_smaxis ** (3 / 2))
 
     def alpha_matrix(self, kuiperbelt=False):
         '''NOTE: Function to compute the alpha matrix and the alpha bar and alpha product matrix.
@@ -493,12 +493,14 @@ class simulation():
 if __name__ == '__main__':
     kuiperbelt = True
     order_test = False
+    etnos = False
+    planet9 = True
 
     if kuiperbelt:
         file_name = 'data.json'
         etnos_file_name = 'etnos.json'
-        sim = simulation(file_name=file_name,etnos_file=etnos_file_name, kuiperbelt=kuiperbelt,etnos=True, hom_mode=True, total_mass=10000, r_res=8, range_min=40,
-                         range_max=100, planet9 = True)
+        sim = simulation(file_name=file_name,etnos_file=etnos_file_name, kuiperbelt=kuiperbelt, etnos = etnos, hom_mode = True, total_mass=10000, r_res=2, range_min=40,
+                         range_max=100, planet9 = planet9)
 
         omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
         big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
@@ -526,12 +528,12 @@ if __name__ == '__main__':
         var_omega = omega + big_omega
         initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
         initial_conditionsk = np.vstack((eccentricityk, var_omegak, inclinationk, big_omegak))
-        t_eval = [0, 40*10**4]
-        max_step = 1000
+        t_eval = [0, 10**2]
+        max_step = 10**1
         form_of_ic = np.array([False, False])
-        method = 'DOP853'
-        r_tol = 10 ** -4
-        a_tol = 10 ** -3
+        method = 'RK23'
+        r_tol = 10 ** -6
+        a_tol = 10 ** -10
 
         if not order_test:
 
@@ -563,12 +565,12 @@ if __name__ == '__main__':
 
         var_omega = omega + big_omega
         initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
-        t_eval = [0, 10 ** 6]
+        t_eval = [0, 10 ** 5]
         max_step = 10 ** 3
         form_of_ic = np.array([False, False])
         method = 'RK23'
-        a_tol = 10 ** 4
-        r_tol = 10 ** 3
+        a_tol = 10 ** -6
+        r_tol = 10 ** -10
         e, I, var_omega, big_omega, solution = sim.run(time_scale=t_eval, form_of_ic=form_of_ic,
                                                        initial_conditions=(initial_conditions), max_step=max_step,
                                                        method=method,
@@ -582,9 +584,12 @@ if __name__ == '__main__':
     # anim = animation.FuncAnimation(fig1, animate, fargs=(e, I, var_omega, big_omega, smallaxis),
     #                                 frames=round(t_eval[1] / max_step), interval=10, blit=False)
 
-        tekenen = Od.visualisatie()
-        #tekenen.animatieN(e, I, var_omega, big_omega, smallaxis)
-        tekenen.PlotParamsVsTijd((e, I, var_omega, big_omega), solution.t, ('e', 'I', 'var_omega', 'big_omega'))
+    tekenen = Od.visualisatie()
+    #tekenen.animatieN(e, I, var_omega, big_omega, smallaxis)
+    tekenen.PlotParamsVsTijd((e), solution.t, ('e'), alleenplaneten = True, planet9 = planet9)
+    # tekenen.PlotParamsVsTijd((I), solution.t, ('I'), splitsen = False)
+    # tekenen.PlotParamsVsTijd((var_omega), solution.t, ('$\overline{\omega}$'), splitsen = False)
+    # tekenen.PlotParamsVsTijd((big_omega), solution.t, ('$\Omega$'), splitsen = False)
 
     # #testen:
     # # alpha, alpha_bar_times_alpha = sim.alpha_matrix(kuiperbelt=False)    #, free_alpha, free_alpha_bar_times_alpha
