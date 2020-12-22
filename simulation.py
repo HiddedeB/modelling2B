@@ -38,7 +38,7 @@ class simulation():
             pdh = create_pdh(file_name,etnos_file)
 
         # G = 6.67430 * 10**(-11)
-        G = 39.47692641 # units van au^3/y^2 M_sun        #3.963e-14
+        G = 39.47692641  # units van au^3/y^2 M_sun
         self.j = pdh.jupiter
         self.s = pdh.saturn
         self.u = pdh.uranus
@@ -47,12 +47,13 @@ class simulation():
         self.smaxis_vector = np.array([self.j['smaxis'], self.s['smaxis'], self.u['smaxis'], self.n['smaxis']])
         self.mass_vector = np.array([self.j['mass'], self.s['mass'], self.u['mass'], self.n['mass']])
 
-        if kwargs['planet9']:
-            pdh.createnewplanet(30.03e-6, 1e-5, 100/180*np.pi, 0.6, 700, 140/180*np.pi, 30/180*np.pi, 0)    #mass, radius, loanode, eccentricity
-            # , smaxis, argperiapsis, orbital_inclination, mean_longitude
-            self.planet9 = pdh.planet9
-            self.smaxis_vector = np.append(self.smaxis_vector, self.planet9['smaxis'])
-            self.mass_vector = np.append(self.mass_vector, self.planet9['mass'])
+        if 'planet9' in kwargs:
+            if kwargs['planet9']:
+                pdh.createnewplanet(15e-3, 1e-5, 100/180*np.pi, 0.6, 700, 140/180*np.pi, 30/180*np.pi, 0)    #mass, radius, loanode, eccentricity
+                # , smaxis, argperiapsis, orbital_inclination, mean_longitude
+                self.planet9 = pdh.planet9
+                self.smaxis_vector = np.append(self.smaxis_vector, self.planet9['smaxis'])
+                self.mass_vector = np.append(self.mass_vector, self.planet9['mass'])
 
 
 
@@ -511,11 +512,12 @@ if __name__ == '__main__':
 
 
         #Toevoegen van planet9 parameters
-        omega = np.append(omega, sim.planet9['argperiapsis'])
-        big_omega = np.append(big_omega, sim.planet9['loanode'])
-        inclination = np.append(inclination, sim.planet9['orbital inclination'])
-        eccentricity = np.append(eccentricity, sim.planet9['eccentricity'])
-        smallaxis = np.append(smallaxis, sim.planet9['smaxis'])
+        if planet9:
+            omega = np.append(omega, sim.planet9['argperiapsis'])
+            big_omega = np.append(big_omega, sim.planet9['loanode'])
+            inclination = np.append(inclination, sim.planet9['orbital inclination'])
+            eccentricity = np.append(eccentricity, sim.planet9['eccentricity'])
+            smallaxis = np.append(smallaxis, sim.planet9['smaxis'])
 
 
         omegak = sim.asteroid_argperiapsis
@@ -528,8 +530,8 @@ if __name__ == '__main__':
         var_omega = omega + big_omega
         initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
         initial_conditionsk = np.vstack((eccentricityk, var_omegak, inclinationk, big_omegak))
-        t_eval = [0, 10**2]
-        max_step = 10**1
+        t_eval = [0, 40*10**4]
+        max_step = 10
         form_of_ic = np.array([False, False])
         method = 'RK23'
         r_tol = 10 ** -6

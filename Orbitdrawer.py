@@ -174,7 +174,7 @@ class visualisatie():
             line[0].set_data([self.X, self.Y])
             line[0].set_3d_properties(self.Z)
 
-    def animatieN(self, e, I, var, big_omega, smallaxis):
+    def animatieN(self, e, I, var, big_omega, smallaxis, plot_range=[-10,10]):
         '''
         Functie voor het animeren van de planeetbanen.
         '''
@@ -182,11 +182,11 @@ class visualisatie():
         # figuur definieren
         self.figureN = plt.figure()
         self.ax = p3.Axes3D(self.figureN)
-        self.ax.set_xlim3d([-10, 10])
+        self.ax.set_xlim3d(plot_range)
         self.ax.set_xlabel('X')
-        self.ax.set_ylim3d([-10, 10])
+        self.ax.set_ylim3d(plot_range)
         self.ax.set_ylabel('Y')
-        self.ax.set_zlim3d([-10, 10])
+        self.ax.set_zlim3d(plot_range)
         self.ax.set_zlabel('Z')
 
         self.plotobjecten = []

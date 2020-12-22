@@ -53,10 +53,10 @@ var_omega = omega + big_omega
 initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
 if kuiperbelt or etnos:
     initial_conditionsk = np.vstack((eccentricityk, var_omegak, inclinationk, big_omegak))
-t_eval = [0, 10 ** 3]
+t_eval = [0, 4*10**5]
 max_step = 10 ** 2
 form_of_ic = np.array([False, False])
-method = 'RK23'
+method = 'DOP853'
 a_tol = 10 ** -6
 r_tol = 10 ** -10
 
@@ -75,5 +75,11 @@ else:
 
 
 tekenen = Od.visualisatie()
-# tekenen.animatieN(e, I, var_omega, big_omega, smallaxis)
-tekenen.PlotParamsVsTijd((e), solution.t, ('e'), alleenplaneten=False, planet9=planet9)
+tekenen.animatieN(e, I, var_omega, big_omega, smallaxis, plot_range=[-700,700])
+# tekenen.PlotParamsVsTijd((e), solution.t, ('e'), alleenplaneten=False, planet9=planet9)
+tekenen.PlotParamsVsTijd((e, I, var_omega, big_omega), solution.t, (r'$e$', r'$I$', r'$\varpi$', r'$\Omega$'),
+                          alleenplaneten=False, planet9=planet9)
+
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps=100)
+tekenen.anim.save('filmpje massa x1000.mp4',writer=writer)
