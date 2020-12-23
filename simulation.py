@@ -49,7 +49,7 @@ class simulation():
 
         if 'planet9' in kwargs:
             if kwargs['planet9']:
-                pdh.createnewplanet(15e-3, 1e-5, 100/180*np.pi, 0.6, 700, 140/180*np.pi, 30/180*np.pi, 0)    #mass, radius, loanode, eccentricity
+                pdh.createnewplanet(15e-6, 1e-5, 100/180*np.pi, 0.6, 700, 140/180*np.pi, 30/180*np.pi, 0)    #mass, radius, loanode, eccentricity
                 # , smaxis, argperiapsis, orbital_inclination, mean_longitude
                 self.planet9 = pdh.planet9
                 self.smaxis_vector = np.append(self.smaxis_vector, self.planet9['smaxis'])
