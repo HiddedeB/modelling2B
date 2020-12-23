@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 
 kuiperbelt = True
 # specificaties van kuiperbelt objecten kan je in sim = ST.simulation( .... ) vinden.
-planet9 = True
+planet9 = False
 etnos = True
 
 
@@ -75,11 +75,12 @@ else:
 
 
 tekenen = Od.visualisatie()
-tekenen.animatieN(e, I, var_omega, big_omega, smallaxis, plot_range=[-700,700])
+# tekenen.animatieN(e, I, var_omega, big_omega, smallaxis, plot_range=[-700,700])
 # tekenen.PlotParamsVsTijd((e), solution.t, ('e'), alleenplaneten=False, planet9=planet9)
-tekenen.PlotParamsVsTijd((e, I, var_omega, big_omega), solution.t, (r'$e$', r'$I$', r'$\varpi$', r'$\Omega$'),
-                          alleenplaneten=False, planet9=planet9)
+tekenen.PlotParamsVsTijd((e, I, var_omega, big_omega), solution.t, (r'$e$', r'$I$ (rad)',
+                                                                    r'$\varpi$ (rad)',r'$\Omega$ (rad)'),
+                          alleenplaneten=False, planet9=planet9, legend=False)
 
-Writer = animation.writers['ffmpeg']
-writer = Writer(fps=100)
-tekenen.anim.save('filmpje massa x1000.mp4',writer=writer)
+# Writer = animation.writers['ffmpeg']
+# writer = Writer(fps=100)
+# tekenen.anim.save('filmpje massa x1000.mp4',writer=writer)

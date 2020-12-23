@@ -198,7 +198,7 @@ class visualisatie():
                                        frames=round(np.shape(e)[1]), interval=1, blit=False)
         #plt.show()
 
-    def PlotParamsVsTijd(self,param, tijd, paramname, alleenplaneten = False, planet9 = False):
+    def PlotParamsVsTijd(self,param, tijd, paramname, alleenplaneten = False, planet9 = False, legend=True):
         '''NOTE: a function to plot multiple parameters against time.
         :param param: tuple of parameters to plot. formatted as outputted by simulation.run()
         :type param: tuple
@@ -222,24 +222,29 @@ class visualisatie():
                 nrplanets = 4
             if len(paramname) == 1:
                 self.axs[0].plot(tijd,param.T[:,0:nrplanets])
-                self.axs[0].set(xlabel='time [years]', ylabel = paramname[0])
+                self.axs[0].set(xlabel='Time (y)', ylabel = paramname[0], title='Planets')
 
                 self.axs[1].plot(tijd,param.T[:,nrplanets:])
-                self.axs[1].set(xlabel='time [years]')
+                self.axs[1].set(xlabel='Time (y)', title='Objects')
             else:
                 j = 1
                 for i in param:
+                    if j==1:
+                        tits = ['Planets','Objects']
+                    else:
+                        tits = ['','']
                     self.axs[j-1,0].plot(tijd,i.T[:,0:nrplanets])
-                    self.axs[j - 1, 0].set(xlabel='time [years]', ylabel = paramname[j-1])
+                    self.axs[j - 1, 0].set(xlabel='Time (y)', ylabel = paramname[j-1], title=tits[0])
 
                     self.axs[j-1,1].plot(tijd,i.T[:,nrplanets:])
-                    self.axs[j - 1, 1].set(xlabel='time [years]')
+                    self.axs[j - 1, 1].set(xlabel='Time (y)', title=tits[1])
 
                     j += 1
-            if planet9:
-                self.figureT.legend(['Jupiter','Saturn','Uranus','Neptune','planet9'],loc = 'upper left')
-            else:
-                self.figureT.legend(['Jupiter','Saturn','Uranus','Neptune'],loc = 'upper left')
+            if legend:
+                if planet9:
+                    self.figureT.legend(['Jupiter','Saturn','Uranus','Neptune','planet9'],loc = 'upper left')
+                else:
+                    self.figureT.legend(['Jupiter','Saturn','Uranus','Neptune'],loc = 'upper left')
 
         else:
 
@@ -250,7 +255,7 @@ class visualisatie():
 
             if len(paramname) == 1:
                 plt.plot(tijd, param.T[:,0:nrplanets])
-                plt.xlabel('time [years]')
+                plt.xlabel('Time (y)')
                 plt.ylabel(paramname)
             else:
                 j = 1
@@ -258,14 +263,15 @@ class visualisatie():
 
                     plt.subplot(len(param),1,j)
                     plt.plot(tijd, i.T[:,0:nrplanets])
-                    plt.xlabel('time [years]')
+                    plt.xlabel('Time (y)')
                     plt.ylabel(paramname[j-1])
 
                     j += 1
-            if planet9:
-                plt.legend(['Jupiter','Saturn','Uranus','Neptune','planet9'],loc = 'upper left')
-            else:
-                plt.legend(['Jupiter','Saturn','Uranus','Neptune'],loc = 'upper left')
+            if legend:
+                if planet9:
+                    plt.legend(['Jupiter','Saturn','Uranus','Neptune','planet9'],loc = 'upper left')
+                else:
+                    plt.legend(['Jupiter','Saturn','Uranus','Neptune'],loc = 'upper left')
 
 
 
