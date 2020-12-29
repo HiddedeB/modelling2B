@@ -542,13 +542,14 @@ class simulation():
 if __name__ == '__main__':
     kuiperbelt = True
     order_test = False
+    etnos = True
     planet9 = True
 
     if kuiperbelt:
         file_name = 'data.json'
         etnos_file_name = 'etnos.json'
-        sim = simulation(file_name=file_name,etnos_file=etnos_file_name, kuiperbelt=kuiperbelt,etnos=True, hom_mode=True, total_mass=10000, r_res=8, range_min=40,
-                         range_max=100, planet9 = True)
+        sim = simulation(file_name=file_name,etnos_file=etnos_file_name, kuiperbelt=kuiperbelt,etnos=etnos, hom_mode=True, total_mass=10000, r_res=8, range_min=40,
+                         range_max=100, planet9 = planet9)
 
         omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
         big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
