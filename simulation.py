@@ -2,7 +2,7 @@ import numpy as np
 from data import create_pdh
 from scipy.integrate import solve_ivp
 from scipy.integrate import quad
-from numba import njit, types, jit
+from numba import njit
 import Orbitdrawer as Od
 from matplotlib import animation
 import Orbitdrawer as Od
@@ -12,10 +12,12 @@ import math
 class simulation():
     '''Class to compute simulation of the orbital elements'''
 
-    def __init__(self, file_name, etnos_file=False, **kwargs):
+    def __init__(self, file_name, etnos_file='', **kwargs):
         '''NOTE: Initial function that sets up all the different attributes of our class.
         :param file_name: File_name directing to data file for planethandler.
         :type file_name: str
+        :param etnos_file: File_name for the ETNO's.
+        :type etnos_file: str
         :param **kuiperbelt: If True the function creates a kuiperbelt. For this all the following parameters should be
         given.
         :type **kuiperbelt: bool
@@ -35,7 +37,7 @@ class simulation():
         if not etnos_file:
             pdh = create_pdh(file_name)
         else:
-            pdh = create_pdh(file_name,etnos_file)
+            pdh = create_pdh(file_name, etnos_file)
 
         # G = 6.67430 * 10**(-11)
         G = 39.47692641  # units van au^3/y^2 M_sun
@@ -325,14 +327,30 @@ class simulation():
         free_p_vector = vector[2 * amount_of_particles: 3 * amount_of_particles]
         free_q_vector = vector[3 * amount_of_particles: 4 * amount_of_particles]
 
+        # Redefine to be useful
+        f_h = np.zeros((amount_of_particles, planet_number+1))
+        f_k = np.zeros((amount_of_particles, planet_number+1))
+        f_p = np.zeros((amount_of_particles, planet_number+1))
+        f_q = np.zeros((amount_of_particles, planet_number+1))
+
+        f_h[:, 0] = free_h_vector
+        f_k[:, 0] = free_k_vector
+        f_p[:, 0] = free_p_vector
+        f_q[:, 0] = free_q_vector
+
+        f_h[:, 1:] = h_vector.repeat(amount_of_particles).reshape(-1, amount_of_particles).T
+        f_k[:, 1:] = k_vector.repeat(amount_of_particles).reshape(-1, amount_of_particles).T
+        f_p[:, 1:] = p_vector.repeat(amount_of_particles).reshape(-1, amount_of_particles).T
+        f_q[:, 1:] = q_vector.repeat(amount_of_particles).reshape(-1, amount_of_particles).T
+
         # Differential equations.
-        d_h_free_matrix = free_a_matrix * np.expand_dims(free_k_vector, 1)
+        d_h_free_matrix = free_a_matrix * f_k
         d_h_free_vec = d_h_free_matrix.sum(axis=1)
-        d_k_free_matrix = free_a_matrix * np.expand_dims(free_h_vector, 1)
+        d_k_free_matrix = free_a_matrix * f_h
         d_k_free_vec = -d_k_free_matrix.sum(axis=1)
-        d_p_free_matrix = free_b_matrix * np.expand_dims(free_q_vector, 1)
+        d_p_free_matrix = free_b_matrix * f_q
         d_p_free_vec = d_p_free_matrix.sum(axis=1)
-        d_q_free_matrix = free_b_matrix * np.expand_dims(free_p_vector, 1)
+        d_q_free_matrix = free_b_matrix * f_p
         d_q_free_vec = -d_q_free_matrix.sum(axis=1)
 
         return np.concatenate((d_h_vec, d_k_vec, d_p_vec, d_q_vec, d_h_free_vec, d_k_free_vec, d_p_free_vec,
@@ -369,6 +387,36 @@ class simulation():
         d_q_vec = -d_q_matrix.sum(axis=1)
 
         return np.concatenate((d_h_vec, d_k_vec, d_p_vec, d_q_vec))
+
+    @staticmethod
+    def Euler_backward(t, vector, *args):
+        f"""NOTE: Function to compute the Euler backward implementation of our problem. Futhermore, 
+        Euler backward has y_n+1 = y_n + dt * f(t_n+1, y_n+1) = y_n + dt * A y_n+1, when considering matrices. Aside 
+        from this, note that for the planets we have h_n+1 = h_n + dt * A * k_n+1, additionally we have k_n+1 = k_n 
+        - dt * A h_n+1 => h_n+1 = h_n + dt * A * (k_n - dt * A * h_n+1) => 
+        h_n+1 = (I_[number_of_planets] + dt^2 A^2)^-1 (h_n + dt * A * k_n). Aside from this, consider for the free 
+        particle, every particle is described by h_n+1 = A_free[0] h_n+1 (asteroid) + A_free[1:] h_n+1(planets) 
+        => h_n+1 = (1 - A_free[0])^-1*(A_free[1:]*(I_[number_of_planets] + dt^2 A^2)^-1 (h_n + dt * A * k_n)) """
+        # Matrices
+        a_matrix = args[0]
+        b_matrix = args[1]
+        free_a_matrix = args[2]
+        free_b_matrix = args[3]
+
+        # Current data
+        planet_number = a_matrix.shape[0]
+        h_vector = vector[:planet_number]
+        k_vector = vector[planet_number:2 * planet_number]
+        p_vector = vector[2 * planet_number: 3 * planet_number]
+        q_vector = vector[3 * planet_number: 4 * planet_number]
+
+        free_h_vector = vector[:amount_of_particles]
+        free_k_vector = vector[amount_of_particles:2 * amount_of_particles]
+        free_p_vector = vector[2 * amount_of_particles: 3 * amount_of_particles]
+        free_q_vector = vector[3 * amount_of_particles: 4 * amount_of_particles]
+
+
+
 
     def order_of_error(self, time_scale, form_of_ic, initial_conditions, max_step, method, relative_tolerance,
                        absolute_tolerance, kuiperbelt=False):
@@ -494,14 +542,13 @@ class simulation():
 if __name__ == '__main__':
     kuiperbelt = True
     order_test = False
-    etnos = False
     planet9 = True
 
     if kuiperbelt:
         file_name = 'data.json'
         etnos_file_name = 'etnos.json'
-        sim = simulation(file_name=file_name,etnos_file=etnos_file_name, kuiperbelt=kuiperbelt, etnos = etnos, hom_mode = True, total_mass=10000, r_res=2, range_min=40,
-                         range_max=100, planet9 = planet9)
+        sim = simulation(file_name=file_name,etnos_file=etnos_file_name, kuiperbelt=kuiperbelt,etnos=True, hom_mode=True, total_mass=10000, r_res=8, range_min=40,
+                         range_max=100, planet9 = True)
 
         omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
         big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
@@ -531,11 +578,11 @@ if __name__ == '__main__':
         initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
         initial_conditionsk = np.vstack((eccentricityk, var_omegak, inclinationk, big_omegak))
         t_eval = [0, 40*10**4]
-        max_step = 10
+        max_step = 1000
         form_of_ic = np.array([False, False])
-        method = 'RK23'
-        r_tol = 10 ** -6
-        a_tol = 10 ** -10
+        method = 'DOP853'
+        r_tol = 10 ** -4
+        a_tol = 10 ** -3
 
         if not order_test:
 
