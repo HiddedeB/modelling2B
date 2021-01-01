@@ -359,7 +359,8 @@ class simulation():
     @staticmethod
     @njit
     def orbital_calculator_no_kuiperbelt(t, vector, *args):
-        '''NOTE: function to run the solver with, vector contains h, k, p, q in that order. Furthermore, the values are
+        '''
+        NOTE: function to run the solver with, vector contains h, k, p, q in that order. Furthermore, the values are
         taken to go from closest to the sun to most outward.
         :param *args: Array of matrices, because scipy is stupid.
         :type *args: np.ndarray
@@ -389,8 +390,8 @@ class simulation():
         return np.concatenate((d_h_vec, d_k_vec, d_p_vec, d_q_vec))
 
     @staticmethod
-    def Euler_backward(t, vector, *args):
-        f"""NOTE: Function to compute the Euler backward implementation of our problem. Futhermore, 
+    def Euler_backward_calculator(dt, vector, *args):
+        """NOTE: Function to compute the Euler backward implementation of our problem. Futhermore,
         Euler backward has y_n+1 = y_n + dt * f(t_n+1, y_n+1) = y_n + dt * A y_n+1, when considering matrices. Aside 
         from this, note that for the planets we have h_n+1 = h_n + dt * A * k_n+1, additionally we have k_n+1 = k_n 
         - dt * A h_n+1 => h_n+1 = h_n + dt * A * (k_n - dt * A * h_n+1) => 
@@ -405,18 +406,74 @@ class simulation():
 
         # Current data
         planet_number = a_matrix.shape[0]
+        identity = np.identity(planet_number)
         h_vector = vector[:planet_number]
         k_vector = vector[planet_number:2 * planet_number]
         p_vector = vector[2 * planet_number: 3 * planet_number]
         q_vector = vector[3 * planet_number: 4 * planet_number]
+
+        amount_of_particles = int(len(vector) / 4) - planet_number
+        free_identity = np.ones(amount_of_particles)
+
+        first_a_column = free_a_matrix[:, 0]
+        a_prime = free_a_matrix[:, 1:]
+        first_b_column = free_b_matrix[:, 0]
+        b_prime = free_b_matrix[:, 1:]
 
         free_h_vector = vector[:amount_of_particles]
         free_k_vector = vector[amount_of_particles:2 * amount_of_particles]
         free_p_vector = vector[2 * amount_of_particles: 3 * amount_of_particles]
         free_q_vector = vector[3 * amount_of_particles: 4 * amount_of_particles]
 
+        # Build the n+1 terms
+        d_h = np.dot(np.linalg.inv(identity + dt**2 * np.dot(a_matrix, a_matrix)), (h_vector + dt * np.dot(a_matrix, k_vector)))
+        d_k = np.dot(np.linalg.inv(identity + dt**2 * np.dot(a_matrix, a_matrix)), (k_vector - dt * np.dot(a_matrix, h_vector)))
+        d_p = np.dot(np.linalg.inv(identity + dt**2 * np.dot(b_matrix, b_matrix)), (p_vector + dt * np.dot(b_matrix, q_vector)))
+        d_q = np.dot(np.linalg.inv(identity + dt**2 * np.dot(b_matrix, b_matrix)), (q_vector - dt * np.dot(b_matrix, p_vector)))
 
+        # We do not need to invert with the matrices, since these operations are 1-D
+        d_h_free = 1 / (free_identity + dt**2 * first_a_column**2) * (free_h_vector +
+                                                                      dt * first_a_column * free_k_vector -
+                                                                      dt**2 * first_a_column * np.dot(a_prime, d_h) +
+                                                                      dt * np.dot(a_prime, d_k))
+        d_k_free = 1 / (free_identity + dt**2 * first_a_column**2) * (free_k_vector -
+                                                                      dt * first_a_column * free_h_vector -
+                                                                      dt**2 * first_a_column * np.dot(a_prime, d_k) -
+                                                                      dt * np.dot(a_prime, d_h))
+        d_p_free = 1 / (free_identity + dt**2 * first_b_column**2) * (free_p_vector +
+                                                                      dt * first_b_column * free_q_vector -
+                                                                      dt**2 * first_b_column * np.dot(b_prime, d_p) +
+                                                                      dt * np.dot(b_prime, d_q))
+        d_q_free = 1 / (free_identity + dt**2 * first_b_column**2) * (free_q_vector +
+                                                                      dt * first_a_column * free_p_vector -
+                                                                      dt**2 * first_b_column * np.dot(b_prime, d_q) +
+                                                                      dt * np.dot(b_prime, d_p))
 
+        return np.concatenate((d_h, d_k, d_p, d_q, d_h_free, d_k_free, d_p_free, d_q_free))
+
+    def Euler_backward_method(self, time_scale, initial_conditions, max_step, kuiperbelt, *args):
+
+        time = np.array([], dtype=np.float64)
+
+        # preliminary calculation first.
+
+        if kuiperbelt:
+            solutions = np.zeros((4*(self.planet_number+self.asteroid_number), 1))
+
+        else:
+            solutions = np.zeros((4*self.planet_number, 1))
+
+        new_solution = self.Euler_backward_calculator(max_step, initial_conditions, *args)
+        solutions = np.hstack((solutions, new_solution[:, np.newaxis]))
+
+        for time_step in np.arange(time_scale[0]+max_step, time_scale[1], max_step):
+            new_solution = self.Euler_backward_calculator(max_step, solutions[:, -1], *args)
+            solutions = np.hstack((solutions, new_solution[:, np.newaxis]))
+            time = np.append(time, time_step)
+
+        solutions = solutions[:, 1:]
+
+        return solutions, time
 
     def order_of_error(self, time_scale, form_of_ic, initial_conditions, max_step, method, relative_tolerance,
                        absolute_tolerance, kuiperbelt=False):
@@ -428,7 +485,7 @@ class simulation():
         make_array = True
         for multiplier in multipliers[::-1]:
                 solution = self.run(time_scale, form_of_ic, initial_conditions, multiplier, method, relative_tolerance,
-                                    absolute_tolerance, kuiperbelt, )
+                                    absolute_tolerance, kuiperbelt)
 
                 solution = solution[:-1]
 
@@ -506,12 +563,18 @@ class simulation():
             beta = self.beta_values(alpha_array[0], kuiperbelt)
             matrix_array = self.a_b_matrices(alpha_array[1], beta, kuiperbelt)
 
-        solution = solve_ivp(orbital_calculator, t_span=time_scale, y0=initial_conditions, args=(*matrix_array,),
-                             method=method, rtol=relative_tolerance, atol=absolute_tolerance, max_step=max_step,
-                             first_step=max_step)
+        if method != 'Euler':
+            solution = solve_ivp(orbital_calculator, t_span=time_scale, y0=initial_conditions, args=(*matrix_array,),
+                                 method=method, rtol=relative_tolerance, atol=absolute_tolerance, max_step=max_step,
+                                 first_step=max_step)
+            data = solution['y']
 
+        else:
+            solution, time = self.Euler_backward_method(time_scale, initial_conditions, max_step, kuiperbelt,
+                                                        *matrix_array)
+            data = solution
         planet_number = self.planet_number
-        data = solution['y']
+
         h = data[:planet_number, :]
         k = data[planet_number:2 * planet_number, :]
         p = data[2 * planet_number: 3 * planet_number, :]
@@ -580,7 +643,7 @@ if __name__ == '__main__':
         t_eval = [0, 40*10**4]
         max_step = 1000
         form_of_ic = np.array([False, False])
-        method = 'DOP853'
+        method = "Euler"#'DOP853'
         r_tol = 10 ** -4
         a_tol = 10 ** -3
 
@@ -633,9 +696,9 @@ if __name__ == '__main__':
     # anim = animation.FuncAnimation(fig1, animate, fargs=(e, I, var_omega, big_omega, smallaxis),
     #                                 frames=round(t_eval[1] / max_step), interval=10, blit=False)
 
-    tekenen = Od.visualisatie()
-    #tekenen.animatieN(e, I, var_omega, big_omega, smallaxis)
-    tekenen.PlotParamsVsTijd((e), solution.t, ('e'), alleenplaneten = True, planet9 = planet9)
+    # tekenen = Od.visualisatie()
+    # #tekenen.animatieN(e, I, var_omega, big_omega, smallaxis)
+    # tekenen.PlotParamsVsTijd((e), solution.t, ('e'), alleenplaneten = True, planet9 = planet9)
     # tekenen.PlotParamsVsTijd((I), solution.t, ('I'), splitsen = False)
     # tekenen.PlotParamsVsTijd((var_omega), solution.t, ('$\overline{\omega}$'), splitsen = False)
     # tekenen.PlotParamsVsTijd((big_omega), solution.t, ('$\Omega$'), splitsen = False)
