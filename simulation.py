@@ -444,16 +444,16 @@ class simulation():
                                                                       dt * first_b_column * free_q_vector -
                                                                       dt**2 * first_b_column * np.dot(b_prime, d_p) +
                                                                       dt * np.dot(b_prime, d_q))
-        d_q_free = 1 / (free_identity + dt**2 * first_b_column**2) * (free_q_vector +
+        d_q_free = 1 / (free_identity + dt**2 * first_b_column**2) * (free_q_vector -
                                                                       dt * first_a_column * free_p_vector -
-                                                                      dt**2 * first_b_column * np.dot(b_prime, d_q) +
+                                                                      dt**2 * first_b_column * np.dot(b_prime, d_q) -
                                                                       dt * np.dot(b_prime, d_p))
 
         return np.concatenate((d_h, d_k, d_p, d_q, d_h_free, d_k_free, d_p_free, d_q_free))
 
     def Euler_backward_method(self, time_scale, initial_conditions, max_step, kuiperbelt, *args):
 
-        time = np.array([], dtype=np.float64)
+        time = np.array([max_step], dtype=np.float64)
 
         # preliminary calculation first.
 
@@ -572,6 +572,7 @@ class simulation():
         else:
             solution, time = self.Euler_backward_method(time_scale, initial_conditions, max_step, kuiperbelt,
                                                         *matrix_array)
+
             data = solution
         planet_number = self.planet_number
 
@@ -598,8 +599,10 @@ class simulation():
 
         else:
             print('Regular simulation ran succesfully returning values.')
-
-        return np.array([e, I, var_omega, big_omega, solution], dtype=np.ndarray)
+        if method != "Euler":
+            return np.array([e, I, var_omega, big_omega, solution], dtype=np.ndarray)
+        else:
+            return np.array([e, I, var_omega, big_omega, solution, time], dtype=np.ndarray)
 
 
 if __name__ == '__main__':
@@ -649,12 +652,21 @@ if __name__ == '__main__':
         a_tol = 10 ** -3
 
         if not order_test:
-
-            e, I, var_omega, big_omega, solution = sim.run(time_scale=t_eval, form_of_ic=form_of_ic,
+            if method != "Euler":
+                e, I, var_omega, big_omega, solution = sim.run(time_scale=t_eval, form_of_ic=form_of_ic,
                                                        initial_conditions=(initial_conditions,initial_conditionsk), max_step=max_step,
                                                        method=method,
                                                        relative_tolerance=r_tol, absolute_tolerance=a_tol,
                                                        kuiperbelt=kuiperbelt)
+            else:
+                e, I, var_omega, big_omega, solution, time = sim.run(time_scale=t_eval, form_of_ic=form_of_ic,
+                                                               initial_conditions=(initial_conditions, initial_conditionsk),
+                                                               max_step=max_step,
+                                                               method=method,
+                                                               relative_tolerance=r_tol, absolute_tolerance=a_tol,
+                                                               kuiperbelt=kuiperbelt)
+                tekenen = Od.visualisatie()
+                tekenen.PlotParamsVsTijd((e), time, ('e'), alleenplaneten=True, planet9=planet9)
         else:
             length, solutions, order = sim.order_of_error(time_scale=t_eval, form_of_ic=form_of_ic,
                                            initial_conditions=(initial_conditions, initial_conditionsk),
@@ -698,7 +710,7 @@ if __name__ == '__main__':
     #                                 frames=round(t_eval[1] / max_step), interval=10, blit=False)
 
     # tekenen = Od.visualisatie()
-    # #tekenen.animatieN(e, I, var_omega, big_omega, smallaxis)
+    # # #tekenen.animatieN(e, I, var_omega, big_omega, smallaxis)
     # tekenen.PlotParamsVsTijd((e), solution.t, ('e'), alleenplaneten = True, planet9 = planet9)
     # tekenen.PlotParamsVsTijd((I), solution.t, ('I'), splitsen = False)
     # tekenen.PlotParamsVsTijd((var_omega), solution.t, ('$\overline{\omega}$'), splitsen = False)
