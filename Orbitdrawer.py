@@ -294,7 +294,7 @@ class visualisatie():
         j = 1
         # for i in param:
         plt.subplot(len(param),1,j)
-        self.ax = plt.axes(xlim=(10**11, 10**13), ylim=(min(0,param.min()),param.max()))
+        self.ax = plt.axes(xlim=(smallaxis.min(), smallaxis.max()), ylim=(min(0,param.min()),param.max()))
         self.ax.set_ylabel(paramnaam[0])
         self.ax.set_xlabel('a')
 
