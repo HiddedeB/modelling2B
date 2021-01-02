@@ -198,7 +198,7 @@ class visualisatie():
                                        frames=round(np.shape(e)[1]), interval=1, blit=False)
         #plt.show()
 
-    def PlotParamsVsTijd(self,param, tijd, paramname, alleenplaneten = False, planet9 = False, legend=True):
+    def PlotParamsVsTijd(self,param, tijd, paramname, alleen = '', planet9 = False, legend=True):
         '''NOTE: a function to plot multiple parameters against time.
         :param param: tuple of parameters to plot. formatted as outputted by simulation.run()
         :type param: tuple
@@ -212,7 +212,7 @@ class visualisatie():
         :param planet9: boolean die aangeeft of planet 9 wel of niet in de simulatie zit.
         :type planet9: boolean
         '''
-        if not alleenplaneten:
+        if alleen == '':
             self.figureT = plt.figure()
             self.grid = self.figureT.add_gridspec(len(paramname),2)
             self.axs = self.grid.subplots()
@@ -246,7 +246,7 @@ class visualisatie():
                 else:
                     self.figureT.legend(['Jupiter','Saturn','Uranus','Neptune'],loc = 'upper left')
 
-        else:
+        elif alleen == 'planeten':
 
             if planet9:
                 nrplanets = 5
@@ -272,6 +272,28 @@ class visualisatie():
                     plt.legend(['Jupiter','Saturn','Uranus','Neptune','planet9'],loc = 'upper left')
                 else:
                     plt.legend(['Jupiter','Saturn','Uranus','Neptune'],loc = 'upper left')
+        elif alleen == 'objecten':
+
+            if planet9:
+                nrplanets = 5
+            else:
+                nrplanets = 4
+
+            if len(paramname) == 1:
+                plt.plot(tijd, param.T[:,nrplanets:])
+                plt.xlabel('Time (y)')
+                plt.ylabel(paramname)
+            else:
+                j = 1
+                for i in param:
+
+                    plt.subplot(len(param),1,j)
+                    plt.plot(tijd, i.T[:,nrplanets:])
+                    plt.xlabel('Time (y)')
+                    plt.ylabel(paramname[j-1])
+
+                    j += 1
+
 
 
 
@@ -295,7 +317,7 @@ class visualisatie():
         # for i in param:
         plt.subplot(len(param),1,j)
         self.ax = plt.axes(xlim=(smallaxis.min(), smallaxis.max()), ylim=(min(0,param.min()),param.max()))
-        self.ax.set_ylabel(paramnaam[0])
+        self.ax.set_ylabel(paramnaam)
         self.ax.set_xlabel('a')
 
         self.plotobjecten = []
