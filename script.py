@@ -76,7 +76,7 @@ else:
 
 tekenen = Od.visualisatie()
 # tekenen.animatieN(e, I, var_omega, big_omega, smallaxis, plot_range=[-700,700])
-tekenen.PlotParamsVsTijdKuiper((e,I), solution.t, ('e','I'), alleenplaneten=False, planet9=planet9, paramset = (1,2,3))
+tekenen.PlotParamsVsTijd((e,I), solution.t, ('e','I'), alleen = 'objecten', planet9=planet9, paramset = (1,2,3), savefigure = False)
 # tekenen.PlotParamsVsTijd((e, I, var_omega, big_omega), solution.t, (r'$e$', r'$I$ (rad)',
 #                                                                     r'$\varpi$ (rad)',r'$\Omega$ (rad)'),
 #                           alleenplaneten=False, planet9=planet9, legend=False)
