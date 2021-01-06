@@ -198,7 +198,7 @@ class visualisatie():
                                        frames=round(np.shape(e)[1]), interval=1, blit=False)
         #plt.show()
 
-    def PlotParamsVsTijd(self,param, tijd, paramname, alleenplaneten = False, planet9 = False, legend=True):
+    def PlotParamsVsTijd(self,param, tijd, paramname, alleenplaneten = False, planet9 = False, legend=True, paramset = (0,0,0)):
         '''NOTE: a function to plot multiple parameters against time.
         :param param: tuple of parameters to plot. formatted as outputted by simulation.run()
         :type param: tuple
@@ -245,7 +245,8 @@ class visualisatie():
                     self.figureT.legend(['Jupiter','Saturn','Uranus','Neptune','planet9'],loc = 'upper left')
                 else:
                     self.figureT.legend(['Jupiter','Saturn','Uranus','Neptune'],loc = 'upper left')
-
+            plt.savefig('plotjes/combi/mass{}eccentricity{}a{}.png'.format(paramset[0],paramset[1],paramset[2]))
+            plt.close()
         else:
 
             if planet9:
@@ -273,6 +274,76 @@ class visualisatie():
                 else:
                     plt.legend(['Jupiter','Saturn','Uranus','Neptune'],loc = 'upper left')
 
+    def PlotParamsVsTijdKuiper(self,param, tijd, paramname, alleenplaneten = False, planet9 = False, legend=True, paramset = (0,0,0)):
+        '''NOTE: a function to plot multiple parameters against time.
+        :param param: tuple of parameters to plot. formatted as outputted by simulation.run()
+        :type param: tuple
+        :param tijd: time of simulation
+        :type *args: np.array
+        :param paramname: tuple containing names of parameters as strings
+        :type paramname: tuple
+        :param alleenplaneten: True geeft de parameter geplot tegen de tijd voor alleen de planeten (4 of 5). False geeft
+        twee kolommen waarbij de linker de planeten bevat en de rechter de andere objecten
+        :type alleenplaneten: Boolean
+        :param planet9: boolean die aangeeft of planet 9 wel of niet in de simulatie zit.
+        :type planet9: boolean
+        '''
+        if not alleenplaneten:
+            self.figureT = plt.figure()
+            self.grid = self.figureT.add_gridspec(len(paramname),1)
+            self.axs = self.grid.subplots()
+            if planet9:
+                nrplanets = 5
+            else:
+                nrplanets = 4
+            if len(paramname) == 1:
+                self.axs.plot(tijd,param.T[:,nrplanets:])
+                self.axs.set(xlabel='Time (y)', title='Objects')
+            else:
+                j = 1
+                for i in param:
+                    if j==1:
+                        tits = ['Planets','Objects']
+                    else:
+                        tits = ['','']
+                    self.axs[j-1].plot(tijd,i.T[:,nrplanets:])
+                    self.axs[j - 1].set(xlabel='Time (y)')#, title=tits[1])
+                    j += 1
+            self.figureT.suptitle('mass: {}, eccentricity: {}, a: {}'.format(paramset[0],paramset[1],paramset[2]))
+            plt.savefig('plotjes/kuiperonly/konly_mass_{}_eccentricity_{}_a_{}.png'.format(paramset[0],paramset[1],paramset[2]))
+            plt.close()
+            # if legend:
+            #     if planet9:
+            #         self.figureT.legend(['Jupiter','Saturn','Uranus','Neptune','planet9'],loc = 'upper left')
+            #     else:
+            #         self.figureT.legend(['Jupiter','Saturn','Uranus','Neptune'],loc = 'upper left')
+
+        else:
+
+            if planet9:
+                nrplanets = 5
+            else:
+                nrplanets = 4
+
+            if len(paramname) == 1:
+                plt.plot(tijd, param.T[:,0:nrplanets])
+                plt.xlabel('Time (y)')
+                plt.ylabel(paramname)
+            else:
+                j = 1
+                for i in param:
+
+                    plt.subplot(len(param),1,j)
+                    plt.plot(tijd, i.T[:,0:nrplanets])
+                    plt.xlabel('Time (y)')
+                    plt.ylabel(paramname[j-1])
+
+                    j += 1
+            if legend:
+                if planet9:
+                    plt.legend(['Jupiter','Saturn','Uranus','Neptune','planet9'],loc = 'upper left')
+                else:
+                    plt.legend(['Jupiter','Saturn','Uranus','Neptune'],loc = 'upper left')
 
 
     def animate(self,i , param, smallaxis):

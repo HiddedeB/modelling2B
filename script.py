@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 
 kuiperbelt = True
 # specificaties van kuiperbelt objecten kan je in sim = ST.simulation( .... ) vinden.
-planet9 = False
+planet9 = True
 etnos = True
 
 
@@ -53,8 +53,8 @@ var_omega = omega + big_omega
 initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
 if kuiperbelt or etnos:
     initial_conditionsk = np.vstack((eccentricityk, var_omegak, inclinationk, big_omegak))
-t_eval = [0, 4*10**5]
-max_step = 10 ** 2
+t_eval = [0, 4*10**3]
+max_step = 2 * 10 ** 2
 form_of_ic = np.array([False, False])
 method = 'DOP853'
 a_tol = 10 ** -6
@@ -76,11 +76,12 @@ else:
 
 tekenen = Od.visualisatie()
 # tekenen.animatieN(e, I, var_omega, big_omega, smallaxis, plot_range=[-700,700])
-# tekenen.PlotParamsVsTijd((e), solution.t, ('e'), alleenplaneten=False, planet9=planet9)
-tekenen.PlotParamsVsTijd((e, I, var_omega, big_omega), solution.t, (r'$e$', r'$I$ (rad)',
-                                                                    r'$\varpi$ (rad)',r'$\Omega$ (rad)'),
-                          alleenplaneten=False, planet9=planet9, legend=False)
+tekenen.PlotParamsVsTijdKuiper((e,I), solution.t, ('e','I'), alleenplaneten=False, planet9=planet9, paramset = (1,2,3))
+# tekenen.PlotParamsVsTijd((e, I, var_omega, big_omega), solution.t, (r'$e$', r'$I$ (rad)',
+#                                                                     r'$\varpi$ (rad)',r'$\Omega$ (rad)'),
+#                           alleenplaneten=False, planet9=planet9, legend=False)
+# tekenen.ParamVsA(e,smallaxis,'e')
 
-# Writer = animation.writers['ffmpeg']
+# Writer = animation.writers['pillow']
 # writer = Writer(fps=100)
 # tekenen.anim.save('filmpje massa x1000.mp4',writer=writer)

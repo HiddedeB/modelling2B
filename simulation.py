@@ -396,7 +396,7 @@ class simulation():
         from this, note that for the planets we have h_n+1 = h_n + dt * A * k_n+1, additionally we have k_n+1 = k_n 
         - dt * A h_n+1 => h_n+1 = h_n + dt * A * (k_n - dt * A * h_n+1) => 
         h_n+1 = (I_[number_of_planets] + dt^2 A^2)^-1 (h_n + dt * A * k_n). Aside from this, consider for the free 
-        particle, every particle is described by h_n+1 = A_free[0] h_n+1 (asteroid) + A_free[1:] h_n+1(planets) 
+        particle, every particle is described by h_n+1 = h_n + A_free[0] k_n+1 (asteroid) + A_free[1:] h_n+1(planets)
         => h_n+1 = (1 - A_free[0])^-1*(A_free[1:]*(I_[number_of_planets] + dt^2 A^2)^-1 (h_n + dt * A * k_n)) """
         # Matrices
         a_matrix = args[0]
