@@ -248,9 +248,11 @@ class visualisatie():
                     self.figureT.legend(['Jupiter','Saturn','Uranus','Neptune','planet9'],loc = 'upper left')
                 else:
                     self.figureT.legend(['Jupiter','Saturn','Uranus','Neptune'],loc = 'upper left')
+
             if savefigure == True and 'paramset' in kwargs:
                 paramset = kwargs.get("paramset")
-                plt.savefig('plotjes/combi/mass{}eccentricity{}a{}.png'.format(paramset[0], paramset[1], paramset[2]))
+                self.figureT.suptitle('mass: {:.2E}, eccentricity: {:.2f}, a: {}'.format(paramset[0], paramset[1], paramset[2]))
+                plt.savefig('plotjes/combi/mass{:.2E}eccentricity{:.2f}a{}.png'.format(paramset[0], paramset[1], paramset[2]))
                 plt.close()
         elif alleen == 'planeten':
 
@@ -299,7 +301,8 @@ class visualisatie():
                     j += 1
             if savefigure == True and 'paramset' in kwargs:
                 paramset = kwargs.get("paramset")
-                plt.savefig('plotjes/kuiperonly/mass{}eccentricity{}a{}.png'.format(paramset[0], paramset[1], paramset[2]))
+                plt.suptitle('mass: {:.2E}, eccentricity: {:.2f}, a: {}'.format(paramset[0], paramset[1], paramset[2]))
+                plt.savefig('plotjes/kuiperonly/kleinesimulatie/massavariatie/mass{:.2E}eccentricity{:.2f}a{}.png'.format(paramset[0], paramset[1], paramset[2]))
                 plt.close()
 
     # def PlotParamsVsTijdKuiper(self,param, tijd, paramname, alleenplaneten = False, planet9 = False, legend=True, paramset = (0,0,0)):

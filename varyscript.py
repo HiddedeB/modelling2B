@@ -35,10 +35,10 @@ mearth = 5.972*10**24
 mplanet9 = mearth*10/msun
 eplanet9 = sim.planet9['eccentricity']
 aplanet9 = sim.planet9['smaxis']
-massvariation = np.linspace(mplanet9/2,mplanet9, 6)
-evariation = np.linspace(eplanet9 - 0.2, eplanet9 + 0.2, 5)
-avariation = np.linspace(aplanet9 - 50, aplanet9 + 50, 6)
-combinations = list(it.product(massvariation, evariation, avariation))
+massvariation = np.linspace(mplanet9/10,mplanet9, 10)
+evariation = np.linspace(eplanet9 - 0.2, eplanet9 + 0.2, 3)
+avariation = np.linspace(aplanet9 - 50, aplanet9 + 50, 2)
+combinations = list(it.product(massvariation, evariation))#, avariation))
 
 # j = 0
 # for i in combinations:
@@ -49,7 +49,7 @@ k = 0
 for i in combinations:
     sim.mass_vector[-1] = i[0]
     sim.planet9['eccentricity'] = i[1]
-    sim.planet9['smaxis'] = i[2]
+#    sim.planet9['smaxis'] = i[2]
     omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
     big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
     inclination = np.array([sim.j['orbital inclination'], sim.s['orbital inclination'], sim.n['orbital inclination'],
@@ -99,8 +99,7 @@ for i in combinations:
 
     tekenen = Od.visualisatie()
     # tekenen.animatieN(e, I, var_omega, big_omega, smallaxis, plot_range=[-700,700])
-    tekenen.PlotParamsVsTijdKuiper((e,I), solution.t, ('e','I'), alleenplaneten = False, planet9=planet9, paramset = i)
-    tekenen.PlotParamsVsTijd((e,I), solution.t, ('e','I'), alleenplaneten = False, planet9=planet9, paramset = i)
+    tekenen.PlotParamsVsTijd((e,I), solution.t, ('e','I'), alleen = 'objecten', planet9=planet9, paramset = (i[0],i[1],aplanet9), savefigure = True)
 
     # tekenen.PlotParamsVsTijd((e, I, var_omega, big_omega), solution.t, (r'$e$', r'$I$ (rad)',
     #                                                                     r'$\varpi$ (rad)',r'$\Omega$ (rad)'),

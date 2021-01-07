@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 
 kuiperbelt = True
 # specificaties van kuiperbelt objecten kan je in sim = ST.simulation( .... ) vinden.
-planet9 = True
+planet9 = False
 etnos = True
 
 
@@ -53,7 +53,7 @@ var_omega = omega + big_omega
 initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
 if kuiperbelt or etnos:
     initial_conditionsk = np.vstack((eccentricityk, var_omegak, inclinationk, big_omegak))
-t_eval = [0, 4*10**3]
+t_eval = [0, 4*10**7]
 max_step = 2 * 10 ** 2
 form_of_ic = np.array([False, False])
 method = 'DOP853'
@@ -76,7 +76,7 @@ else:
 
 tekenen = Od.visualisatie()
 # tekenen.animatieN(e, I, var_omega, big_omega, smallaxis, plot_range=[-700,700])
-tekenen.PlotParamsVsTijd((e,I), solution.t, ('e','I'), alleen = 'objecten', planet9=planet9, paramset = (1,2,3), savefigure = False)
+tekenen.PlotParamsVsTijd((e,I), solution.t, ('e','I'), alleen = '', planet9=planet9, paramset = (1,2,3), savefigure = False)
 # tekenen.PlotParamsVsTijd((e, I, var_omega, big_omega), solution.t, (r'$e$', r'$I$ (rad)',
 #                                                                     r'$\varpi$ (rad)',r'$\Omega$ (rad)'),
 #                           alleenplaneten=False, planet9=planet9, legend=False)
