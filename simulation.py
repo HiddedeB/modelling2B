@@ -51,7 +51,9 @@ class simulation():
 
         if 'planet9' in kwargs:
             if kwargs['planet9']:
-                pdh.createnewplanet(15e-6, 1e-5, 100/180*np.pi, 0.6, 700, 140/180*np.pi, 30/180*np.pi, 0)    #mass, radius, loanode, eccentricity
+                d = kwargs['planet9'] # for shorter notation below
+                pdh.createnewplanet(d['mass'], d['radius'], d['loanode'], d['eccentricity'], d['smaxis'],
+                    d['argperiapsis'], d['orbital inclination'], d['mean longitude'])
                 # , smaxis, argperiapsis, orbital_inclination, mean_longitude
                 self.planet9 = pdh.planet9
                 self.smaxis_vector = np.append(self.smaxis_vector, self.planet9['smaxis'])
@@ -609,7 +611,8 @@ if __name__ == '__main__':
     kuiperbelt = True
     order_test = False
     etnos = True
-    planet9 = True
+    planet9 = {'mass':15e-6, 'radius':1e-5, 'loanode':100/180*np.pi,'eccentricity':0.6,'smaxis':50,
+               'argperiapsis':140/180*np.pi,'orbital inclination':30/180*np.pi,'mean longitude':0}
 
     if kuiperbelt:
         file_name = 'data.json'

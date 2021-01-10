@@ -12,7 +12,8 @@ from matplotlib import pyplot as plt
 
 kuiperbelt = True
 # specificaties van kuiperbelt objecten kan je in sim = ST.simulation( .... ) vinden.
-planet9 = False
+planet9 = {'mass':15e-6, 'radius':1e-5, 'loanode':100/180*np.pi,'eccentricity':0.6,'smaxis':50,
+           'argperiapsis':140/180*np.pi,'orbital inclination':30/180*np.pi,'mean longitude':0}
 etnos = True
 
 
@@ -23,8 +24,8 @@ if etnos:
     etnos_file_name = 'etnos.json'
 
 sim = ST.simulation(file_name=file_name, etnos_file=etnos_file_name, kuiperbelt=kuiperbelt, etnos=etnos, hom_mode=True,
-                 total_mass=10000, r_res=5, range_min=40,
-                 range_max=100, planet9=planet9)
+                 total_mass=10000, r_res=5, range_min=31,
+                 range_max=49, planet9=planet9)
 
 
 omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
@@ -82,6 +83,6 @@ tekenen.PlotParamsVsTijd((e,I), solution.t, ('e','I'), alleen = '', planet9=plan
 #                           alleenplaneten=False, planet9=planet9, legend=False)
 # tekenen.ParamVsA(e,smallaxis,'e')
 
-# Writer = animation.writers['pillow']
+# Writer = animation.writers['ffmpeg']
 # writer = Writer(fps=100)
 # tekenen.anim.save('filmpje massa x1000.mp4',writer=writer)

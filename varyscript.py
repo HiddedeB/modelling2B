@@ -8,14 +8,17 @@ import Orbitdrawer as Od
 from matplotlib import animation
 from matplotlib import pyplot as plt
 import itertools as it
+from tqdm import tqdm
 from matplotlib import use
-use('Agg')
+#use('Agg')
 
 
 
 kuiperbelt = True
 # specificaties van kuiperbelt objecten kan je in sim = ST.simulation( .... ) vinden.
-planet9 = True
+
+planet9 = {'mass': 15e-6, 'radius': 1e-5, 'loanode': 100 / 180 * np.pi, 'eccentricity': 0.6, 'smaxis': 50,
+           'argperiapsis': 140 / 180 * np.pi, 'orbital inclination': 30 / 180 * np.pi, 'mean longitude': 0}
 varyplanet9mass = True
 etnos = True
 
@@ -33,12 +36,15 @@ sim = ST.simulation(file_name=file_name, etnos_file=etnos_file_name, kuiperbelt=
 msun = 1.989*10**30
 mearth = 5.972*10**24
 mplanet9 = mearth*10/msun
-eplanet9 = sim.planet9['eccentricity']
-aplanet9 = sim.planet9['smaxis']
-massvariation = np.linspace(mplanet9/10,mplanet9, 10)
-evariation = np.linspace(eplanet9 - 0.2, eplanet9 + 0.2, 3)
-avariation = np.linspace(aplanet9 - 50, aplanet9 + 50, 2)
-combinations = list(it.product(massvariation, evariation))#, avariation))
+eplanet9 = 0.6
+aplanet9 = 700
+# massvariation = np.linspace(mplanet9/10,mplanet9, 10)
+# evariation = np.linspace(eplanet9 - 0.2, eplanet9 + 0.2, 3)
+# avariation = np.linspace(aplanet9 - 50, aplanet9 + 50, 2)
+massvariation = np.linspace(mplanet9,mplanet9, 1)
+evariation = np.linspace(eplanet9, eplanet9, 1)
+avariation = np.linspace(50, aplanet9, 2)
+combinations = list(it.product(massvariation, evariation, avariation))
 
 # j = 0
 # for i in combinations:
@@ -46,10 +52,13 @@ combinations = list(it.product(massvariation, evariation))#, avariation))
 #     j+=1
 # print(j)
 k = 0
-for i in combinations:
-    sim.mass_vector[-1] = i[0]
-    sim.planet9['eccentricity'] = i[1]
-#    sim.planet9['smaxis'] = i[2]
+for i in tqdm(combinations):
+    planet9 = {'mass':i[0], 'radius':1e-5, 'loanode':100/180*np.pi,'eccentricity':i[1],'smaxis':i[2],
+               'argperiapsis':140/180*np.pi,'orbital inclination':30/180*np.pi,'mean longitude':0}
+    sim = ST.simulation(file_name=file_name, etnos_file=etnos_file_name, kuiperbelt=kuiperbelt, etnos=etnos,
+                        hom_mode=True,
+                        total_mass=10000, r_res=5, range_min=31,
+                        range_max=48, planet9=planet9)
     omega = np.array([sim.j['argperiapsis'], sim.s['argperiapsis'], sim.n['argperiapsis'], sim.u['argperiapsis']])
     big_omega = np.array([sim.j['loanode'], sim.s['loanode'], sim.n['loanode'], sim.u['loanode']])
     inclination = np.array([sim.j['orbital inclination'], sim.s['orbital inclination'], sim.n['orbital inclination'],
@@ -76,7 +85,7 @@ for i in combinations:
     initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
     if kuiperbelt or etnos:
         initial_conditionsk = np.vstack((eccentricityk, var_omegak, inclinationk, big_omegak))
-    t_eval = [0, 4*10**7]
+    t_eval = [0, 4*10**5]
     max_step = 2 * 10 ** 2
     form_of_ic = np.array([False, False])
     method = 'DOP853'
@@ -99,7 +108,8 @@ for i in combinations:
 
     tekenen = Od.visualisatie()
     # tekenen.animatieN(e, I, var_omega, big_omega, smallaxis, plot_range=[-700,700])
-    tekenen.PlotParamsVsTijd((e,I), solution.t, ('e','I'), alleen = 'objecten', planet9=planet9, paramset = (i[0],i[1],aplanet9), savefigure = True)
+    tekenen.PlotParamsVsTijd((e,I), solution.t, ('e','I'), alleen = 'objecten', planet9=planet9,
+                             paramset = (i[0],i[1],i[2]), savefigure = True, savepath='testingfigures/')
 
     # tekenen.PlotParamsVsTijd((e, I, var_omega, big_omega), solution.t, (r'$e$', r'$I$ (rad)',
     #                                                                     r'$\varpi$ (rad)',r'$\Omega$ (rad)'),
@@ -109,5 +119,4 @@ for i in combinations:
     # Writer = animation.writers['pillow']
     # writer = Writer(fps=100)
     # tekenen.anim.save('filmpje massa x1000.mp4',writer=writer)
-    k += 1
-    print(k)
+    print(i)

@@ -198,7 +198,8 @@ class visualisatie():
                                        frames=round(np.shape(e)[1]), interval=1, blit=False)
         #plt.show()
 
-    def PlotParamsVsTijd(self,param, tijd, paramname, alleen = '', planet9 = False, legend=True, savefigure = False, **kwargs):
+    def PlotParamsVsTijd(self,param, tijd, paramname, alleen = '', planet9 = False, legend=True, savefigure = False,
+                         savepath = 'plotjes/kuiperonly/kleinesimulatie/massavariatie/',  **kwargs):
         '''NOTE: a function to plot multiple parameters against time.
         :param param: tuple of parameters to plot. formatted as outputted by simulation.run()
         :type param: tuple
@@ -252,7 +253,7 @@ class visualisatie():
             if savefigure == True and 'paramset' in kwargs:
                 paramset = kwargs.get("paramset")
                 self.figureT.suptitle('mass: {:.2E}, eccentricity: {:.2f}, a: {}'.format(paramset[0], paramset[1], paramset[2]))
-                plt.savefig('plotjes/combi/mass{:.2E}eccentricity{:.2f}a{}.png'.format(paramset[0], paramset[1], paramset[2]))
+                plt.savefig(savepath+'mass{:.2E}eccentricity{:.2f}a{}.png'.format(paramset[0], paramset[1], paramset[2]))
                 plt.close()
         elif alleen == 'planeten':
 
@@ -302,7 +303,7 @@ class visualisatie():
             if savefigure == True and 'paramset' in kwargs:
                 paramset = kwargs.get("paramset")
                 plt.suptitle('mass: {:.2E}, eccentricity: {:.2f}, a: {}'.format(paramset[0], paramset[1], paramset[2]))
-                plt.savefig('plotjes/kuiperonly/kleinesimulatie/massavariatie/mass{:.2E}eccentricity{:.2f}a{}.png'.format(paramset[0], paramset[1], paramset[2]))
+                plt.savefig(savepath+'mass{:.2E}eccentricity{:.2f}a{}.png'.format(paramset[0], paramset[1], paramset[2]))
                 plt.close()
 
     # def PlotParamsVsTijdKuiper(self,param, tijd, paramname, alleenplaneten = False, planet9 = False, legend=True, paramset = (0,0,0)):
