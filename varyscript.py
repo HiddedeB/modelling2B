@@ -85,7 +85,7 @@ for i in tqdm(combinations):
     initial_conditions = np.vstack((eccentricity, var_omega, inclination, big_omega))
     if kuiperbelt or etnos:
         initial_conditionsk = np.vstack((eccentricityk, var_omegak, inclinationk, big_omegak))
-    t_eval = [0, 4*10**5]
+    t_eval = [0, 4*10**7]
     max_step = 2 * 10 ** 2
     form_of_ic = np.array([False, False])
     method = 'DOP853'
