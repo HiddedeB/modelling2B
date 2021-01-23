@@ -1,3 +1,5 @@
 2.29271736 value for two suns
 starting speed -1e4 in x direction
 starting speed earth_speed in y direction
+
+https://www.youtube.com/watch?v=dQw4w9WgXcQ
